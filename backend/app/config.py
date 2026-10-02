@@ -28,4 +28,7 @@ DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{BASE_DIR / 'paseo.db'}")
 ZONA_HORARIA = ZoneInfo("America/La_Paz")
 
 CORS_ORIGINS = [o.strip() for o in os.getenv("CORS_ORIGINS", "*").split(",") if o.strip()]
+# Carpeta del frontend que el backend sirve en "/" si existe. Vacío = no servir frontend (solo API).
+_frontend = os.getenv("FRONTEND_DIR", str(BASE_DIR.parent / "frontend")).strip()
+FRONTEND_DIR = Path(_frontend) if _frontend else None
 ADMIN_TOKEN = os.getenv("ADMIN_TOKEN", "")

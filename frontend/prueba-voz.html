@@ -26,6 +26,7 @@
   .meta { color: var(--tenue); font-size: .8rem; margin-top: 4px; }
   #estado { color: var(--tenue); min-height: 1.2em; }
 </style>
+<script src="config.js"></script>
 </head>
 <body>
 <main>
@@ -56,6 +57,7 @@
 </main>
 
 <script>
+const API = window.PASEITO_API;
 const $ = (id) => document.getElementById(id);
 let sessionId = null;
 let audioActual = null;
@@ -116,7 +118,7 @@ function dividirFrases(texto) {
 }
 
 async function pedirAudio(texto) {
-  const r = await fetch("/voz", {
+  const r = await fetch(`${API}/voz`, {
     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ texto }),
   });
   if (!r.ok) throw new Error((await r.json()).detail || r.status);
@@ -179,7 +181,7 @@ async function preguntar(texto) {
   estado("Paseito está pensando…");
   const t0 = performance.now();
   try {
-    const r = await fetch("/chat", {
+    const r = await fetch(`${API}/chat`, {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ mensaje: texto, session_id: sessionId }),
     });
@@ -202,7 +204,7 @@ async function preguntar(texto) {
 $("enviar").onclick = () => { preguntar($("texto").value); $("texto").value = ""; };
 $("texto").onkeydown = (e) => { if (e.key === "Enter") $("enviar").click(); };
 $("reiniciar").onclick = async () => {
-  if (sessionId) await fetch(`/chat/${sessionId}`, { method: "DELETE" });
+  if (sessionId) await fetch(`${API}/chat/${sessionId}`, { method: "DELETE" });
   sessionId = null;
   $("conversacion").innerHTML = "";
   estado("Conversación nueva");

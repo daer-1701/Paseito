@@ -4,7 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Paseito · Paseo Aranjuez</title>
-<script type="importmap">{ "imports": { "three": "/static/vendor/three/three.module.js" } }</script>
+<script type="importmap">{ "imports": { "three": "./vendor/three/three.module.js" } }</script>
+<script src="config.js"></script>
 <style>
   :root {
     --vino: #7a1f3d; --vino-oscuro: #4a1026; --oro: #e7b73a; --oro-claro: #ffd977; --crema: #fffaf0;
@@ -241,6 +242,7 @@ const PISOS = [
   ["1", "Primer piso"], ["PB", "Planta baja"], ["S", "Semisótanos"],
 ];
 const INACTIVIDAD_MS = 90_000;
+const API = window.PASEITO_API;
 
 const $ = (id) => document.getElementById(id);
 let avatar;
@@ -252,12 +254,12 @@ let enBienvenida = true;
 
 // ---------- Avatar: 3D si hay WebGL, si no el 2D ----------
 try {
-  const { Avatar3D } = await import("/static/avatar3d.js");
+  const { Avatar3D } = await import("./js/avatar3d.js");
   avatar = new Avatar3D($("escena3d"));
   document.body.classList.add("modo-3d");
 } catch (error) {
   console.warn("Sin WebGL; uso el avatar 2D", error);
-  const { Avatar } = await import("/static/avatar.js");
+  const { Avatar } = await import("./js/avatar.js");
   avatar = new Avatar($("avatar2d"));
   document.body.classList.add("modo-2d");
 }
@@ -439,7 +441,7 @@ function pensando() {
 
 // ---------- Voz ----------
 async function pedirAudio(texto) {
-  const r = await fetch("/voz", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ texto }) });
+  const r = await fetch(`${API}/voz`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ texto }) });
   if (!r.ok) throw new Error(r.status);
   return URL.createObjectURL(await r.blob());
 }
@@ -498,7 +500,7 @@ async function preguntar(texto) {
   estado("Pensando…", "pensando");
   avatar.gesto("pensar");
   try {
-    const r = await fetch("/chat", {
+    const r = await fetch(`${API}/chat`, {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ mensaje: texto, session_id: sessionId }),
     });
@@ -523,7 +525,7 @@ $("texto").onkeydown = (e) => { if (e.key === "Enter") $("enviar").click(); };
 
 async function reiniciar() {
   callar();
-  if (sessionId) fetch(`/chat/${sessionId}`, { method: "DELETE" }).catch(() => {});
+  if (sessionId) fetch(`${API}/chat/${sessionId}`, { method: "DELETE" }).catch(() => {});
   sessionId = null;
   $("tarjetas").innerHTML = "";
   cuentasPisos = {};
@@ -637,7 +639,7 @@ async function transcribir(trozos, tipo, ctx) {
   estado("Entendiendo…", "pensando");
   try {
     const wav = await aWav(new Blob(trozos, { type: tipo }), ctx);
-    const r = await fetch("/voz/escuchar", { method: "POST", headers: { "Content-Type": "audio/wav" }, body: wav });
+    const r = await fetch(`${API}/voz/escuchar`, { method: "POST", headers: { "Content-Type": "audio/wav" }, body: wav });
     const datos = await r.json();
     if (!r.ok) throw new Error(datos.detail || r.status);
     if (!datos.texto) { estado(""); aviso("No te entendí, ¿puedes repetirlo?"); return; }
