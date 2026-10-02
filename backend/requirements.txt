@@ -4,3 +4,4 @@ sqlmodel>=0.0.47
 google-genai>=2.27
 python-dotenv>=1.0
 tzdata>=2024.1
+edge-tts>=7.2
