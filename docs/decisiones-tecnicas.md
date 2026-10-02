@@ -13,7 +13,7 @@ navegador, USD 10 iniciales para la API de OpenAI y datos preparados por el equi
 | Datos e identidad | Un proyecto Supabase: PostgreSQL + Auth | Catálogo, pedidos y puntos consultables desde un mismo lugar con reglas de acceso. |
 | Búsqueda inicial | PostgreSQL Full Text Search sobre negocios, productos, promociones, eventos y FAQ | El catálogo de la demo será pequeño y cambia con frecuencia. |
 | Modelo de texto | OpenAI GPT-6 Luna mediante Responses API | Costo bajo para respuestas breves basadas en datos recuperados; `reasoning.effort=none` evita gastar tokens de razonamiento en el MVP. |
-| Voz | GPT-Live sobre WebRTC, después de integrar el texto | Conversación natural en navegador; el servidor conserva la clave y delega las consultas de datos a Jarvis. |
+| Voz | Whisper local para transcribir + Piper local para hablar | Reduce el consumo de la API y reutiliza `/chat`; la primera versión funciona por turnos. |
 | Despliegue | Vercel para web y FastAPI como proyectos separados del mismo Git; Supabase para datos | Evita depender del disco local de una función. Mantener también una demo local preparada. |
 
 La elección de Next.js depende de que el equipo frontend ya sepa React. Si
@@ -67,19 +67,16 @@ del proyecto al modelo con una llamada real antes de la demo.
 [precios](https://developers.openai.com/api/docs/pricing),
 [lista de despliegue](https://developers.openai.com/api/docs/guides/deployment-checklist).
 
-GPT-Live cuesta USD 0,05 por minuto de sesión, además de las consultas que
-delegue al backend. Como referencia, USD 6 alcanzarían para 120 minutos de
-sesión **si no hubiera otros cargos**; reservar los otros USD 4 para texto,
-integración y pruebas deja margen, pero no garantiza una duración exacta.
-Iniciar WebRTC solo cuando el visitante pulse el micrófono, cerrar conexiones
-inactivas y observar el uso en el panel de OpenAI. El backend debe crear la
-sesión de voz y conservar la clave; las consultas de catálogo pasan por la
-misma lógica de Jarvis. Para llegar al domingo, primero probar texto y la
-integración de fuentes; después añadir la voz.
-[GPT-Live y costos](https://developers.openai.com/api/docs/pricing),
-[arquitecturas de voz](https://developers.openai.com/api/docs/guides/voice-agents),
-[WebRTC](https://developers.openai.com/api/docs/guides/voice-webrtc),
-[delegación](https://developers.openai.com/api/docs/guides/live-delegation).
+La voz elegida es local. El navegador graba una frase, `whisper-cli` la
+transcribe en español, Jarvis consulta sus datos y OpenAI produce el texto; un
+modelo Piper genera la respuesta hablada. Esto evita facturar sesiones de voz
+en OpenAI. En el Mac de desarrollo ya están descargados los modelos y existe
+una página de prueba en el backend. El backend ya acepta eventos de mirada
+sostenida sobre una ficha mediante `/stimulus/gaze`; falta conectar el
+dispositivo y su UI. La conversación simultánea requiere medir latencia antes
+de integrarse a la demo.
+[whisper.cpp](https://github.com/ggml-org/whisper.cpp),
+[Piper](https://github.com/OHF-Voice/piper1-gpl).
 
 ## Despliegue y orden de entrega
 
@@ -94,11 +91,9 @@ o USD 0,05/hora. En ambos casos, usar Supabase para persistir datos.
 [Render Free](https://render.com/docs/free),
 [Render pricing](https://render.com/pricing).
 
-La secuencia de entrega es texto → fuentes e integración → voz. La voz debe
-llamar la misma lógica de consultas de Jarvis. Una ruta de respaldo de pulsar
-para hablar puede usar transcripción → `/chat` → síntesis si Live falla;
-OpenAI documenta esta arquitectura por etapas para controlar cada paso.
-[Voice agents](https://developers.openai.com/api/docs/guides/voice-agents).
+La secuencia de entrega es texto → fuentes e integración → voz por turnos.
+La voz llama la misma lógica de consultas de Jarvis. Medir transcripción,
+respuesta y síntesis con el hardware que se llevará a la presentación.
 
 ## Cambios necesarios al prototipo actual
 
@@ -112,8 +107,8 @@ web compartida:
    identidad del visitante, no se agregan al índice público.
 3. Sustituir la búsqueda lineal local por consultas de PostgreSQL. Mantener
    `source_id`, `updated_at`, `starts_at` y `ends_at` en las respuestas.
-4. Verificar una llamada real de OpenAI con la clave del servidor, y luego unir
-   la interfaz de voz a `/chat` o a funciones de lectura equivalentes.
+4. Verificar una llamada real de OpenAI con la clave del servidor y probar la
+   página de voz local con el catálogo definitivo.
 
 FastAPI genera documentación OpenAPI y valida modelos con Pydantic. Supabase
 recomienda Row Level Security para controlar el acceso de las aplicaciones a

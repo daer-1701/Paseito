@@ -71,7 +71,8 @@ def llm_answer(message: str, records: list[dict], history: list[dict]) -> str | 
         return None
 
 
-def chat(db, message: str, session_id: str | None = None) -> dict:
+def chat(db, message: str, session_id: str | None = None,
+         records_override: list[dict] | None = None) -> dict:
     if not isinstance(message, str) or not message.strip() or len(message) > 2000:
         raise ValueError("message must contain 1 to 2000 characters")
     session_id = session_id or str(uuid4())
@@ -93,7 +94,7 @@ def chat(db, message: str, session_id: str | None = None) -> dict:
     else:
         # Short follow-up questions reuse the user's preceding topic.
         query = message + (" " + previous_user if previous_user and len(message.split()) <= 6 else "")
-        records = search(db, query)
+        records = records_override if records_override is not None else search(db, query)
         answer = llm_answer(message, records, history) if records else None
         result = {"session_id": session_id, "intent": mode,
                   "answer": answer or local_answer(records),

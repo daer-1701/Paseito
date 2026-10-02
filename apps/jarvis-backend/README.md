@@ -14,10 +14,50 @@ export JARVIS_INGEST_TOKEN="secreto-local-para-la-demo"
 python3 -m jarvis.api
 ```
 
-Servidor: `http://localhost:8000`. Solo usa la biblioteca estándar de Python
-3.9 o superior. `JARVIS_DB` permite cambiar la ruta de SQLite. La semilla
+Abrir `http://localhost:8000` para usar la página funcional de chat. El backend
+de texto solo usa la biblioteca estándar de Python 3.9 o superior. `JARVIS_DB`
+permite cambiar la ruta de SQLite. La semilla
 incluida está marcada como **datos de demostración**; reemplácenla por datos
 confirmados antes de presentarlos como información real.
+La página integrada comparte origen con la API. Si otro frontend consume el
+backend desde un dominio distinto, establecer `JARVIS_CORS_ORIGIN` con ese
+origen exacto; no se habilita CORS abierto por defecto.
+
+## Voz local
+
+La página ofrece grabación de hasta 12 segundos con botón. Envía WAV mono de
+16 kHz a `POST /voice/transcribe`, consulta `/chat` y pide el audio de respuesta
+a `POST /voice/synthesize`. `GET /voice/status` indica qué adaptadores están
+disponibles. El micrófono del navegador requiere `localhost` o HTTPS.
+
+En este Mac ya están instalados `whisper-cli`, el modelo multilingüe `base` y
+una voz Piper `es_MX-ald-medium`. Los modelos están en `models/` (ignorado por
+Git); para arrancar todo, usa el entorno virtual local:
+
+```bash
+cd apps/jarvis-backend
+.venv/bin/python -m jarvis.seed
+.venv/bin/python -m jarvis.api
+```
+
+En otra máquina, instalar `whisper-cli`, crear un entorno virtual, instalar
+Piper y descargar los modelos. En macOS con Homebrew:
+
+```bash
+brew install whisper-cpp
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements-voice.txt
+mkdir -p models
+curl --fail --location -o models/ggml-base.bin https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.bin
+.venv/bin/python -m piper.download_voices --download-dir models es_MX-ald-medium
+```
+
+Si los modelos viven en otra ruta, configurar `JARVIS_WHISPER_MODEL` y
+`JARVIS_PIPER_MODEL`. Se puede cambiar `JARVIS_WHISPER_BIN`. El reconocimiento
+usa CPU por defecto para mayor compatibilidad; `JARVIS_WHISPER_GPU=1` habilita
+la GPU si el equipo la soporta. En macOS, si falta Piper, se usa la voz del
+sistema; en otros equipos el navegador puede leer la respuesta. El chat de
+texto sigue disponible aunque falte la voz.
 
 ## API
 
@@ -56,6 +96,22 @@ Requiere `Authorization: Bearer <JARVIS_INGEST_TOKEN>`. Inserta o actualiza por
 verifica el servicio. Sin `JARVIS_INGEST_TOKEN`, los endpoints de administración
 devuelven 401. Las promociones deben incluir `expires_at`.
 
+### `POST /stimulus/gaze` (integración opcional)
+
+El frontend del eye tracker envía **un evento de mirada sostenida sobre una
+ficha**, no video ni coordenadas. El `target_id` es el `id` de un registro
+público ya mostrado al visitante. El backend exige al menos 900 ms de mirada y
+aplica 12 segundos de espera por objetivo y sesión para evitar respuestas
+repetidas y gasto accidental.
+
+```json
+{"session_id":"demo-1", "target_id":"venue:demo-cafe", "dwell_ms":1000}
+```
+
+La respuesta tiene `triggered: false` y un motivo, o `triggered: true` y el
+objeto `chat` de Jarvis. El dispositivo y la UI de mirada todavía deben
+conectarse; este endpoint permite integrarlos sin cambiar el agente.
+
 ## Integración con el equipo
 
 - **PaseoYa**: enviará `venue`, `product` y `promotion` al endpoint de ingesta
@@ -65,8 +121,7 @@ devuelven 401. Las promociones deben incluir `expires_at`.
 - **Paseo Points**: consultar saldo y canjes mediante una API autenticada en
   tiempo real. Los saldos personales nunca se indexan en el RAG compartido.
 - **Frontend/voz**: ambos consumen `/chat`. El frontend puede convertir voz a
-  texto y leer `answer` con TTS; una conexión de voz en tiempo real se puede
-  añadir sin duplicar la lógica de búsqueda.
+  texto y leer `answer` con TTS; la página integrada muestra este recorrido.
 
 ## Proveedor de LLM
 
@@ -82,10 +137,8 @@ export OPENAI_API_KEY="tu-clave-local"
 python3 -m jarvis.api
 ```
 
-La ruta de voz todavía no está implementada. La primera integración del
-frontend puede enviar texto transcrito a `/chat`; después se puede conectar
-GPT-Live con WebRTC y delegar las consultas a este backend. Cerrar sesiones de
-voz inactivas para controlar el gasto.
+La voz local funciona por turnos: pulsar, hablar, detener y escuchar. Esto
+permite una demo confiable antes de implementar conversación simultánea.
 
 ## Límites deliberados del MVP
 

@@ -30,6 +30,10 @@ export JARVIS_INGEST_TOKEN="un-secreto-para-la-demo"
 python3 -m jarvis.api
 ```
 
+Abrir `http://localhost:8000` para probar el chat y la voz local. Consulta el
+[README de Jarvis](apps/jarvis-backend/README.md) para preparar Whisper y Piper
+en otra máquina.
+
 Consulta el README de cada aplicación para sus detalles. El repositorio no fija
 un lenguaje ni framework común a las tres aplicaciones; cada equipo puede
 escogerlos y compartir únicamente los contratos de integración.

@@ -6,6 +6,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from jarvis.agent import chat, llm_answer
+from jarvis.stimulus import gaze
 from jarvis.store import connect, search, upsert, delete
 
 
@@ -88,6 +89,16 @@ class JarvisTests(unittest.TestCase):
         self.assertEqual(request.get_header("Authorization"), "Bearer test-key")
         self.assertEqual(json.loads(request.data)["store"], False)
         self.assertEqual(timeout, 12)
+
+    def test_gaze_activates_once_after_sustained_dwell(self):
+        upsert(self.db, self.record())
+        upsert(self.db, self.record(id="venue:other-cafe", title="Café Sur"))
+        self.assertEqual(gaze(self.db, "gaze-demo", "venue:cafe", 500)["reason"], "dwell_too_short")
+        activated = gaze(self.db, "gaze-demo", "venue:cafe", 1000)
+        self.assertTrue(activated["triggered"])
+        self.assertEqual(activated["chat"]["sources"][0]["id"], "venue:cafe")
+        self.assertEqual(len(activated["chat"]["sources"]), 1)
+        self.assertEqual(gaze(self.db, "gaze-demo", "venue:cafe", 1000)["reason"], "cooldown")
 
 
 if __name__ == "__main__":
