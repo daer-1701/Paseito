@@ -8,7 +8,9 @@ import urllib.request
 from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 
+from .context import opening_status
 from .store import search
+from .weather import current_weather
 
 
 FALLBACK = "No tengo información confirmada para responder eso. Puedo ayudarte a buscar negocios, productos, promociones o eventos del Paseo."
@@ -22,6 +24,10 @@ def intent(message: str) -> str:
         return "loyalty"
     if words & {"pedido", "orden", "retiro"}:
         return "order"
+    if words & {"clima", "tiempo", "lluvia", "llueve", "temperatura"}:
+        return "weather"
+    if words & {"abierto", "abierta", "cerrado", "cerrada", "horario", "abre", "cierra"}:
+        return "hours"
     if words & {"producto", "comprar", "precio", "stock", "disponibilidad"}:
         return "product_search"
     if words & {"evento", "actividad", "concierto", "feria"}:
@@ -106,6 +112,19 @@ def chat(db, message: str, session_id: str | None = None,
         result = {"session_id": session_id, "intent": mode,
                 "answer": "Para consultar un pedido necesito conectarme a PaseoYa con tu sesión autenticada. Mientras tanto puedo ayudarte a encontrar productos o negocios.",
                 "sources": [], "suggestions": [], "grounded": True, "answer_mode": STRICT_RESPONSE_MODE}
+    elif mode == "hours":
+        context = opening_status()
+        result = {"session_id": session_id, "intent": mode, **context, "suggestions": [],
+                  "grounded": True, "answer_mode": STRICT_RESPONSE_MODE}
+    elif mode == "weather":
+        try:
+            context = current_weather()
+            result = {"session_id": session_id, "intent": mode, **context, "suggestions": [],
+                      "grounded": True, "answer_mode": STRICT_RESPONSE_MODE}
+        except RuntimeError:
+            result = {"session_id": session_id, "intent": mode,
+                      "answer": "No puedo confirmar el clima actual en este momento.", "sources": [],
+                      "suggestions": [], "grounded": True, "answer_mode": STRICT_RESPONSE_MODE}
     else:
         # Short follow-up questions reuse the user's preceding topic.
         query = message + (" " + previous_user if previous_user and len(message.split()) <= 6 else "")

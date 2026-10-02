@@ -68,6 +68,24 @@ class JarvisTests(unittest.TestCase):
         self.assertEqual(result["intent"], "loyalty")
         self.assertEqual(result["sources"], [])
 
+    def test_open_now_uses_published_area_schedule(self):
+        result = chat(self.db, "¿Qué está abierto ahora?")
+        self.assertEqual(result["intent"], "hours")
+        self.assertEqual(len(result["sources"]), 3)
+        self.assertTrue(all(source["source_url"].startswith("https://paseoaranjuez.com")
+                            for source in result["sources"]))
+        self.assertIn("Cochabamba", result["answer"])
+
+    def test_weather_is_sourced_and_never_uses_llm(self):
+        weather = {"answer": "En Cochabamba hay cielo despejado, 22 °C y sensación de 21 °C.",
+                   "sources": [{"id": "weather:cochabamba", "kind": "faq", "title": "Clima actual de Cochabamba",
+                                "attributes": {}, "source_url": "https://api.open-meteo.com/example", "updated_at": self.now.isoformat()}]}
+        with patch("jarvis.agent.current_weather", return_value=weather), patch("jarvis.agent.llm_answer") as synthesis:
+            result = chat(self.db, "¿Cómo está el clima?")
+        synthesis.assert_not_called()
+        self.assertEqual(result["intent"], "weather")
+        self.assertEqual(result["sources"][0]["id"], "weather:cochabamba")
+
     def test_answer_includes_source_and_location(self):
         upsert(self.db, self.record())
         result = chat(self.db, "¿Dónde hay café?")

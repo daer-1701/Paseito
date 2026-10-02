@@ -122,6 +122,14 @@ Requiere `Authorization: Bearer <JARVIS_INGEST_TOKEN>`. Inserta o actualiza por
 verifica el servicio. Sin `JARVIS_INGEST_TOKEN`, los endpoints de administración
 devuelven 401. Las promociones deben incluir `expires_at`.
 
+### Contexto en vivo
+
+`¿Qué está abierto ahora?` responde con el horario publicado para las áreas
+generales del Paseo, Mercado Gastronómico y El Cuarto. No afirma que un local
+particular esté abierto sin su propio horario confirmado. `¿Cómo está el clima?`
+consulta el clima actual de Cochabamba en Open-Meteo, guarda el resultado por
+10 minutos en memoria y adjunta la fuente a la respuesta.
+
 ### `POST /stimulus/gaze` (integración opcional)
 
 El frontend del eye tracker envía **un evento de mirada sostenida sobre una
