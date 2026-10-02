@@ -14,7 +14,9 @@ siguen siendo propuestas, no capacidades desplegadas.
 Jarvis debe pasar de ser un directorio que responde preguntas a ser el conserje
 digital del Paseo: guía a una persona a un negocio, responde sólo con
 información verificable, acompaña con voz y mantiene la conversación al escanear
-un QR desde el teléfono.
+un QR desde el teléfono. Como primer estímulo interactivo, puede saludar una vez
+cuando detecta que alguien dirige la mirada hacia el kiosco; esa señal sólo
+activa el saludo y no personaliza la conversación.
 
 La diferencia visible para un visitante sería:
 
@@ -211,41 +213,36 @@ que la visita termina más rápido y con menos pasos.
 
 ### Decisión provisional sobre eye tracking
 
-**No convertirlo todavía en la función principal ni comprar hardware dedicado.**
-De momento, Jarvis ya puede recibir el evento opcional `stimulus/gaze`, pero no
-hay un eye tracker conectado ni evidencia de que se necesite para ayudar al
-visitante.
+**Alcance confirmado:** eye tracking sólo activa un saludo breve de bienvenida.
+No recomienda contenido por mirada, no infiere interés o emoción y no controla
+acciones. Jarvis ya puede recibir el evento opcional `stimulus/gaze`, pero todavía
+no hay un sensor conectado. Probar primero en un kiosco y decidir el sensor a
+partir de si detecta de forma fiable que una persona mira la pantalla.
 
-Hacer primero un prototipo opcional en un solo kiosco, sólo si hay un resultado
-concreto que probar: por ejemplo, ofrecer ayuda cuando una persona mantiene la
-mirada sobre una tarjeta de ruta y no interactúa. El prototipo debe:
+Comportamiento a validar:
 
-1. Probar mirada **sobre la pantalla** con usuarios voluntarios y calibración
-   breve, incluyendo lentes, estaturas, iluminación y distancia variadas.
-2. Medir falsos disparos, ayudas útiles y tareas completadas; una mirada sólo
-   puede resaltar u ofrecer ayuda. Nunca inicia compras, canjes, pago ni comparte
-   información personal.
-3. Comparar con control táctil/voz y con presencia simple; no asumir que “miró”
-   significa interés o intención de compra.
-4. Procesar cuadros en memoria en el borde, descartar imagen inmediatamente,
-   guardar únicamente contadores agregados con umbral mínimo, publicar aviso y
-   ofrecer un interruptor para desactivar la cámara.
-5. Mantener la experiencia completamente funcional sin cámara. Si falla la
-   calibración, no se detecta a la persona o hay duda, no mostrar ayuda basada en
-   la mirada.
+1. El sensor identifica localmente una mirada dirigida al área del kiosco durante
+   un breve umbral estable (el endpoint actual exige 900 ms como mínimo).
+2. Jarvis dice una sola vez: “Hola, bienvenido al Paseo Aranjuez. ¿En qué te
+   puedo ayudar?”; no continúa hablando hasta que la persona pregunte.
+3. Un temporizador evita repetir el saludo mientras la misma sesión está activa;
+   el kiosco vuelve al estado de bienvenida al quedar inactivo.
+4. Si no hay mirada fiable, la persona lleva lentes, pasa caminando o el sensor
+   no puede decidir, Jarvis se queda en silencio. El botón táctil y el micrófono
+   siguen disponibles como siempre.
+5. El procesamiento ocurre en el dispositivo; se descartan los cuadros de
+   inmediato. No se guarda video, imagen facial, vector de mirada ni identidad.
+   Mostrar señalización clara sobre la activación y permitir silenciar la voz.
+6. Probar falsas activaciones, saludos perdidos, molestias y respuesta a lentes,
+   diferentes estaturas, distancias e iluminación del Paseo.
 
-Antes de elegir sensor o técnica falta cerrar: **¿queremos ayudar a quien no sabe
-por dónde empezar, o medir qué elementos atraen atención?** Son productos
-distintos. Para el primero basta validar una señal de mirada y preferencia con
-usuarios, tal vez empezando por un botón “ayúdame a elegir”. Para el segundo se
-necesita un estudio de investigación con consentimiento y método de gaze
-mapping. No inferir edad, emoción, identidad o intención de compra a partir de
-los ojos.
-
-La recomendación para cerrar hoy es comenzar sin cámara: pantalla táctil, botón
-claro para pedir ayuda y voz optativa. Si las observaciones de uso muestran una
-fricción que eso no resuelve, evaluar gaze en un experimento voluntario; no
-construir el producto alrededor de la cámara antes de demostrar necesidad.
+No hace falta eye tracking de precisión ocular si un sensor local más simple
+detecta de forma suficiente que una persona está frente a la pantalla y mira
+hacia ella. Comparar mirada de pantalla con presencia/orientación frontal para
+elegir lo más fiable y menos invasivo. La mirada sólo dispara el saludo; no
+significa que haya interés, intención de compra ni permiso para personalizar.
+Mantener la cámara apagada hasta aprobar el prototipo y la señalización con la
+administración.
 
 ## 10. Decisiones que faltan cerrar para el primer piloto
 
@@ -254,7 +251,7 @@ construir el producto alrededor de la cámara antes de demostrar necesidad.
 | Visitante y tareas principales | Elegir tres: encontrar un local, decidir dónde comer y saber si está abierto. Priorizar familias, visitantes nuevos y quienes requieren ruta accesible. | Equipo de producto + atención al cliente |
 | Fuente de verdad y actualización | Una persona de administración aprueba locales, ubicación, horarios, eventos y promociones; cada dato publicado debe tener vencimiento y canal de corrección rápida. | Administración del Paseo + comercios |
 | Mapa que hace posible la guía | Crear un mapa por piso con nodos/rutas y comprobar físicamente ascensores, escaleras y accesibilidad; no inventar instrucciones usando sólo el número de piso. | Administración + equipo Jarvis |
-| Uso de cámara/eye tracker | Excluir del primer piloto. Decidir sólo después de entrevistar y observar usuarios voluntarios frente a botones, tacto y voz. | Producto + responsable de privacidad |
+| Uso de cámara/eye tracker | Un único caso: saludo por mirada dirigida al kiosco. Prototipo apagado por defecto; validar falsos positivos, lentes y señalización antes de prueba pública. Sin biometría ni grabación. | Producto + administración |
 | Idioma y reconocimiento | Verificar español boliviano, nombres de tiendas, ruido y micrófonos reales. Definir si otro idioma es necesario para usuarios del Paseo. | Equipo Jarvis + administración |
 | Handoff y conversión | Acordar URLs/IDs estables de local, caducidad del QR y flujo PaseoYa/Points. Identidad, pago y canje se continúan en el móvil autenticado. | Responsables de Jarvis, PaseoYa y Points |
 | Éxito del piloto | Medir contra directorio/cartelería actual: tiempo para completar tareas, tasa de éxito, errores de ruta y consultas que terminan en personal. Acordar umbrales antes de presentar resultados. | Equipo + administración |
@@ -404,8 +401,9 @@ un canal de pagos.
 7. **Escala:** instalar el primer kiosco Raspberry con watchdog, HTTPS y métricas;
    crecer a más kioscos sólo después de resolver correcciones de catálogo y
    responsable de soporte.
-8. **Eye tracking:** prototipo opt-in como experimento, después de demostrar que
-   tacto y voz no resuelven ya la tarea y definir un criterio para apagarlo.
+8. **Eye tracking:** probar únicamente el saludo de bienvenida en un kiosco;
+   conservarlo si la detección es fiable y los visitantes lo perciben como útil,
+   y apagarlo si interrumpe, saluda a transeúntes o falla con frecuencia.
 
 ## 15. Referencias técnicas y ejemplos
 
