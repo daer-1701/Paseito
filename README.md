@@ -33,3 +33,6 @@ python3 -m jarvis.api
 Consulta el README de cada aplicación para sus detalles. El repositorio no fija
 un lenguaje ni framework común a las tres aplicaciones; cada equipo puede
 escogerlos y compartir únicamente los contratos de integración.
+
+La [recomendación técnica](docs/decisiones-tecnicas.md) propone un stack y los
+acuerdos de datos que el equipo debe cerrar antes de integrar la demo.
