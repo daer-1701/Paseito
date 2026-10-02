@@ -43,3 +43,6 @@ acuerdos de datos que el equipo debe cerrar antes de integrar la demo.
 La [propuesta de Jarvis presencial](docs/propuesta-jarvis-presencial.md) describe
 la experiencia, el servidor central, las garantías sobre fuentes y la
 demostración para el jurado.
+El [plan de implementación futura](docs/implementacion-futura-jarvis.md) define
+la transición hacia kioscos Raspberry Pi, un servidor central, voz local y el
+uso posterior de Vercel y AWS.
