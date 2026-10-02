@@ -69,6 +69,22 @@ la GPU si el equipo la soporta. En macOS, si falta Piper, se usa la voz del
 sistema; en otros equipos el navegador puede leer la respuesta. El chat de
 texto sigue disponible aunque falte la voz.
 
+### Voz natural con OpenAI
+
+Piper es el respaldo local predeterminado. Para una voz más natural durante la
+demo, configurar estas variables **en la terminal del servidor** y reiniciar:
+
+```bash
+export JARVIS_TTS_PROVIDER=openai
+export JARVIS_OPENAI_TTS_VOICE=marin
+.venv/bin/python -m jarvis.api
+```
+
+El endpoint usa `gpt-4o-mini-tts`, genera WAV y aplica una instrucción de voz
+latinoamericana cálida. Si OpenAI falla, vuelve automáticamente a Piper. Usar
+`JARVIS_TTS_STRICT_OPENAI=1` únicamente si prefieren mostrar el error en vez
+del respaldo. `GET /voice/status` informa el proveedor activo.
+
 ## API
 
 ### `POST /chat`
