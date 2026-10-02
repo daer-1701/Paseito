@@ -1,15 +1,14 @@
 import logging
 from contextlib import asynccontextmanager
-from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from sqlmodel import Session
 
 from . import agente
-from .config import CORS_ORIGINS, GEMINI_MODEL
+from .config import CORS_ORIGINS, FRONTEND_DIR, GEMINI_MODEL
 from .db import crear_tablas, engine
 from .rutas import admin, analitica, catalogo, chat, voz
 from .seed import sembrar
@@ -53,15 +52,17 @@ def salud():
     return {"ok": True, "modelo": GEMINI_MODEL, "ia_configurada": agente.ia_configurada()}
 
 
-ESTATICOS = Path(__file__).parent / "static"
-app.mount("/static", StaticFiles(directory=ESTATICOS), name="static")
-
-
 @app.get("/kiosco", include_in_schema=False)
 def kiosco():
-    return FileResponse(ESTATICOS / "kiosco.html")
+    return RedirectResponse("/")
 
 
 @app.get("/prueba-voz", include_in_schema=False)
 def prueba_voz():
-    return FileResponse(ESTATICOS / "prueba-voz.html")
+    return RedirectResponse("/prueba-voz.html")
+
+
+# Comodidad para desarrollo y para el kiosco: si el frontend está al lado, se sirve en la raíz.
+# Va al final para que las rutas de la API tengan prioridad.
+if FRONTEND_DIR and FRONTEND_DIR.is_dir():
+    app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")
