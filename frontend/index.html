@@ -233,6 +233,7 @@
 
 <script type="module">
 const SALUDO = "¡Hola! Soy Paseito, tu asistente del Paseo Aranjuez. ¿En qué te puedo ayudar hoy?";
+const DESPEDIDA = "¡Gracias por tu visita! Vuelve pronto al Paseo Aranjuez.";
 const SUGERENCIAS = [
   ["🍽️", "¿Dónde puedo comer?"], ["☕", "Quiero tomar un café"], ["🎁", "Busco un regalo"],
   ["🅿️", "¿Dónde estaciono?"], ["📅", "¿Qué eventos hay hoy?"], ["🕒", "¿Qué está abierto ahora?"],
@@ -255,7 +256,7 @@ let enBienvenida = true;
 // ---------- Avatar: 3D si hay WebGL, si no el 2D ----------
 try {
   const { Avatar3D } = await import("./js/avatar3d.js");
-  avatar = new Avatar3D($("escena3d"));
+  avatar = new Avatar3D($("escena3d"), { calidadAdaptativa: new URLSearchParams(location.search).get("calidad") !== "fija" });
   document.body.classList.add("modo-3d");
 } catch (error) {
   console.warn("Sin WebGL; uso el avatar 2D", error);
@@ -453,7 +454,10 @@ function vozNavegador(texto, alProgresar) {
     u.voice = voces.find((v) => /BO|419|MX|US/.test(v.lang)) || voces[0] || null;
     u.lang = u.voice?.lang || "es-419";
     u.onstart = () => avatar.hablarSimulado(true);
-    u.onboundary = (e) => alProgresar(e.charIndex / texto.length);
+    u.onboundary = (e) => {
+      alProgresar(e.charIndex / texto.length);
+      avatar.decirPalabra?.(texto.slice(e.charIndex).match(/^\S+/)?.[0]);
+    };
     u.onend = u.onerror = () => { avatar.hablarSimulado(false); alProgresar(1); resolve(); };
     speechSynthesis.speak(u);
   });
@@ -471,14 +475,23 @@ async function hablar(texto, { presentar = false } = {}) {
       try { url = await audios[i]; } catch { /* esa frase va con la voz del navegador */ }
       if (miTurno !== turno) return;
       estado("");
-      if (i === 0 && presentar) avatar.gesto("presentar", 2600);
+      if (i === 0 && presentar) señalarTarjetas();
       const alProgresar = (f) => progresoFrase(i, f);
-      if (url) await avatar.hablarAudio(url, { alProgresar });
+      if (url) await avatar.hablarAudio(url, { alProgresar, texto: frases[i] });
       else await vozNavegador(frases[i], alProgresar);
     }
+    if (miTurno === turno) avatar.sonreir?.(1, 2500);
   } finally {
     if (miTurno === turno) { hablando = false; ultimaActividad = Date.now(); }
   }
+}
+
+/** Paseito señala y mira la primera tarjeta mientras empieza a responder. */
+function señalarTarjetas() {
+  const tarjeta = $("tarjetas").querySelector(".tarjeta");
+  if (!avatar.señalar || !tarjeta) return avatar.gesto("presentar", 2600);
+  const r = tarjeta.getBoundingClientRect();
+  avatar.señalar(r.left + r.width * 0.25, r.top + r.height / 2, 2600);
 }
 
 function callar() {
@@ -535,7 +548,7 @@ async function reiniciar() {
   progresoFrase(0, 1);
   estado("", "normal");
 }
-$("nueva").onclick = () => { reiniciar(); aviso("Conversación nueva"); };
+$("nueva").onclick = () => { reiniciar(); avatar.gesto("despedir", 1800); aviso("Conversación nueva"); };
 
 // ---------- Bienvenida e inactividad ----------
 let saludoPeriodico = setInterval(() => enBienvenida && avatar.gesto("saludar", 2400), 7000);
@@ -553,14 +566,29 @@ function salirBienvenida(saludar = true) {
 }
 $("inicio").onclick = () => salirBienvenida(true);
 
-for (const evento of ["pointerdown", "keydown"]) addEventListener(evento, () => { ultimaActividad = Date.now(); });
+let toques = 0;
+for (const evento of ["pointerdown", "keydown"]) addEventListener(evento, () => { ultimaActividad = Date.now(); toques++; });
+
+// Al quedar sola se despide con la mano y la voz; si alguien vuelve mientras tanto, la conversación sigue.
+let despidiendo = false;
+async function despedirse() {
+  despidiendo = true;
+  const toquesAntes = toques, turnoAntes = turno;
+  avatar.gesto("despedir", 3200);
+  try { await hablar(DESPEDIDA); } finally { despidiendo = false; }
+  if (enBienvenida || toques !== toquesAntes || turno !== turnoAntes + 1) return;
+  reiniciar();
+  enBienvenida = true;
+  $("inicio").classList.remove("fuera");
+}
 setInterval(() => {
-  if (!enBienvenida && !hablando && Date.now() - ultimaActividad > INACTIVIDAD_MS) {
-    reiniciar();
-    enBienvenida = true;
-    $("inicio").classList.remove("fuera");
-  }
+  if (!enBienvenida && !hablando && !despidiendo && Date.now() - ultimaActividad > INACTIVIDAD_MS) despedirse();
 }, 5000);
+
+// Tocar a Paseito mientras habla la interrumpe y se pone a escuchar.
+for (const id of ["escena3d", "avatar2d"]) {
+  $(id).addEventListener("pointerdown", () => { if (hablando && !enBienvenida) alternar(); });
+}
 
 // ---------- Micrófono ----------
 // Primero el reconocimiento del navegador (Chrome/Edge, con texto en vivo). Si no existe o no tiene servicio
@@ -583,6 +611,15 @@ let modoMicrofono = Reconocimiento ? "navegador" : "servidor";
 let escuchando = false;
 let preparando = false;
 let detenerGrabacion = null;
+
+// Mientras la persona habla, Paseito asiente cada tanto (no en cada sílaba).
+let ultimoAsentir = 0;
+function asentirDeVezEnCuando() {
+  const ahora = performance.now();
+  if (ahora - ultimoAsentir < 2600 + Math.random() * 1500) return;
+  ultimoAsentir = ahora;
+  avatar.asentir?.();
+}
 
 function marcarEscucha(activo) {
   escuchando = activo;
@@ -612,6 +649,7 @@ if (Reconocimiento) {
     ultimaActividad = Date.now();
     const r = e.results[e.results.length - 1];
     oyente(r[0].transcript);
+    asentirDeVezEnCuando();
     if (r.isFinal) preguntar(r[0].transcript);
   };
 }
@@ -710,7 +748,7 @@ async function escucharConServidor() {
     const nivel = Math.sqrt(suma / muestras.length);
     $("microfono").style.setProperty("--nivel", Math.min(1, nivel * 10).toFixed(2));
     const ahora = performance.now();
-    if (nivel > UMBRAL_VOZ) { hablo = true; ultimaVoz = ahora; ultimaActividad = Date.now(); }
+    if (nivel > UMBRAL_VOZ) { hablo = true; ultimaVoz = ahora; ultimaActividad = Date.now(); asentirDeVezEnCuando(); }
     const callado = hablo && ahora - ultimaVoz > SILENCIO_FIN_MS;
     if (callado || (!hablo && ahora - inicio > ESPERA_SIN_VOZ_MS) || ahora - inicio > MAX_GRABACION_MS) return terminar();
     requestAnimationFrame(medir);

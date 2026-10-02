@@ -2,32 +2,64 @@
 // manta de aguayo y pollera, sobre una plataforma frente al Tunari y el Cristo de la Concordia.
 // Misma API que el avatar 2D (avatar.js) para poder intercambiarlos:
 //
-//   const avatar = new Avatar3D(contenedor);     // lanza un error si no hay WebGL
+//   const avatar = new Avatar3D(contenedor, { calidadAdaptativa: true });  // lanza un error si no hay WebGL
 //   avatar.desbloquear();                        // dentro de un clic (política de audio)
-//   await avatar.hablarAudio(url, { alProgresar: f => ... });
-//   avatar.hablarSimulado(true / false);
+//   await avatar.hablarAudio(url, { alProgresar: f => ..., texto: "lo que dice el audio" });  // texto: boca por visemas
+//   avatar.hablarSimulado(true / false);         // voz del navegador; avatar.decirPalabra(p) en cada palabra
 //   avatar.estado = "normal" | "escuchando" | "pensando";
-//   avatar.gesto("saludar" | "presentar" | "pensar" | "normal");
+//   avatar.gesto("saludar" | "despedir" | "presentar" | "pensar" | "normal", ms);
+//   avatar.señalar(x, y, ms);  avatar.mirarA(x, y, ms);   // punto de la pantalla en px
+//   avatar.asentir();  avatar.sonreir(intensidad, ms);
 //   avatar.encuadre({ arriba, abajo, izquierda, derecha });  // px que tapa la interfaz
 
 import * as THREE from "three";
+import { FORMAS, formaEn, formaPorVolumen, palabraEn, planDePalabra, prepararPlan } from "./habla.js";
 
 const C = {
   piel: 0xc68a5c, pielOscura: 0xa96f46, cabello: 0x1e1412, sombrero: 0xf7f3ea, cinta: 0x151515,
-  blusa: 0xfbf7ef, pollera: 0xc2185b, oro: 0xe7b73a, labio: 0xb4505a, boca: 0x3a0d12, manta: 0xb03a63,
+  blusa: 0xfbf7ef, pollera: 0xc2185b, oro: 0xe7b73a, labio: 0xb4505a, labioSup: 0xa3434d, boca: 0x3a0d12,
+  lengua: 0xc65a63, manta: 0xb03a63,
 };
 const COLOR_ESTADO = { normal: 0xe7b73a, escuchando: 0xff5470, pensando: 0x8f7bff };
+const CLAVES_BOCA = Object.keys(FORMAS.reposo);
 
-// Pose de cada brazo en coordenadas del torso: adónde va la mano y hacia dónde apunta el codo.
-// s = +1 brazo izquierdo de Paseito (derecha de la pantalla).
+// Pose de cada brazo en coordenadas del torso: adónde va la mano, hacia dónde apunta el codo, la forma
+// de los dedos y el giro de la mano sobre el antebrazo. s = +1 brazo izquierdo de Paseito (derecha de la pantalla).
 const POSES = {
-  normal: (s) => ({ mano: [s * 0.05, 0.83, 0.3], codo: [s, -0.4, -0.45] }),
-  saludar: (s) => (s > 0 ? { mano: [0.42, 1.62, 0.16], codo: [1, -0.8, -0.1] } : POSES.normal(s)),
-  presentar: (s) => (s > 0 ? { mano: [0.48, 1.03, 0.28], codo: [0.5, -1, -0.4] } : POSES.normal(s)),
-  pensar: (s) => (s < 0 ? { mano: [-0.05, 1.43, 0.21], codo: [-0.4, -1, 0.15] } : POSES.normal(s)),
+  normal: (s) => ({ mano: [s * 0.05, 0.83, 0.3], codo: [s, -0.4, -0.45], dedos: "relajada", giro: -s * 1.2 }),
+  saludar: (s) => (s > 0 ? { mano: [0.42, 1.62, 0.16], codo: [1, -0.8, -0.1], dedos: "abierta", giro: Math.PI, ola: 9 } : POSES.normal(s)),
+  despedir: (s) => (s > 0 ? { mano: [0.44, 1.6, 0.2], codo: [1, -0.8, -0.1], dedos: "abierta", giro: Math.PI, ola: 6 } : POSES.normal(s)),
+  presentar: (s) => (s > 0 ? { mano: [0.48, 1.03, 0.28], codo: [0.5, -1, -0.4], dedos: "abierta", giro: -1.2 } : POSES.normal(s)),
+  pensar: (s) => (s < 0 ? { mano: [-0.04, 1.47, 0.2], codo: [-0.4, -1, 0.15], dedos: "barbilla", giro: Math.PI } : POSES.normal(s)),
+  trenza: (s) => (s > 0 ? { mano: [0.19, 1.12, 0.3], codo: [1, -0.7, -0.2], dedos: "pinza", giro: 1.6 } : POSES.normal(s)),
+  sombrero: (s) => (s < 0 ? { mano: [-0.2, 1.69, 0.17], codo: [-1, -0.25, 0.1], dedos: "pinza", giro: Math.PI } : POSES.normal(s)),
+};
+// Se precalculan para no crear objetos en cada cuadro.
+const POSES_LADO = Object.fromEntries(Object.entries(POSES).map(([nombre, fn]) => [nombre, [-1, 1].map((s) => {
+  const p = fn(s);
+  return { mano: new THREE.Vector3(...p.mano), codo: new THREE.Vector3(...p.codo), dedos: p.dedos, giro: p.giro, ola: p.ola || 0 };
+})]));
+const GESTOS = new Set([...Object.keys(POSES), "señalar"]);
+// Curvatura de cada dedo (índice, medio, anular, meñique), del pulgar y separación entre dedos.
+const MANOS = {
+  relajada: { curva: [0.45, 0.55, 0.62, 0.7], pulgar: 0.35, abre: 0.05 },
+  abierta: { curva: [0.05, 0.03, 0.05, 0.09], pulgar: 0.05, abre: 0.17 },
+  señalar: { curva: [0, 1.45, 1.55, 1.6], pulgar: 0.95, abre: 0 },
+  barbilla: { curva: [0.85, 1.05, 1.15, 1.2], pulgar: 0.6, abre: 0 },
+  pinza: { curva: [0.5, 0.8, 0.95, 1.05], pulgar: 0.55, abre: 0.02 },
 };
 const ABAJO = new THREE.Vector3(0, -1, 0);
-const tmp = { a: new THREE.Vector3(), b: new THREE.Vector3(), c: new THREE.Vector3(), d: new THREE.Vector3(), q: new THREE.Quaternion() };
+const tmp = {
+  a: new THREE.Vector3(), b: new THREE.Vector3(), c: new THREE.Vector3(), d: new THREE.Vector3(), q: new THREE.Quaternion(),
+  mano: new THREE.Vector3(), polo: new THREE.Vector3(), v2: new THREE.Vector2(), m: new THREE.Matrix4(), color: new THREE.Color(),
+};
+const limitar = THREE.MathUtils.clamp;
+
+/** Resorte amortiguado (estado {x, v}) que persigue a `objetivo`: da el retraso y el vaivén de telas y trenzas. */
+function resorte(e, objetivo, dt, rigidez, amortiguacion) {
+  e.v += ((objetivo - e.x) * rigidez - e.v * amortiguacion) * dt;
+  e.x += e.v * dt;
+}
 
 function aleatorio(semilla) {
   let s = semilla;
@@ -225,11 +257,110 @@ const texturaLetrero = () => lienzo(512, 96, (g, w, h) => {
   g.fillText("PASEO ARANJUEZ", w / 2, h / 2 + 3);
 });
 
+// Iris café con anillo oscuro, vetas claras y pupila.
+const texturaIris = () => lienzo(128, 128, (g, w) => {
+  const c = w / 2;
+  const r = g.createRadialGradient(c, c, 0, c, c, c);
+  r.addColorStop(0, "#120904"); r.addColorStop(0.38, "#120904"); r.addColorStop(0.42, "#5a3317");
+  r.addColorStop(0.68, "#8d5a2b"); r.addColorStop(0.88, "#55301a"); r.addColorStop(1, "#24130a");
+  g.fillStyle = r;
+  g.fillRect(0, 0, w, w);
+  g.strokeStyle = "rgba(255, 214, 160, .22)";
+  g.lineWidth = 2;
+  for (let i = 0; i < 28; i++) {
+    const a = (i / 28) * Math.PI * 2;
+    g.beginPath();
+    g.moveTo(c + Math.cos(a) * c * 0.45, c + Math.sin(a) * c * 0.45);
+    g.lineTo(c + Math.cos(a) * c * 0.82, c + Math.sin(a) * c * 0.82);
+    g.stroke();
+  }
+});
+
+/**
+ * Boca de dibujo animado que se deforma en cada cuadro (sin crear geometría nueva): labios, interior,
+ * dientes y lengua son tiras de vértices fijos que siguen la forma del visema y la sonrisa.
+ */
+const COLUMNAS_BOCA = 17;
+class BocaFlexible {
+  constructor(materiales) {
+    this.grupo = new THREE.Group();
+    this.tiras = {};
+    for (const [nombre, orden] of [["interior", 0], ["lengua", 1], ["dientes", 2], ["labioInf", 3], ["labioSup", 3]]) {
+      const geo = new THREE.BufferGeometry();
+      const n = COLUMNAS_BOCA * 2;
+      geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(n * 3), 3).setUsage(THREE.DynamicDrawUsage));
+      const normales = new Float32Array(n * 3);
+      for (let i = 0; i < n; i++) normales[i * 3 + 2] = 1;
+      geo.setAttribute("normal", new THREE.BufferAttribute(normales, 3));
+      const indices = [];
+      for (let i = 0; i < COLUMNAS_BOCA - 1; i++) {
+        const a = i * 2;
+        indices.push(a, a + 1, a + 2, a + 2, a + 1, a + 3);
+      }
+      geo.setIndex(indices);
+      const malla = new THREE.Mesh(geo, materiales[nombre]);
+      malla.frustumCulled = false;
+      malla.renderOrder = orden;
+      this.grupo.add(malla);
+      this.tiras[nombre] = geo.attributes.position;
+    }
+  }
+
+  /** b: forma actual (abre, ancho, redondo, presion, dientes); sonrisa 0-1. */
+  actualizar(b, sonrisa) {
+    const abre = Math.max(0, b.abre), red = b.redondo, pres = b.presion;
+    const w = 0.028 * b.ancho * (1 - 0.28 * red) * (1 + 0.1 * sonrisa);
+    const expo = 0.45 + 0.4 * (1 - red);
+    const aSup = abre * (0.0055 + 0.004 * red);
+    const aInf = abre * (0.019 + 0.002 * red);
+    const levanta = sonrisa * 0.0085 * (1 - 0.5 * abre) * (1 - red);
+    const tSup = 0.0047 * (1 - 0.3 * pres) + 0.0014 * red;
+    const tInf = 0.0064 * (1 - 0.25 * pres) + 0.0014 * red;
+    const alto = 0.006 * (0.45 + 0.55 * b.dientes);
+    const f = (u) => Math.pow(Math.max(0, 1 - u * u), expo);
+    const grosor = (u) => Math.pow(Math.max(0, 1 - u * u), 0.35);
+    const linea = (u) => levanta * u * u - sonrisa * 0.0015;
+    const sup = (u) => linea(u) + aSup * f(u);
+    const inf = (u) => linea(u) - aInf * f(u);
+    const arco = (u) => 0.0007 * Math.exp(-(((Math.abs(u) - 0.3) / 0.16) ** 2)) - 0.0004 * Math.exp(-((u / 0.1) ** 2));
+    // la cara es curva: los bordes se hunden hacia atrás y hacia abajo
+    const z = (x, y, encima) => encima - (x * x) / (2 * 0.134) - (y * y) / (2 * 0.2);
+    const sobresale = (u) => 0.0032 * red * f(u) + 0.0008 * pres;
+    const { interior, lengua, dientes, labioSup, labioInf } = this.tiras;
+    for (let i = 0; i < COLUMNAS_BOCA; i++) {
+      const u = -1 + (2 * i) / (COLUMNAS_BOCA - 1);
+      const x = u * w;
+      const yS = sup(u), yI = inf(u);
+      const zLabio = sobresale(u);
+      labioSup.setXYZ(i * 2, x, yS + tSup * grosor(u) + arco(u), z(x, yS, 0.0038 + zLabio));
+      labioSup.setXYZ(i * 2 + 1, x, yS, z(x, yS, 0.0038 + zLabio));
+      labioInf.setXYZ(i * 2, x, yI, z(x, yI, 0.0038 + zLabio));
+      labioInf.setXYZ(i * 2 + 1, x, yI - tInf * grosor(u), z(x, yI, 0.0038 + zLabio));
+      interior.setXYZ(i * 2, x * 1.02, yS + 0.0004, z(x, yS, 0.0022));
+      interior.setXYZ(i * 2 + 1, x * 1.02, yI - 0.0004, z(x, yI, 0.0022));
+      const ud = u * 0.8, xd = ud * w;
+      const dSup = sup(ud), dInf = inf(ud);
+      dientes.setXYZ(i * 2, xd, dSup + 0.0003, z(xd, dSup, 0.003));
+      dientes.setXYZ(i * 2 + 1, xd, Math.max(dSup - alto * Math.pow(1 - ud * ud, 0.25), dInf), z(xd, dSup, 0.003));
+      const ul = u * 0.62, xl = ul * w;
+      const lInf = inf(ul);
+      lengua.setXYZ(i * 2, xl, Math.min(lInf + 0.0065 * f(ul), sup(ul)), z(xl, lInf, 0.0026));
+      lengua.setXYZ(i * 2 + 1, xl, lInf + 0.0002, z(xl, lInf, 0.0026));
+    }
+    for (const tira of Object.values(this.tiras)) tira.needsUpdate = true;
+  }
+}
+
 export class Avatar3D {
-  constructor(contenedor) {
+  constructor(contenedor, { calidadAdaptativa = true } = {}) {
     this.contenedor = contenedor;
     this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
     this.renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    // Si el equipo no llega a ~40 cuadros por segundo se baja la resolución interna (y se recupera si sobra).
+    this.calidad = {
+      activa: calidadAdaptativa, maxima: Math.min(devicePixelRatio, 2), minima: Math.min(devicePixelRatio, 2) * 0.6,
+      suma: 0, cuadros: 0, ultimoCambio: 0,
+    };
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.05;
@@ -251,16 +382,42 @@ export class Avatar3D {
     this._estado = "normal";
     this.gestoActual = "normal";
     this.finGesto = 0;
-    this.apertura = 0;
-    this.ancho = 1;
     this.analizador = null;
     this.simulado = false;
+    this.plan = null;
+    this.palabraSim = null;
+    this.boca = { ...FORMAS.reposo };
+    this._forma = { ...FORMAS.reposo };
+    this.sonrisa = 0.3;
+    this.intensidadSonrisa = 0;
+    this.finSonrisa = 0;
     this.puntero = new THREE.Vector2();
     this.ultimoPuntero = -1e9;
     this.mirada = new THREE.Vector2();
+    this.puntoMirada = new THREE.Vector2();
+    this.mirarHasta = 0;
+    this.cabezaBase = { x: 0, y: 0, z: 0 };
+    this.asentirDesde = -1e9;
+    this.sorpresaHasta = 0;
+    this.inclinacionExtra = 0;
+    this.inclinarHasta = 0;
     this.proximoParpadeo = 1500;
     this.parpadeo = -1;
+    this.parpado = { sup: -1.02, inf: 0.95 };
+    this.cejas = { subir: [0, 0], interior: [0, 0] };
     this.aretes = { angulo: 0, velocidad: 0, giroPrevio: 0 };
+    this.cadera = 0;
+    this.pesoObjetivo = 0;
+    this.suspiroDesde = -1e9;
+    this.proximoReposo = performance.now() + 5000;
+    this.ultimaAccion = "";
+    this.señal = { s: 1, mano: new THREE.Vector3() };
+    this.raycaster = new THREE.Raycaster();
+    this.planoSeñal = new THREE.Plane(new THREE.Vector3(0, 0, 1), -0.5);
+    this.fisica = {
+      giroPrevio: 0, caderaPrevia: 0, cabezaPrevia: 0,
+      polleraGiro: { x: 0, v: 0 }, polleraX: { x: 0, v: 0 }, polleraZ: { x: 0, v: 0 },
+    };
 
     this._construirEscena();
     this._construirPersonaje();
@@ -281,8 +438,48 @@ export class Avatar3D {
   set estado(valor) { this._estado = COLOR_ESTADO[valor] ? valor : "normal"; }
 
   gesto(nombre, duracion = 0) {
-    this.gestoActual = POSES[nombre] ? nombre : "normal";
+    this.gestoActual = GESTOS.has(nombre) ? nombre : "normal";
     this.finGesto = duracion ? performance.now() + duracion : 0;
+  }
+
+  /** Señala con el índice y mira un punto de la pantalla (px), p. ej. las tarjetas de resultados. */
+  señalar(x, y, duracion = 2600) {
+    this._aPantalla(x, y, tmp.v2);
+    this.raycaster.setFromCamera(tmp.v2, this.camara);
+    const punto = this.raycaster.ray.intersectPlane(this.planoSeñal, tmp.a);
+    if (!punto) return;
+    this.torso.updateWorldMatrix(true, false);
+    const local = this.torso.worldToLocal(punto);
+    const s = local.x >= 0 ? 1 : -1;
+    const hombro = tmp.b.set(s * 0.245, 1.255, 0.01);
+    const direccion = tmp.c.subVectors(local, hombro).normalize();
+    const mano = this.señal.mano.copy(hombro).addScaledVector(direccion, 0.47);
+    mano.set(limitar(mano.x, -0.62, 0.62), limitar(mano.y, 1.0, 1.72), Math.max(mano.z, 0.14));
+    this.señal.s = s;
+    this.gesto("señalar", duracion);
+    this.mirarA(x, y, Math.min(duracion, 1600));
+  }
+
+  /** Mira un punto de la pantalla (px) durante `duracion` ms. */
+  mirarA(x, y, duracion = 1500) {
+    this._aPantalla(x, y, this.puntoMirada);
+    this.mirarHasta = performance.now() + duracion;
+  }
+
+  /** Dos cabeceos cortos, como quien escucha y dice "ajá". */
+  asentir() {
+    const ahora = performance.now();
+    if (ahora - this.asentirDesde > 900) this.asentirDesde = ahora;
+  }
+
+  sonreir(intensidad = 1, duracion = 2500) {
+    this.intensidadSonrisa = intensidad;
+    this.finSonrisa = performance.now() + duracion;
+  }
+
+  _aPantalla(x, y, salida) {
+    const r = this.renderer.domElement.getBoundingClientRect();
+    return salida.set(((x - r.left) / r.width) * 2 - 1, -(((y - r.top) / r.height) * 2 - 1));
   }
 
   /** Márgenes en px que tapa la interfaz; Paseito se encuadra completa en el espacio libre que queda. */
@@ -296,9 +493,14 @@ export class Avatar3D {
     if (Avatar3D.contextoAudio.state === "suspended") Avatar3D.contextoAudio.resume();
   }
 
-  hablarAudio(url, { alProgresar } = {}) {
+  /**
+   * Reproduce un audio (URL) moviendo la boca. Con `texto` (lo que dice el audio) la boca toma la forma de
+   * cada sonido y `alProgresar` avanza palabra por palabra; sin texto, la boca sigue solo el volumen.
+   */
+  hablarAudio(url, { alProgresar, texto } = {}) {
     this.desbloquear();
     const ctx = Avatar3D.contextoAudio;
+    const plan = texto ? prepararPlan(url, texto, ctx).catch(() => null) : Promise.resolve(null);
     return new Promise((resolve, reject) => {
       const audio = new Audio(url);
       const analizador = ctx.createAnalyser();
@@ -309,23 +511,49 @@ export class Avatar3D {
       this.analizador = analizador;
       this.buffer = new Uint8Array(analizador.fftSize);
       this.alProgresar = alProgresar;
+      this.plan = null;
+      this.ultimaPalabra = -2;
+      let hecho = false;
       const terminar = () => {
-        if (this.audio === audio) { this.analizador = null; this.audio = null; this.alProgresar = null; }
+        if (hecho) return;
+        hecho = true;
+        if (this.audio === audio) { this.analizador = null; this.audio = null; this.alProgresar = null; this.plan = null; }
+        if (this._terminar === terminar) this._terminar = null;
         alProgresar?.(1);
         resolve();
       };
+      this._terminar = terminar;
       audio.onended = terminar;
       audio.onpause = terminar;
       audio.onerror = reject;
-      audio.play().catch(reject);
+      // El análisis del audio tarda unos milisegundos; si se demora, empieza a hablar igual y se suma al llegar.
+      Promise.race([plan, new Promise((ok) => setTimeout(ok, 300))]).then((listo) => {
+        if (this.audio !== audio) return;
+        if (listo) this.plan = listo;
+        else plan.then((tarde) => { if (tarde && this.audio === audio) this.plan = tarde; });
+        audio.play().catch(reject);
+      });
     });
   }
 
-  hablarSimulado(activo) { this.simulado = activo; }
+  hablarSimulado(activo) {
+    this.simulado = activo;
+    if (!activo) this.palabraSim = null;
+  }
+
+  /** Con la voz del navegador: forma de boca de la palabra que empieza a sonar (evento onboundary). */
+  decirPalabra(palabra) {
+    if (palabra) this.palabraSim = { plan: planDePalabra(palabra), desde: performance.now() };
+  }
 
   callar() {
+    const hablaba = !!(this.audio || this.simulado);
     if (this.audio) this.audio.pause();
+    this._terminar?.();
     this.simulado = false;
+    this.palabraSim = null;
+    this.plan = null;
+    if (hablaba) this.sorpresaHasta = performance.now() + 450;
   }
 
   // ---------- Construcción ----------
@@ -415,9 +643,18 @@ export class Avatar3D {
     valle.receiveShadow = true;
     e.add(valle);
 
+    // Montes, casas, techos y árboles se dibujan instanciados: una llamada de dibujo por tipo en vez de una por objeto.
+    const matriz = new THREE.Matrix4();
+    const giroY = new THREE.Quaternion();
+    const posicion = new THREE.Vector3();
+    const escala = new THREE.Vector3();
+    const color = new THREE.Color();
+    const rotarY = (angulo) => giroY.setFromAxisAngle(new THREE.Vector3(0, 1, 0), angulo);
+
     // cordillera del Tunari con nieve en las cumbres
     const matMonte = new THREE.MeshStandardMaterial({ color: 0x77739f, flatShading: true, roughness: 1 });
     const matNieve = new THREE.MeshStandardMaterial({ color: 0xf5f7fc, flatShading: true, roughness: 0.9 });
+    const montesPorLados = { 5: [], 6: [], 7: [] };
     for (let i = 0; i < 16; i++) {
       const alto = 9 + azar() * 11;
       const radio = 6 + azar() * 6;
@@ -425,14 +662,19 @@ export class Avatar3D {
       const giro = azar() * Math.PI;
       const x = -46 + i * 6.2 + azar() * 3;
       const z = -46 - azar() * 12;
-      const monte = new THREE.Mesh(new THREE.ConeGeometry(radio, alto, lados, 1), matMonte);
-      monte.position.set(x, alto / 2 - 1.5, z);
-      monte.rotation.y = giro;
-      const nieve = new THREE.Mesh(new THREE.ConeGeometry(radio * 0.3, alto * 0.3, lados, 1), matNieve);
-      nieve.position.set(x, alto - alto * 0.15 - 1.5 + 0.05, z);
-      nieve.rotation.y = giro;
-      nieve.scale.setScalar(1.04);
-      e.add(monte, nieve);
+      montesPorLados[lados].push({ alto, radio, giro, x, z });
+    }
+    for (const [lados, montes] of Object.entries(montesPorLados)) {
+      if (!montes.length) continue;
+      const roca = new THREE.InstancedMesh(new THREE.ConeGeometry(1, 1, Number(lados), 1), matMonte, montes.length);
+      const nieve = new THREE.InstancedMesh(new THREE.ConeGeometry(1, 1, Number(lados), 1), matNieve, montes.length);
+      montes.forEach((m, i) => {
+        rotarY(m.giro);
+        roca.setMatrixAt(i, matriz.compose(posicion.set(m.x, m.alto / 2 - 1.5, m.z), giroY, escala.set(m.radio, m.alto, m.radio)));
+        const k = 0.3 * 1.04;
+        nieve.setMatrixAt(i, matriz.compose(posicion.set(m.x, m.alto - m.alto * 0.15 - 1.5 + 0.05, m.z), giroY, escala.set(m.radio * k, m.alto * k, m.radio * k)));
+      });
+      e.add(roca, nieve);
     }
 
     // el Tunari: el pico nevado que domina el valle
@@ -452,26 +694,36 @@ export class Avatar3D {
     const geoTecho = new THREE.ConeGeometry(0.78, 0.42, 4).rotateY(Math.PI / 4).translate(0, 1.21, 0);
     const matTeja = new THREE.MeshStandardMaterial({ color: 0xb4532f, flatShading: true, roughness: 0.9 });
     const geoCopa = new THREE.IcosahedronGeometry(0.55, 0);
-    const matCopas = [0x9b72d9, 0x4f8a3c, 0xb08ae6, 0x6c9a45].map((color) => new THREE.MeshStandardMaterial({ color, flatShading: true }));
+    const coloresCopas = [0x9b72d9, 0x4f8a3c, 0xb08ae6, 0x6c9a45];
+    const matCopa = new THREE.MeshStandardMaterial({ flatShading: true });
+    const casas = [];
+    const arboles = [];
     for (let i = 0; i < 130; i++) {
       const x = (azar() - 0.5) * 64;
       const z = -8 - azar() * 30;
       if (Math.abs(x) < 6 && z > -16) continue;
       if (i % 3 === 0) {
-        const arbol = new THREE.Mesh(geoCopa, matCopas[i % matCopas.length]);
-        arbol.position.set(x, 0.6 + azar() * 0.3, z);
-        arbol.scale.setScalar(0.8 + azar() * 0.7);
-        e.add(arbol);
+        const y = 0.6 + azar() * 0.3;
+        arboles.push({ color: coloresCopas[i % coloresCopas.length], x, y, z, s: 0.8 + azar() * 0.7 });
       } else {
-        const casa = new THREE.Group();
-        casa.add(new THREE.Mesh(geoCasa, new THREE.MeshStandardMaterial({ color: colores[i % colores.length], roughness: 0.9 })));
-        casa.add(new THREE.Mesh(geoTecho, matTeja));
-        casa.scale.set(0.8 + azar() * 1.2, 0.5 + azar() * 0.8, 0.8 + azar() * 1.0);
-        casa.position.set(x, 0, z);
-        casa.rotation.y = azar() * 0.6;
-        e.add(casa);
+        const sx = 0.8 + azar() * 1.2, sy = 0.5 + azar() * 0.8, sz = 0.8 + azar() * 1.0;
+        casas.push({ color: colores[i % colores.length], x, z, sx, sy, sz, giro: azar() * 0.6 });
       }
     }
+    const paredes = new THREE.InstancedMesh(geoCasa, new THREE.MeshStandardMaterial({ roughness: 0.9 }), casas.length);
+    const techos = new THREE.InstancedMesh(geoTecho, matTeja, casas.length);
+    casas.forEach((c, i) => {
+      matriz.compose(posicion.set(c.x, 0, c.z), rotarY(c.giro), escala.set(c.sx, c.sy, c.sz));
+      paredes.setMatrixAt(i, matriz);
+      techos.setMatrixAt(i, matriz);
+      paredes.setColorAt(i, color.setHex(c.color));
+    });
+    const copas = new THREE.InstancedMesh(geoCopa, matCopa, arboles.length);
+    arboles.forEach((a, i) => {
+      copas.setMatrixAt(i, matriz.compose(posicion.set(a.x, a.y, a.z), rotarY(0), escala.setScalar(a.s)));
+      copas.setColorAt(i, color.setHex(a.color));
+    });
+    e.add(paredes, techos, copas);
 
     // cerro San Pedro con el Cristo de la Concordia y el teleférico
     this.cerro = new THREE.Group();
@@ -486,15 +738,16 @@ export class Avatar3D {
     const loma = new THREE.Mesh(geoLoma, new THREE.MeshStandardMaterial({ color: 0x9a8a57, flatShading: true, roughness: 1 }));
     loma.scale.set(1, 0.37, 0.75);
     this.cerro.add(loma);
+    const arbustos = new THREE.InstancedMesh(geoCopa, matCopa, 14);
     for (let i = 0; i < 14; i++) {
       const a = azar() * Math.PI * 2;
       const r = 3 + azar() * 3.5;
-      const arbusto = new THREE.Mesh(geoCopa, matCopas[1 + (i % 2) * 2]);
       const y = 0.37 * Math.sqrt(Math.max(0, 49 - r * r));
-      arbusto.position.set(Math.cos(a) * r, y + 0.1, Math.sin(a) * r * 0.75);
-      arbusto.scale.setScalar(0.5 + azar() * 0.3);
-      this.cerro.add(arbusto);
+      posicion.set(Math.cos(a) * r, y + 0.1, Math.sin(a) * r * 0.75);
+      arbustos.setMatrixAt(i, matriz.compose(posicion, rotarY(0), escala.setScalar(0.5 + azar() * 0.3)));
+      arbustos.setColorAt(i, color.setHex(coloresCopas[1 + (i % 2) * 2]));
     }
+    this.cerro.add(arbustos);
 
     const cristo = crearCristo();
     cristo.position.y = 2.5;
@@ -604,12 +857,20 @@ export class Avatar3D {
     }
     geoPollera.computeVertexNormals();
     geoPollera.translate(0, 0.45, 0);
-    P.add(this._pieza(geoPollera, this._toon(C.pollera, { side: THREE.DoubleSide }), 0.02));
+    const pollera = this._pieza(geoPollera, this._toon(C.pollera, { side: THREE.DoubleSide }), 0.02);
+    P.add(pollera);
+    // La pollera se mece con resortes: se guardan los vértices en reposo para deformarlos en cada cuadro.
+    p.setUsage(THREE.DynamicDrawUsage);
+    const base = Float32Array.from(p.array);
+    const angulos = new Float32Array(p.count);
+    for (let i = 0; i < p.count; i++) angulos[i] = Math.atan2(base[i * 3 + 2], base[i * 3]) * 3;
+    this.pollera = { malla: pollera, base, angulos, alto: 0.8, arriba: 0.85, franjas: [] };
     for (const [y, color] of [[0.16, 0x1f9d55], [0.22, 0xf2b705]]) {
       const radio = 0.44 - (y - 0.05) * 0.29;
       const franja = new THREE.Mesh(new THREE.CylinderGeometry(radio + 0.012, radio + 0.014, 0.03, 112, 1, true), this._toon(color, { side: THREE.DoubleSide }));
       franja.position.y = y;
       P.add(franja);
+      this.pollera.franjas.push(franja);
     }
 
     // parte de arriba (respira)
@@ -642,7 +903,7 @@ export class Avatar3D {
     this.brazos = [this._brazo(1), this._brazo(-1)];
     for (const b of this.brazos) T.add(b.hombro);
     this.trenzas = [this._trenza(1), this._trenza(-1)];
-    for (const t of this.trenzas) T.add(t);
+    for (const t of this.trenzas) T.add(t.grupo);
 
     this.cabeza = this._cabeza();
     T.add(this.cabeza);
@@ -669,29 +930,70 @@ export class Avatar3D {
     volado.position.y = -0.2;
     codo.add(volado);
 
+    // mano: muñeca (gira sobre el antebrazo) > palma (se agita al saludar) > dedos con dos falanges y pulgar.
+    // La palma mira a +z y los dedos cuelgan hacia −y; el pulgar queda del lado de afuera (s).
     const piel = this._toon(C.piel);
-    const mano = new THREE.Group();
-    mano.position.y = -largoAntebrazo;
-    const palma = this._pieza(new THREE.SphereGeometry(0.04, 18, 14), piel, 0.05);
-    palma.scale.set(1, 1.05, 0.62);
-    const dedos = this._pieza(new THREE.SphereGeometry(0.034, 16, 12), piel, 0.05);
-    dedos.scale.set(1, 1.15, 0.55);
-    dedos.position.y = -0.042;
-    const pulgar = this._pieza(new THREE.CapsuleGeometry(0.012, 0.03, 4, 8), piel, 0.08);
-    pulgar.position.set(-s * 0.034, -0.008, 0.01);
-    pulgar.rotation.z = -s * 0.5;
-    mano.add(palma, dedos, pulgar);
-    codo.add(mano);
+    const muneca = new THREE.Group();
+    muneca.position.y = -largoAntebrazo + 0.012;
+    const palma = new THREE.Group();
+    muneca.add(palma);
+    const dorso = this._pieza(new THREE.SphereGeometry(0.036, 18, 14), piel, 0.05);
+    dorso.scale.set(0.98, 1.05, 0.56);
+    dorso.position.y = -0.026;
+    palma.add(dorso);
+    const geoFalange = (radio, largo) => new THREE.CapsuleGeometry(radio, largo, 4, 8).translate(0, -largo / 2, 0);
+    const dedos = [
+      [0.021, 0.022, 0.018, 0.0078], [0.007, 0.025, 0.02, 0.008], [-0.007, 0.023, 0.018, 0.0076], [-0.02, 0.018, 0.015, 0.007],
+    ].map(([x, largo1, largo2, radio]) => {
+      const base = new THREE.Group();
+      base.position.set(s * x, -0.056, 0.002);
+      const proximal = this._pieza(geoFalange(radio, largo1), piel, 0.1, false);
+      const nudillo = new THREE.Group();
+      nudillo.position.y = -largo1;
+      const distal = this._pieza(geoFalange(radio * 0.92, largo2), piel, 0.1, false);
+      nudillo.add(distal);
+      base.add(proximal, nudillo);
+      palma.add(base);
+      return { base, nudillo, curva: 0.4 };
+    });
+    const pulgar = new THREE.Group();
+    pulgar.position.set(s * 0.03, -0.018, 0.012);
+    const pulgarBase = this._pieza(geoFalange(0.009, 0.02), piel, 0.1, false);
+    const pulgarNudillo = new THREE.Group();
+    pulgarNudillo.position.y = -0.02;
+    pulgarNudillo.add(this._pieza(geoFalange(0.0085, 0.016), piel, 0.1, false));
+    pulgar.add(pulgarBase, pulgarNudillo);
+    palma.add(pulgar);
+    codo.add(muneca);
     hombro.add(codo);
 
-    const pose = POSES.normal(s);
+    const pose = POSES_LADO.normal[s > 0 ? 1 : 0];
     const brazo = {
-      s, hombro, codo, largoBrazo, largoAntebrazo,
-      mano: new THREE.Vector3(...pose.mano),
-      polo: new THREE.Vector3(...pose.codo),
+      s, hombro, codo, muneca, palma, dedos, largoBrazo, largoAntebrazo,
+      pulgar: { base: pulgar, nudillo: pulgarNudillo, curva: 0.3 },
+      abre: 0.05, giro: pose.giro,
+      mano: pose.mano.clone(),
+      polo: pose.codo.clone(),
     };
     this._resolverBrazo(brazo);
+    this._ponerDedos(brazo, MANOS.relajada, 1, 0);
     return brazo;
+  }
+
+  /** Lleva los dedos hacia la forma `forma` (MANOS) con el factor k (0-1). */
+  _ponerDedos(b, forma, k, t) {
+    const s = b.s;
+    b.abre += (forma.abre - b.abre) * k;
+    b.dedos.forEach((d, i) => {
+      d.curva += (forma.curva[i] + Math.sin(t * 0.7 + i) * 0.03 - d.curva) * k;
+      d.base.rotation.set(-d.curva, 0, s * (1.5 - i) * b.abre * 0.9);
+      d.nudillo.rotation.x = -d.curva * 1.15;
+    });
+    const p = b.pulgar;
+    p.curva += (forma.pulgar - p.curva) * k;
+    p.base.rotation.set(-0.35 - p.curva * 0.9, -s * p.curva * 0.6, s * (0.75 - p.curva * 0.55));
+    p.nudillo.rotation.x = -p.curva * 0.8;
+    b.muneca.rotation.y = b.giro;
   }
 
   /** IK de dos huesos: orienta hombro y codo para que la mano llegue a brazo.mano, con el codo hacia brazo.polo. */
@@ -717,33 +1019,61 @@ export class Avatar3D {
     const curva = new THREE.CatmullRomCurve3([
       [0.12, 1.55, -0.06], [0.17, 1.45, 0.0], [0.22, 1.33, 0.14], [0.235, 1.2, 0.215], [0.225, 1.07, 0.245], [0.21, 0.95, 0.245],
     ].map(([x, y, z]) => new THREE.Vector3(s * x, y, z)));
-    const mat = this._toon(C.cabello);
     const geo = new THREE.SphereGeometry(1, 12, 8);
     const arriba = new THREE.Vector3(0, 1, 0);
     const n = 20;
+    const nudos = new THREE.InstancedMesh(geo, this._toon(C.cabello), n + 1);
+    nudos.castShadow = true;
+    nudos.frustumCulled = false;
+    const raiz = curva.getPoint(0);
+    const base = [];
     for (let i = 0; i <= n; i++) {
       const t = i / n;
       const punto = curva.getPoint(t);
       const tangente = curva.getTangent(t);
       const lado = new THREE.Vector3().crossVectors(tangente, new THREE.Vector3(0, 0, 1)).normalize();
       const radio = 0.03 * (1 - 0.35 * t);
-      const nudo = new THREE.Mesh(geo, mat);
-      nudo.scale.set(radio, radio * 1.7, radio * 0.85);
-      nudo.quaternion.setFromUnitVectors(arriba, tangente);
-      nudo.position.copy(punto).addScaledVector(lado, (i % 2 ? 1 : -1) * 0.008);
-      nudo.castShadow = true;
-      grupo.add(nudo);
+      base.push({
+        pos: punto.addScaledVector(lado, (i % 2 ? 1 : -1) * 0.008).sub(raiz),
+        giro: new THREE.Quaternion().setFromUnitVectors(arriba, tangente),
+        escala: new THREE.Vector3(radio, radio * 1.7, radio * 0.85),
+        peso: t ** 1.3,
+      });
     }
+    grupo.add(nudos);
     const fin = curva.getPoint(1);
+    const punta = new THREE.Group();
     const cordon = new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.004, 0.05, 6), this._toon(0xd62f5b));
-    cordon.position.copy(fin).add(new THREE.Vector3(0, -0.035, 0));
-    grupo.add(cordon);
+    cordon.position.set(0, -0.035, 0);
+    punta.add(cordon);
     for (const [dx, dy, color] of [[0, -0.07, 0xd62f5b], [-0.018, -0.1, 0xf2b705], [0.018, -0.1, 0x1f9d55]]) {
       const pompon = this._pieza(new THREE.SphereGeometry(0.022, 14, 10), this._toon(color), 0.06);
-      pompon.position.copy(fin).add(new THREE.Vector3(dx, dy, 0.01));
-      grupo.add(pompon);
+      pompon.position.set(dx, dy, 0.01);
+      punta.add(pompon);
     }
-    return grupo;
+    grupo.add(punta);
+    const trenza = {
+      s, grupo, nudos, base, raiz, punta, fin: fin.sub(raiz),
+      ladeo: { x: 0, v: 0 }, vaiven: { x: 0, v: 0 }, rot: new THREE.Quaternion(), euler: new THREE.Euler(),
+    };
+    this._doblarTrenza(trenza);
+    return trenza;
+  }
+
+  /** Dobla la trenza desde la raíz: cada nudo gira según cuánto cuelga (peso), la punta gira entera. */
+  _doblarTrenza(tr) {
+    const { a, q, m } = tmp;
+    tr.base.forEach((b, i) => {
+      tr.euler.set(tr.vaiven.x * b.peso, 0, tr.ladeo.x * b.peso);
+      tr.rot.setFromEuler(tr.euler);
+      a.copy(b.pos).applyQuaternion(tr.rot).add(tr.raiz);
+      q.copy(tr.rot).multiply(b.giro);
+      tr.nudos.setMatrixAt(i, m.compose(a, q, b.escala));
+    });
+    tr.nudos.instanceMatrix.needsUpdate = true;
+    tr.euler.set(tr.vaiven.x, 0, tr.ladeo.x);
+    tr.punta.quaternion.setFromEuler(tr.euler);
+    tr.punta.position.copy(tr.fin).applyQuaternion(tr.punta.quaternion).add(tr.raiz);
   }
 
   _cabeza() {
@@ -771,39 +1101,78 @@ export class Avatar3D {
       sobreCabeza(this._pieza(new THREE.SphereGeometry(0.1585, 40, 12, 0, Math.PI * 2, 0, Math.PI * 0.31), cabello, 0)),
     );
 
-    // ojos
-    ref.ojos = [];
+    // ojos: dentro de `envoltura` (achatada) el globo es una esfera, así el iris gira sobre ella al mirar y
+    // los párpados (casquetes apenas más grandes) lo tapan por completo al parpadear
     ref.iris = [];
+    ref.parpadosSup = [];
+    ref.parpadosInf = [];
+    const R = 0.026;
+    // anillos finos (no un abanico de triángulos grandes) para que el iris siga la curva del globo sin hundirse
+    const geoIris = new THREE.RingGeometry(0.00005, 0.0142, 32, 8);
+    const pi = geoIris.attributes.position;
+    for (let i = 0; i < pi.count; i++) {
+      const x = pi.getX(i), y = pi.getY(i) / 0.78;
+      pi.setXYZ(i, x, y, Math.sqrt(Math.max(0, (R + 0.0004) ** 2 - x * x - y * y)));
+    }
+    const matIris = new THREE.MeshBasicMaterial({ map: texturaIris() });
+    const matBrillo = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const matPestana = new THREE.MeshBasicMaterial({ color: 0x140c0a });
+    const matParpado = this._toon(C.piel);
+    const sobreGlobo = (malla, x, y, radio) => {
+      const z = Math.sqrt(radio * radio - x * x - y * y);
+      malla.position.set(x, y, z);
+      malla.lookAt(x * 2, y * 2, z * 2);
+      return malla;
+    };
     for (const s of [-1, 1]) {
       const ojo = new THREE.Group();
       ojo.position.set(s * 0.052, centro.y + 0.012, superficie(0.052, 0.012) - 0.008);
-      const blanco = new THREE.Mesh(new THREE.SphereGeometry(0.026, 24, 16), this._toon(0xfffaf3));
-      blanco.scale.set(1, 0.78, 0.5);
+      const envoltura = new THREE.Group();
+      envoltura.scale.set(1, 0.78, 0.5);
+      const blanco = new THREE.Mesh(new THREE.SphereGeometry(R, 24, 16), this._toon(0xfffaf3));
       const iris = new THREE.Group();
-      const disco = new THREE.Mesh(new THREE.SphereGeometry(0.015, 20, 14), new THREE.MeshBasicMaterial({ color: 0x3b2416 }));
-      disco.scale.set(1, 1, 0.4);
-      disco.position.z = 0.011;
-      const pupila = new THREE.Mesh(new THREE.SphereGeometry(0.0075, 14, 10), new THREE.MeshBasicMaterial({ color: 0x0d0705 }));
-      pupila.scale.set(1, 1, 0.4);
-      pupila.position.z = 0.0155;
-      const brillo = new THREE.Mesh(new THREE.SphereGeometry(0.0035, 8, 6), new THREE.MeshBasicMaterial({ color: 0xffffff }));
-      brillo.position.set(0.005, 0.006, 0.019);
-      iris.add(disco, pupila, brillo);
-      const pestana = new THREE.Mesh(new THREE.TorusGeometry(0.027, 0.0035, 6, 20, Math.PI), new THREE.MeshBasicMaterial({ color: 0x140c0a }));
-      pestana.scale.set(1, 0.8, 1);
-      pestana.position.z = 0.008;
-      ojo.add(blanco, iris, pestana);
+      iris.add(new THREE.Mesh(geoIris, matIris));
+      iris.add(sobreGlobo(new THREE.Mesh(new THREE.CircleGeometry(0.0036, 12), matBrillo), 0.0048, 0.0085, R + 0.0006));
+      iris.add(sobreGlobo(new THREE.Mesh(new THREE.CircleGeometry(0.0017, 10), matBrillo), -0.0052, -0.0052, R + 0.0006));
+      const sup = new THREE.Group();
+      sup.add(new THREE.Mesh(new THREE.SphereGeometry(R * 1.06, 24, 10, 0, Math.PI * 2, 0, Math.PI / 2), matParpado));
+      const pestanas = new THREE.Mesh(new THREE.TorusGeometry(R * 1.06, 0.0034, 6, 24, Math.PI), matPestana);
+      pestanas.rotation.x = Math.PI / 2;
+      pestanas.scale.set(1, 1, 1.5);
+      const rabillo = new THREE.Mesh(new THREE.ConeGeometry(0.0034, 0.011, 6), matPestana);
+      rabillo.position.set(s * R * 1.08, 0.0035, 0.004);
+      rabillo.rotation.z = -s * 1.0;
+      sup.add(pestanas, rabillo);
+      const inf = new THREE.Group();
+      inf.add(new THREE.Mesh(new THREE.SphereGeometry(R * 1.05, 24, 8, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), matParpado));
+      const borde = new THREE.Mesh(new THREE.TorusGeometry(R * 1.05, 0.0012, 4, 24, Math.PI), new THREE.MeshBasicMaterial({ color: 0x8a5a3e }));
+      borde.rotation.x = Math.PI / 2;
+      inf.add(borde);
+      envoltura.add(blanco, iris, sup, inf);
+      ojo.add(envoltura);
       pivote.add(ojo);
-      ref.ojos.push(ojo);
       ref.iris.push(iris);
+      ref.parpadosSup.push(sup);
+      ref.parpadosInf.push(inf);
     }
 
-    // cejas
+    // cejas: gruesas hacia la nariz, finas hacia afuera y arqueadas sobre la curva de la frente
     ref.cejas = [-1, 1].map((s) => {
-      const ceja = new THREE.Mesh(new THREE.CapsuleGeometry(0.0045, 0.032, 4, 8), oscuro);
-      ceja.rotation.z = Math.PI / 2 + s * 0.12;
-      ceja.position.set(s * 0.055, centro.y + 0.062, superficie(0.055, 0.062) - 0.002);
-      ceja.userData.y = ceja.position.y;
+      const geo = new THREE.CapsuleGeometry(0.0046, 0.034, 4, 10).rotateZ(Math.PI / 2);
+      const pc = geo.attributes.position;
+      for (let i = 0; i < pc.count; i++) {
+        const x = pc.getX(i), y = pc.getY(i), z = pc.getZ(i);
+        const u = limitar(x / 0.021, -1, 1);
+        const adentro = (1 - s * u) / 2;
+        const grosor = 0.45 + 0.7 * adentro;
+        const arco = 0.0055 * (1 - ((u * s - 0.15) / 1.15) ** 2);
+        pc.setXYZ(i, x, y * grosor + arco, z * grosor - (x * x) / (2 * 0.14));
+      }
+      geo.computeVertexNormals();
+      const ceja = new THREE.Mesh(geo, oscuro);
+      ceja.rotation.z = s * 0.06;
+      ceja.position.set(s * 0.055, centro.y + 0.058, superficie(0.055, 0.058) + 0.001);
+      ceja.userData = { y: ceja.position.y, giro: ceja.rotation.z, s };
       pivote.add(ceja);
       return ceja;
     });
@@ -813,26 +1182,29 @@ export class Avatar3D {
     nariz.position.set(0, centro.y - 0.028, superficie(0, -0.028) + 0.002);
     pivote.add(nariz);
 
-    for (const s of [-1, 1]) {
+    ref.mejillas = [-1, 1].map((s) => {
       const normal = new THREE.Vector3(s * 0.085, -0.04 / 1.25, superficie(0.085, -0.04)).normalize();
       const mejilla = new THREE.Mesh(new THREE.CircleGeometry(0.026, 24), new THREE.MeshBasicMaterial({ color: 0xe0676a, transparent: true, opacity: 0.35, depthWrite: false }));
       mejilla.position.set(s * 0.085, centro.y - 0.04, superficie(0.085, -0.04) + 0.003);
       mejilla.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal);
+      mejilla.userData.y = mejilla.position.y;
       pivote.add(mejilla);
-    }
+      return mejilla;
+    });
 
-    // boca: interior, dientes y labios que se mueven con la apertura
-    const boca = new THREE.Group();
-    boca.position.set(0, centro.y - 0.075, superficie(0, -0.075) - 0.006);
+    // boca: labios, interior, dientes y lengua que toman la forma de cada sonido
+    const lados = { side: THREE.DoubleSide };
+    ref.boca = new BocaFlexible({
+      interior: new THREE.MeshBasicMaterial({ color: C.boca, ...lados }),
+      lengua: new THREE.MeshBasicMaterial({ color: C.lengua, ...lados }),
+      dientes: new THREE.MeshBasicMaterial({ color: 0xfbf7f0, ...lados }),
+      labioSup: this._toon(C.labioSup, lados),
+      labioInf: this._toon(C.labio, lados),
+    });
+    const boca = ref.boca.grupo;
+    boca.position.set(0, centro.y - 0.075, superficie(0, -0.075));
     boca.rotation.x = 0.42;
-    ref.interior = new THREE.Mesh(new THREE.SphereGeometry(0.028, 24, 16), new THREE.MeshBasicMaterial({ color: C.boca }));
-    ref.dientes = new THREE.Mesh(new THREE.SphereGeometry(0.019, 16, 8), new THREE.MeshBasicMaterial({ color: 0xfbf7f0 }));
-    ref.labioSup = new THREE.Mesh(new THREE.SphereGeometry(0.03, 24, 12), this._toon(C.labio));
-    ref.labioInf = new THREE.Mesh(new THREE.SphereGeometry(0.03, 24, 12), this._toon(C.labio));
-    ref.labioSup.scale.set(1, 0.2, 0.4);
-    ref.labioInf.scale.set(0.95, 0.26, 0.45);
-    boca.add(ref.interior, ref.dientes, ref.labioSup, ref.labioInf);
-    ref.boca = boca;
+    ref.boca.actualizar(FORMAS.reposo, this.sonrisa);
     pivote.add(boca);
 
     // orejas y aretes dorados
@@ -905,71 +1277,155 @@ export class Avatar3D {
     return Math.sqrt(suma / this.buffer.length);
   }
 
+  /** Movimientos de reposo variados para que no se vea en bucle; nunca repite el anterior. */
+  _accionReposo(ahora) {
+    const acciones = ["mirar", "mirar", "peso", "ladear", "sonreir", "parpadeo", "suspiro", "trenza", "sombrero"]
+      .filter((a) => a !== this.ultimaAccion);
+    const accion = acciones[Math.floor(Math.random() * acciones.length)];
+    this.ultimaAccion = accion;
+    switch (accion) {
+      case "mirar":
+        this.puntoMirada.set((Math.random() - 0.5) * 1.4, (Math.random() - 0.3) * 0.6);
+        this.mirarHasta = ahora + 1200 + Math.random() * 1000;
+        break;
+      case "peso": this.pesoObjetivo = this.pesoObjetivo ? 0 : (Math.random() < 0.5 ? -1 : 1) * 0.012; break;
+      case "ladear":
+        this.inclinacionExtra = (Math.random() < 0.5 ? -1 : 1) * 0.07;
+        this.inclinarHasta = ahora + 2200;
+        break;
+      case "sonreir": this.sonreir(0.8, 2200); break;
+      case "parpadeo": this.parpadeo = ahora; this.proximoParpadeo = ahora + 230; break;
+      case "suspiro": this.suspiroDesde = ahora; break;
+      case "trenza": this.gesto("trenza", 2200); break;
+      case "sombrero": this.gesto("sombrero", 1700); break;
+    }
+  }
+
   _cuadro() {
-    const dt = Math.min(this.reloj.getDelta(), 0.05);
+    const real = this.reloj.getDelta();
+    const dt = Math.min(real, 0.05);
     const t = this.reloj.elapsedTime;
     const ahora = performance.now();
     const suave = (k) => 1 - Math.exp(-dt * k);
-
-    // boca
-    let objetivo = 0;
-    if (this.analizador) {
-      objetivo = Math.min(1, Math.max(0, (this._volumen() - 0.015) * 7));
-      if (this.alProgresar && this.audio?.duration) this.alProgresar(this.audio.currentTime / this.audio.duration);
-    } else if (this.simulado) {
-      objetivo = 0.2 + 0.6 * Math.abs(Math.sin(t * 12.7) * Math.sin(t * 5.3));
-    }
-    this.apertura += (objetivo - this.apertura) * (objetivo > this.apertura ? 0.5 : 0.25);
-    this.ancho += ((objetivo > 0.5 ? 0.88 : 1) + Math.sin(t * 9) * 0.04 * objetivo - this.ancho) * 0.2;
-    const habla = Math.min(1, this.apertura * 2.5);
     const r = this.rostro;
-    r.boca.scale.x = this.ancho;
-    r.interior.scale.set(1, 0.08 + this.apertura * 0.75, 0.35);
-    r.interior.position.y = -this.apertura * 0.008;
-    r.dientes.scale.set(1, 0.3, 0.3);
-    r.dientes.position.set(0, 0.006, 0.004);
-    r.dientes.visible = this.apertura > 0.2;
-    r.labioSup.position.y = 0.004 + this.apertura * 0.004;
-    r.labioInf.position.y = -0.005 - this.apertura * 0.02;
+    const estado = this._estado;
+    const hablando = !!(this.analizador || this.simulado);
 
-    // parpadeo
-    if (ahora > this.proximoParpadeo) { this.parpadeo = ahora; this.proximoParpadeo = ahora + 2200 + Math.random() * 3500; }
-    const fase = (ahora - this.parpadeo) / 70;
-    const cierre = fase >= 0 && fase < 2 ? 1 - Math.abs(1 - fase) : 0;
-    for (const ojo of r.ojos) ojo.scale.y = Math.max(0.08, 1 - cierre);
+    // boca: forma del sonido que suena (plan alineado al audio), de la palabra (voz del navegador) o del volumen
+    const objetivo = this._forma;
+    if (this.analizador) {
+      const volumen = this._volumen();
+      const tAudio = this.audio?.currentTime ?? 0;
+      if (this.plan) {
+        formaEn(this.plan, tAudio, objetivo);
+        const k = palabraEn(this.plan, tAudio);
+        if (this.alProgresar && k >= 0 && k !== this.ultimaPalabra) {
+          this.ultimaPalabra = k;
+          this.alProgresar(Math.min(0.99, (k + 0.5) / this.plan.palabras.length));
+        }
+      } else {
+        formaPorVolumen(volumen, t, objetivo);
+        if (this.alProgresar && this.audio?.duration) this.alProgresar(tAudio / this.audio.duration);
+      }
+    } else if (this.simulado && this.palabraSim) {
+      formaEn(this.palabraSim.plan, (ahora - this.palabraSim.desde) / 1000, objetivo);
+    } else if (this.simulado) {
+      formaPorVolumen(0.015 + (0.2 + 0.6 * Math.abs(Math.sin(t * 12.7) * Math.sin(t * 5.3))) / 7, t, objetivo);
+    } else {
+      Object.assign(objetivo, FORMAS.reposo);
+    }
+    // la boca usa el tiempo real (no el limitado) para no atrasarse respecto del audio en equipos lentos
+    const dtBoca = Math.min(real, 0.12);
+    for (const k of CLAVES_BOCA) {
+      this.boca[k] += (objetivo[k] - this.boca[k]) * (1 - Math.exp(-dtBoca * (objetivo[k] > this.boca[k] ? 30 : 20)));
+    }
+    const habla = Math.min(1, this.boca.abre * 2);
+    const sonrisaObjetivo = ahora < this.finSonrisa ? this.intensidadSonrisa
+      : estado === "pensando" ? 0.1 : estado === "escuchando" ? 0.4 : hablando ? 0.25 : 0.3;
+    this.sonrisa += (sonrisaObjetivo - this.sonrisa) * suave(4);
+    r.boca.actualizar(this.boca, this.sonrisa);
 
-    // hacia dónde mira: el puntero si se movió hace poco; si no, deambula
-    const quieto = ahora - this.ultimoPuntero > 4000;
-    const destino = quieto ? new THREE.Vector2(Math.sin(t * 0.23) * 0.4, Math.sin(t * 0.31) * 0.2) : this.puntero;
-    this.mirada.lerp(destino, suave(4));
+    // reposo: pequeñas acciones al azar cuando no está haciendo nada
+    if (ahora > this.proximoReposo) {
+      this.proximoReposo = ahora + 4000 + Math.random() * 5000;
+      if (estado === "normal" && !hablando && this.gestoActual === "normal") this._accionReposo(ahora);
+    }
+
+    // hacia dónde mira: un punto pedido (tarjetas, reposo), al usuario si escucha, el puntero o deambula
+    const destino = tmp.v2;
+    if (ahora < this.mirarHasta) destino.copy(this.puntoMirada);
+    else if (estado === "escuchando") destino.set(0, 0.1);
+    else if (ahora - this.ultimoPuntero < 4000) destino.copy(this.puntero);
+    else destino.set(Math.sin(t * 0.23) * 0.4, Math.sin(t * 0.31) * 0.2);
+    this.mirada.lerp(destino, suave(ahora < this.mirarHasta ? 7 : 4));
+
+    // cabeza
+    if (ahora > this.inclinarHasta) this.inclinacionExtra += (0 - this.inclinacionExtra) * suave(2);
     let giro = this.mirada.x * 0.35;
     let cabeceo = -this.mirada.y * 0.15;
-    let inclinacion = Math.sin(t * 0.5) * 0.03;
-    if (this._estado === "pensando") { giro = 0.22; cabeceo = -0.16; inclinacion = 0.1; }
-    if (this._estado === "escuchando") { inclinacion = 0.09; cabeceo = 0.03; }
+    let inclinacion = Math.sin(t * 0.5) * 0.03 + this.inclinacionExtra;
+    if (estado === "pensando") { giro = 0.14; cabeceo = -0.13; inclinacion = 0.1; }
+    if (estado === "escuchando") { inclinacion = 0.09; cabeceo = 0.04; }
+    const sorprendida = ahora < this.sorpresaHasta;
+    if (sorprendida) cabeceo -= 0.06;
     giro += Math.sin(t * 1.7) * 0.05 * habla;
     cabeceo += Math.sin(t * 3.1) * 0.035 * habla;
     inclinacion += Math.sin(t * 2.3) * 0.025 * habla;
+    const base = this.cabezaBase;
+    base.y += (giro - base.y) * suave(5);
+    base.x += (cabeceo - base.x) * suave(sorprendida ? 12 : 5);
+    base.z += (inclinacion - base.z) * suave(4);
+    const d = (ahora - this.asentirDesde) / 1000;
+    const asiente = d < 0.8 ? 0.08 * Math.sin((Math.PI * d) / 0.4) ** 2 * (1 - d) : 0;
     const cab = this.cabeza.rotation;
-    cab.y += (giro - cab.y) * suave(5);
-    cab.x += (cabeceo - cab.x) * suave(5);
-    cab.z += (inclinacion - cab.z) * suave(4);
-    const mira = this._estado === "pensando" ? new THREE.Vector2(0.006, 0.006) : new THREE.Vector2(this.mirada.x * 0.006, this.mirada.y * 0.004);
-    for (const iris of r.iris) iris.position.set(mira.x, mira.y, 0);
+    cab.set(base.x + asiente, base.y, base.z);
 
-    // cejas: suben al escuchar, al pensar y al enfatizar
-    const subir = this._estado === "escuchando" ? 0.01 : this._estado === "pensando" ? 0.007 : this.apertura * 0.005;
+    // ojos: iris hacia la mirada (arriba al pensar), parpadeo, ojos felices al sonreír, abiertos al sorprenderse
+    const irisY = estado === "pensando" ? 0.2 : this.mirada.x * 0.23;
+    const irisX = estado === "pensando" ? -0.32 : -this.mirada.y * 0.16;
+    for (const iris of r.iris) {
+      iris.rotation.y += (irisY - iris.rotation.y) * suave(14);
+      iris.rotation.x += (irisX - iris.rotation.x) * suave(14);
+    }
+    if (ahora > this.proximoParpadeo) { this.parpadeo = ahora; this.proximoParpadeo = ahora + 2200 + Math.random() * 3500; }
+    const fase = (ahora - this.parpadeo) / 70;
+    const cierre = fase >= 0 && fase < 2 ? 1 - Math.abs(1 - fase) : 0;
+    const feliz = Math.max(0, this.sonrisa - 0.45) / 0.55;
+    const abierto = sorprendida ? -1.25 : estado === "pensando" ? -1.15 : -1.02 - this.mirada.y * 0.12 + feliz * 0.15;
+    this.parpado.sup += (abierto - this.parpado.sup) * suave(12);
+    this.parpado.inf += (0.95 - feliz * 0.45 - this.parpado.inf) * suave(8);
+    const sup = this.parpado.sup + (1.25 - this.parpado.sup) * cierre;
+    for (const p of r.parpadosSup) p.rotation.x = sup;
+    for (const p of r.parpadosInf) p.rotation.x = this.parpado.inf;
+
+    // cejas: suben al escuchar y al sorprenderse, una se arquea al pensar, acompañan el énfasis al hablar
+    const subir = sorprendida ? 1 : estado === "escuchando" ? 0.7 : estado === "pensando" ? 0.35 : habla * 0.45 + feliz * 0.25;
+    const interior = estado === "escuchando" ? 0.5 : sorprendida ? 0.3 : 0;
     r.cejas.forEach((ceja, i) => {
-      const extra = this._estado === "pensando" && i === 1 ? 0.005 : 0;
-      ceja.position.y += (ceja.userData.y + subir + extra - ceja.position.y) * suave(8);
+      const extra = estado === "pensando" && i === 1 ? 0.7 : 0;
+      this.cejas.subir[i] += (subir + extra - this.cejas.subir[i]) * suave(9);
+      this.cejas.interior[i] += (interior - this.cejas.interior[i]) * suave(6);
+      const { y, giro: giroBase, s } = ceja.userData;
+      ceja.position.y = y + this.cejas.subir[i] * 0.008;
+      ceja.rotation.z = giroBase - s * this.cejas.interior[i] * 0.22 + s * (estado === "pensando" && i === 0 ? 0.08 : 0);
     });
+    for (const mejilla of r.mejillas) {
+      mejilla.position.y = mejilla.userData.y + this.sonrisa * 0.004;
+      mejilla.material.opacity = 0.28 + this.sonrisa * 0.17;
+    }
 
-    // cuerpo: respiración, leve giro hacia la mirada y vaivén
-    this.torso.position.y = Math.sin(t * 1.7) * 0.004;
-    this.manta.scale.set(1 + Math.sin(t * 1.7) * 0.006, 1, 1 + Math.sin(t * 1.7) * 0.006);
+    // cuerpo: respiración (con algún suspiro), cambio de peso, se inclina hacia el usuario al escucharlo
+    const ds = (ahora - this.suspiroDesde) / 1800;
+    const suspiro = ds >= 0 && ds < 1 ? Math.sin(Math.PI * ds) : 0;
+    const respira = Math.sin(t * 1.7);
+    this.cadera += (this.pesoObjetivo - this.cadera) * suave(1.6);
+    this.torso.position.set(this.cadera, respira * 0.004 + suspiro * 0.007, 0);
+    this.manta.scale.set(1 + respira * 0.006 + suspiro * 0.012, 1, 1 + respira * 0.006 + suspiro * 0.012);
     this.personaje.rotation.y += (cab.y * 0.25 - this.personaje.rotation.y) * suave(2);
-    this.torso.rotation.x += ((this._estado === "escuchando" ? 0.04 : 0) - this.torso.rotation.x) * suave(3);
-    for (const [i, trenza] of this.trenzas.entries()) trenza.rotation.z = Math.sin(t * 1.3 + i) * 0.012 - cab.y * 0.03;
+    const inclinarTorso = estado === "escuchando" ? 0.06 : estado === "pensando" ? -0.015 : 0;
+    this.torso.rotation.x += (inclinarTorso - this.torso.rotation.x) * suave(3);
+    this.torso.rotation.z = -this.cadera * 1.2;
+    this._animarTelas(dt, t, cab);
 
     // aretes como péndulos que reaccionan al giro de la cabeza
     const a = this.aretes;
@@ -979,24 +1435,32 @@ export class Avatar3D {
     a.angulo += a.velocidad * dt;
     for (const arete of r.aretes) arete.rotation.set(a.angulo * 0.5, 0, a.angulo + Math.sin(t * 2) * 0.05);
 
-    // brazos hacia la pose del gesto
+    // brazos hacia la pose del gesto, con la forma de mano y el giro de muñeca de esa pose
     if (this.finGesto && ahora > this.finGesto) { this.gestoActual = "normal"; this.finGesto = 0; }
     for (const b of this.brazos) {
-      const pose = POSES[this.gestoActual](b.s);
-      const [x, y, z] = pose.mano;
-      const saluda = this.gestoActual === "saludar" && b.s > 0;
-      const mano = new THREE.Vector3(x + (saluda ? Math.sin(t * 9) * 0.06 : 0), y + Math.sin(t * 1.7) * 0.004, z);
-      b.mano.lerp(mano, suave(saluda ? 10 : 6));
-      b.polo.lerp(new THREE.Vector3(...pose.codo), suave(6));
+      const lado = b.s > 0 ? 1 : 0;
+      const señala = this.gestoActual === "señalar" && b.s === this.señal.s;
+      const pose = POSES_LADO[señala || this.gestoActual === "señalar" ? "normal" : this.gestoActual][lado];
+      const destinoMano = señala ? this.señal.mano : pose.mano;
+      const polo = señala ? tmp.polo.set(b.s, -0.6, -0.35) : pose.codo;
+      const ola = señala ? 0 : pose.ola;
+      tmp.mano.copy(destinoMano);
+      if (ola) tmp.mano.x += Math.sin(t * ola) * 0.06;
+      tmp.mano.y += respira * 0.004;
+      b.mano.lerp(tmp.mano, suave(ola ? 10 : 6));
+      b.polo.lerp(polo, suave(6));
       this._resolverBrazo(b);
+      b.giro += ((señala ? -b.s * 1.5 : pose.giro) - b.giro) * suave(8);
+      b.palma.rotation.z = ola ? Math.sin(t * ola) * 0.3 : 0;
+      this._ponerDedos(b, MANOS[señala ? "señalar" : pose.dedos], suave(10), t);
     }
 
     // plataforma: color del estado, pulso con la voz
-    const color = new THREE.Color(COLOR_ESTADO[this._estado]);
+    const color = tmp.color.setHex(COLOR_ESTADO[estado]);
     this.halo.material.color.lerp(color, suave(4));
     this.anillo.material.color.lerp(color, suave(4));
-    this.halo.material.opacity = 0.35 + Math.sin(t * 2.2) * 0.1 + this.apertura * 0.35;
-    this.halo.scale.setScalar(1 + this.apertura * 0.08 + (this._estado === "escuchando" ? Math.sin(t * 6) * 0.04 : 0));
+    this.halo.material.opacity = 0.35 + Math.sin(t * 2.2) * 0.1 + this.boca.abre * 0.35;
+    this.halo.scale.setScalar(1 + this.boca.abre * 0.08 + (estado === "escuchando" ? Math.sin(t * 6) * 0.04 : 0));
 
     // polvo dorado
     const pos = this.polvo.geometry.attributes.position;
@@ -1015,5 +1479,76 @@ export class Avatar3D {
     cam.lookAt(this.objetivo);
 
     this.renderer.render(this.escena, cam);
+    this._ajustarCalidad(real, ahora);
+  }
+
+  /** Pollera y trenzas con resortes: se quedan atrás al girar o mover la cadera y se mecen un poco al hablar. */
+  _animarTelas(dt, t, cab) {
+    const f = this.fisica;
+    const cuerpo = this.personaje.rotation.y;
+    const dGiro = cuerpo - f.giroPrevio;
+    const dCadera = this.cadera - f.caderaPrevia;
+    const dCabeza = cab.y - f.cabezaPrevia;
+    f.giroPrevio = cuerpo;
+    f.caderaPrevia = this.cadera;
+    f.cabezaPrevia = cab.y;
+
+    f.polleraGiro.x -= dGiro * 0.8;
+    resorte(f.polleraGiro, 0, dt, 38, 4.5);
+    f.polleraX.x -= dCadera * 0.9;
+    resorte(f.polleraX, Math.sin(t * 0.9) * 0.002, dt, 30, 4);
+    resorte(f.polleraZ, -this.torso.rotation.x * 0.05, dt, 30, 4);
+
+    const P = this.pollera;
+    const pos = P.malla.geometry.attributes.position;
+    const arr = pos.array, b = P.base;
+    const mueve = Math.min(1, Math.abs(f.polleraGiro.v) * 3 + Math.abs(f.polleraX.v) * 40);
+    for (let i = 0, j = 0; i < arr.length; i += 3, j++) {
+      const x = b[i], y = b[i + 1], z = b[i + 2];
+      const caida = limitar((P.alto / 2 - y) / P.alto, 0, 1);
+      const c2 = caida * caida;
+      const ang = f.polleraGiro.x * c2;
+      const cos = Math.cos(ang), sin = Math.sin(ang);
+      const onda = 1 + Math.sin(P.angulos[j] + t * 2.4) * 0.012 * caida * (0.25 + mueve);
+      arr[i] = (x * cos - z * sin) * onda + this.cadera * (1 - caida) + f.polleraX.x * c2;
+      arr[i + 1] = y;
+      arr[i + 2] = (x * sin + z * cos) * onda + f.polleraZ.x * c2;
+    }
+    pos.needsUpdate = true;
+    for (const franja of P.franjas) {
+      const caida = limitar((P.arriba - franja.position.y) / P.alto, 0, 1);
+      franja.rotation.y = f.polleraGiro.x * caida * caida;
+      franja.position.x = this.cadera * (1 - caida) + f.polleraX.x * caida * caida;
+      franja.position.z = f.polleraZ.x * caida * caida;
+    }
+
+    for (const tr of this.trenzas) {
+      tr.ladeo.v -= dCabeza * 1.5 + dGiro * 2 + dCadera * 6;
+      resorte(tr.ladeo, Math.sin(t * 1.3 + tr.s) * 0.012 - cab.y * 0.03 - this.torso.rotation.z, dt, 26, 3.5);
+      resorte(tr.vaiven, -this.torso.rotation.x - cab.x * 0.15, dt, 26, 3.5);
+      tr.ladeo.x = limitar(tr.ladeo.x, -0.05, 0.05);
+      tr.vaiven.x = limitar(tr.vaiven.x, -0.09, 0.015);
+      this._doblarTrenza(tr);
+    }
+  }
+
+  /** Baja la resolución interna si el equipo no llega a ~40 cuadros por segundo y la recupera si sobra. */
+  _ajustarCalidad(real, ahora) {
+    const c = this.calidad;
+    if (!c.activa || real > 1) return;
+    c.suma += real;
+    c.cuadros++;
+    if (c.suma < 2) return;
+    const promedio = c.suma / c.cuadros;
+    c.suma = c.cuadros = 0;
+    const actual = this.renderer.getPixelRatio();
+    let nuevo = actual;
+    if (promedio > 1 / 40 && actual > c.minima) nuevo = Math.max(c.minima, actual * 0.85);
+    else if (promedio < 1 / 57 && actual < c.maxima && ahora - c.ultimoCambio > 8000) nuevo = Math.min(c.maxima, actual + 0.1);
+    if (nuevo !== actual) {
+      c.ultimoCambio = ahora;
+      this.renderer.setPixelRatio(nuevo);
+      this._redimensionar();
+    }
   }
 }
