@@ -14,17 +14,20 @@ import * as THREE from "three";
 
 const C = {
   piel: 0xc68a5c, pielOscura: 0xa96f46, cabello: 0x1e1412, sombrero: 0xf7f3ea, cinta: 0x151515,
-  blusa: 0xfbf7ef, pollera: 0xc2185b, oro: 0xe7b73a, labio: 0xb4505a, boca: 0x3a0d12,
+  blusa: 0xfbf7ef, pollera: 0xc2185b, oro: 0xe7b73a, labio: 0xb4505a, boca: 0x3a0d12, manta: 0xb03a63,
 };
 const COLOR_ESTADO = { normal: 0xe7b73a, escuchando: 0xff5470, pensando: 0x8f7bff };
 
-// pose de cada brazo: [hombro x, y, z, codo x, y, z]; s = +1 brazo izquierdo de Paseito (derecha de la pantalla)
+// Pose de cada brazo en coordenadas del torso: adónde va la mano y hacia dónde apunta el codo.
+// s = +1 brazo izquierdo de Paseito (derecha de la pantalla).
 const POSES = {
-  normal: (s) => [-0.2, 0, s * 0.18, -1.3, 0, -s * 0.55],
-  saludar: (s) => (s > 0 ? [-0.25, 0, 2.55, -0.25, 0, 0.35] : POSES.normal(s)),
-  presentar: (s) => (s > 0 ? [-0.95, 0, 0.6, -0.45, 0, 0.15] : POSES.normal(s)),
-  pensar: (s) => (s < 0 ? [-0.85, 0, -0.1, -2.0, 0, 0.65] : POSES.normal(s)),
+  normal: (s) => ({ mano: [s * 0.05, 0.83, 0.3], codo: [s, -0.4, -0.45] }),
+  saludar: (s) => (s > 0 ? { mano: [0.42, 1.62, 0.16], codo: [1, -0.8, -0.1] } : POSES.normal(s)),
+  presentar: (s) => (s > 0 ? { mano: [0.48, 1.03, 0.28], codo: [0.5, -1, -0.4] } : POSES.normal(s)),
+  pensar: (s) => (s < 0 ? { mano: [-0.05, 1.43, 0.21], codo: [-0.4, -1, 0.15] } : POSES.normal(s)),
 };
+const ABAJO = new THREE.Vector3(0, -1, 0);
+const tmp = { a: new THREE.Vector3(), b: new THREE.Vector3(), c: new THREE.Vector3(), d: new THREE.Vector3(), q: new THREE.Quaternion() };
 
 function aleatorio(semilla) {
   let s = semilla;
@@ -97,6 +100,120 @@ const texturaPlataforma = () => lienzo(512, 512, (g, w) => {
     g.restore();
   }
 });
+
+/**
+ * Cristo de la Concordia con sus proporciones reales (1 unidad = 10 m): imagen de 3,42 sobre pedestal de 0,62,
+ * 3,29 entre las manos y cabeza de 0,46. Túnica con pliegues, manto cruzado al pecho, mangas anchas que cuelgan
+ * bajo los antebrazos, cabeza levemente inclinada hacia la ciudad y pedestal redondo escalonado con la cruz.
+ */
+function crearCristo() {
+  const mat = new THREE.MeshStandardMaterial({ color: 0xf4f0e6, emissive: 0x403c34, roughness: 0.6, side: THREE.DoubleSide });
+  const sombreado = new THREE.MeshStandardMaterial({ color: 0xd9d2c4, emissive: 0x2a2620, roughness: 0.7, side: THREE.DoubleSide });
+  const cristo = new THREE.Group();
+
+  for (const [r, alto, y] of [[0.56, 0.24, 0.12], [0.48, 0.22, 0.35], [0.41, 0.16, 0.54]]) {
+    cristo.add(colocar(new THREE.Mesh(new THREE.CylinderGeometry(r, r * 1.03, alto, 40), mat), 0, y, 0));
+  }
+  cristo.add(colocar(new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.17, 0.02), sombreado), 0, 0.36, 0.49));
+  cristo.add(colocar(new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.032, 0.02), sombreado), 0, 0.395, 0.49));
+
+  const cuerpo = new THREE.Group();
+  cuerpo.position.y = 0.62;
+  cristo.add(cuerpo);
+
+  // túnica: más ancha en el ruedo, pliegues verticales hasta el pecho
+  const tunica = new THREE.LatheGeometry(
+    [[0.38, 0], [0.32, 0.14], [0.28, 0.7], [0.26, 1.4], [0.27, 2.0], [0.3, 2.45], [0.33, 2.66], [0.24, 2.78], [0.1, 2.84]]
+      .map(([r, y]) => new THREE.Vector2(r, y)), 48,
+  );
+  const pt = tunica.attributes.position;
+  for (let i = 0; i < pt.count; i++) {
+    const y = pt.getY(i);
+    if (y > 2.4) continue;
+    const k = 1 + Math.sin(Math.atan2(pt.getZ(i), pt.getX(i)) * 14) * 0.03 * (1 - y / 2.4);
+    pt.setXYZ(i, pt.getX(i) * k, y, pt.getZ(i) * k);
+  }
+  tunica.computeVertexNormals();
+  const malla = new THREE.Mesh(tunica, mat);
+  malla.scale.z = 0.72;
+  cuerpo.add(malla);
+
+  // capa sobre los hombros, bordes de la túnica al frente y el manto cruzado sobre el pecho
+  const capa = new THREE.Mesh(
+    new THREE.LatheGeometry([[0.31, 2.2], [0.34, 2.48], [0.355, 2.64], [0.27, 2.77], [0.12, 2.83]].map(([r, y]) => new THREE.Vector2(r, y)), 40),
+    mat,
+  );
+  capa.scale.z = 0.76;
+  cuerpo.add(capa);
+  for (const s of [-1, 1]) {
+    const borde = new THREE.Mesh(new THREE.CapsuleGeometry(0.018, 1.75, 4, 8), sombreado);
+    borde.position.set(s * 0.1, 1.25, 0.2);
+    borde.rotation.z = s * 0.03;
+    cuerpo.add(borde);
+  }
+  const banda = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.15, 0.02), sombreado);
+  banda.position.set(0.02, 2.33, 0.228);
+  banda.rotation.z = -0.48;
+  cuerpo.add(banda);
+
+  // brazos abiertos, apenas levantados, con la manga ancha que cae bajo el antebrazo
+  const caida = new THREE.Shape();
+  caida.moveTo(0, 0);
+  caida.lineTo(1.22, 0);
+  caida.quadraticCurveTo(1.27, -0.2, 1.2, -0.4);
+  caida.quadraticCurveTo(0.98, -0.47, 0.74, -0.37);
+  caida.quadraticCurveTo(0.6, -0.2, 0.42, -0.16);
+  caida.quadraticCurveTo(0.12, -0.22, 0, -0.52);
+  caida.closePath();
+  const geoManga = new THREE.ExtrudeGeometry(caida, {
+    depth: 0.08, bevelEnabled: true, bevelThickness: 0.03, bevelSize: 0.025, bevelSegments: 3, curveSegments: 10,
+  }).translate(0, -0.04, -0.04);
+  for (const s of [-1, 1]) {
+    const brazo = new THREE.Group();
+    brazo.position.set(s * 0.26, 2.62, 0);
+    brazo.rotation.z = s * 0.07;
+    brazo.scale.x = s;
+    brazo.add(colocar(new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.14, 1.3, 16).rotateZ(-Math.PI / 2), mat), 0.62, 0, 0));
+    brazo.add(colocar(new THREE.Mesh(new THREE.SphereGeometry(0.14, 16, 12), mat), 0, 0, 0));
+    brazo.add(new THREE.Mesh(geoManga, mat));
+    const puno = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.08, 0.08, 14).rotateZ(-Math.PI / 2), mat);
+    puno.position.x = 1.29;
+    const palma = new THREE.Mesh(new THREE.SphereGeometry(1, 18, 12), mat);
+    palma.scale.set(0.11, 0.05, 0.09);
+    palma.position.set(1.4, 0.01, 0.01);
+    const dedos = new THREE.Mesh(new THREE.CapsuleGeometry(0.045, 0.1, 4, 10).rotateZ(-Math.PI / 2), mat);
+    dedos.scale.set(1, 0.85, 1.5);
+    dedos.position.set(1.52, 0.035, 0.005);
+    dedos.rotation.z = 0.25;
+    const pulgar = new THREE.Mesh(new THREE.CapsuleGeometry(0.025, 0.07, 4, 8).rotateX(Math.PI / 2), mat);
+    pulgar.position.set(1.38, 0.03, 0.1);
+    pulgar.rotation.y = -0.5;
+    brazo.add(puno, palma, dedos, pulgar);
+    cuerpo.add(brazo);
+  }
+
+  // cabeza con cabello largo hasta los hombros y barba, mirando un poco hacia abajo, a la ciudad
+  cuerpo.add(colocar(new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.11, 0.16, 16), mat), 0, 2.86, 0));
+  const cabeza = new THREE.Group();
+  cabeza.position.set(0, 3.1, 0.02);
+  cabeza.rotation.x = 0.2;
+  const craneo = new THREE.Mesh(new THREE.SphereGeometry(0.19, 28, 20), mat);
+  craneo.scale.set(0.9, 1.18, 0.98);
+  const cabello = new THREE.Mesh(new THREE.SphereGeometry(0.2, 28, 20, Math.PI / 2 + 0.9, Math.PI * 2 - 1.8, 0, Math.PI * 0.62), sombreado);
+  cabello.scale.set(0.95, 1.18, 1);
+  const melena = new THREE.Mesh(new THREE.CapsuleGeometry(0.14, 0.24, 6, 16), sombreado);
+  melena.scale.set(1.35, 1, 0.55);
+  melena.position.set(0, -0.2, -0.08);
+  const barba = new THREE.Mesh(new THREE.SphereGeometry(0.1, 18, 12, 0, Math.PI * 2, Math.PI * 0.35, Math.PI * 0.65), sombreado);
+  barba.scale.set(1, 1.15, 0.85);
+  barba.position.set(0, -0.1, 0.07);
+  const nariz = new THREE.Mesh(new THREE.ConeGeometry(0.025, 0.07, 8), sombreado);
+  nariz.rotation.x = 0.35;
+  nariz.position.set(0, 0, 0.18);
+  cabeza.add(melena, craneo, cabello, barba, nariz);
+  cuerpo.add(cabeza);
+  return cristo;
+}
 
 const texturaLetrero = () => lienzo(512, 96, (g, w, h) => {
   g.fillStyle = "#7a1f3d";
@@ -318,47 +435,99 @@ export class Avatar3D {
       e.add(monte, nieve);
     }
 
-    // ciudad: casitas y árboles en el valle
-    const colores = [0xeedcbc, 0xd9a07a, 0xc77d5a, 0xf3e9d6, 0xe5c79a];
-    const geoCasa = new THREE.BoxGeometry(1, 1, 1);
+    // el Tunari: el pico nevado que domina el valle
+    const tunari = new THREE.Group();
+    tunari.add(colocar(new THREE.Mesh(new THREE.ConeGeometry(17, 27, 7, 1), matMonte), 0, 12, 0));
+    const cumbre = new THREE.Mesh(new THREE.ConeGeometry(6.4, 10.2, 7, 1), matNieve);
+    cumbre.position.y = 21;
+    cumbre.scale.setScalar(1.03);
+    tunari.add(cumbre);
+    tunari.position.set(-14, -1.5, -64);
+    tunari.rotation.y = 0.4;
+    e.add(tunari);
+
+    // ciudad jardín: casitas con techo de teja, jacarandás morados y molles
+    const colores = [0xf3e9d6, 0xeedcbc, 0xe5c79a, 0xf6efe2, 0xd9a07a];
+    const geoCasa = new THREE.BoxGeometry(1, 1, 1).translate(0, 0.5, 0);
+    const geoTecho = new THREE.ConeGeometry(0.78, 0.42, 4).rotateY(Math.PI / 4).translate(0, 1.21, 0);
+    const matTeja = new THREE.MeshStandardMaterial({ color: 0xb4532f, flatShading: true, roughness: 0.9 });
     const geoCopa = new THREE.IcosahedronGeometry(0.55, 0);
-    const matCopa = new THREE.MeshStandardMaterial({ color: 0x4f8a3c, flatShading: true });
-    for (let i = 0; i < 90; i++) {
-      const x = (azar() - 0.5) * 60;
-      const z = -9 - azar() * 26;
-      if (Math.abs(x) < 3 && z > -14) continue;
+    const matCopas = [0x9b72d9, 0x4f8a3c, 0xb08ae6, 0x6c9a45].map((color) => new THREE.MeshStandardMaterial({ color, flatShading: true }));
+    for (let i = 0; i < 130; i++) {
+      const x = (azar() - 0.5) * 64;
+      const z = -8 - azar() * 30;
+      if (Math.abs(x) < 6 && z > -16) continue;
       if (i % 3 === 0) {
-        const arbol = new THREE.Mesh(geoCopa, matCopa);
+        const arbol = new THREE.Mesh(geoCopa, matCopas[i % matCopas.length]);
         arbol.position.set(x, 0.6 + azar() * 0.3, z);
         arbol.scale.setScalar(0.8 + azar() * 0.7);
         e.add(arbol);
       } else {
-        const alto = 0.4 + azar() * 1.1;
-        const casa = new THREE.Mesh(geoCasa, new THREE.MeshStandardMaterial({ color: colores[i % colores.length], roughness: 0.9 }));
-        casa.scale.set(0.8 + azar() * 1.4, alto, 0.8 + azar() * 1.2);
-        casa.position.set(x, alto / 2, z);
+        const casa = new THREE.Group();
+        casa.add(new THREE.Mesh(geoCasa, new THREE.MeshStandardMaterial({ color: colores[i % colores.length], roughness: 0.9 })));
+        casa.add(new THREE.Mesh(geoTecho, matTeja));
+        casa.scale.set(0.8 + azar() * 1.2, 0.5 + azar() * 0.8, 0.8 + azar() * 1.0);
+        casa.position.set(x, 0, z);
         casa.rotation.y = azar() * 0.6;
         e.add(casa);
       }
     }
 
-    // cerro San Pedro con el Cristo de la Concordia
+    // cerro San Pedro con el Cristo de la Concordia y el teleférico
     this.cerro = new THREE.Group();
-    const loma = new THREE.Mesh(new THREE.SphereGeometry(4.6, 9, 6), new THREE.MeshStandardMaterial({ color: 0x8f7c52, flatShading: true, roughness: 1 }));
-    loma.scale.set(1, 0.55, 1);
-    loma.position.y = -0.6;
-    const matCristo = new THREE.MeshStandardMaterial({ color: 0xf4f1ea, emissive: 0x3a3630, roughness: 0.6 });
-    const cristo = new THREE.Group();
-    cristo.add(
-      colocar(new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.6, 0.7), matCristo), 0, 0.3, 0),
-      colocar(new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.3, 1.6, 8), matCristo), 0, 1.4, 0),
-      colocar(new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.16, 0.18), matCristo), 0, 1.95, 0),
-      colocar(new THREE.Mesh(new THREE.SphereGeometry(0.15, 12, 8), matCristo), 0, 2.32, 0),
-    );
-    cristo.position.y = 1.75;
-    cristo.scale.setScalar(1.15);
-    this.cerro.add(loma, cristo);
-    this.cerro.position.set(6, 0, -14);
+    const geoLoma = new THREE.SphereGeometry(7, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2);
+    const pl = geoLoma.attributes.position;
+    for (let i = 0; i < pl.count; i++) {
+      if (pl.getY(i) < 0.01) continue;
+      const k = 1 + (azar() - 0.5) * 0.08;
+      pl.setXYZ(i, pl.getX(i) * k, pl.getY(i), pl.getZ(i) * k);
+    }
+    geoLoma.computeVertexNormals();
+    const loma = new THREE.Mesh(geoLoma, new THREE.MeshStandardMaterial({ color: 0x9a8a57, flatShading: true, roughness: 1 }));
+    loma.scale.set(1, 0.37, 0.75);
+    this.cerro.add(loma);
+    for (let i = 0; i < 14; i++) {
+      const a = azar() * Math.PI * 2;
+      const r = 3 + azar() * 3.5;
+      const arbusto = new THREE.Mesh(geoCopa, matCopas[1 + (i % 2) * 2]);
+      const y = 0.37 * Math.sqrt(Math.max(0, 49 - r * r));
+      arbusto.position.set(Math.cos(a) * r, y + 0.1, Math.sin(a) * r * 0.75);
+      arbusto.scale.setScalar(0.5 + azar() * 0.3);
+      this.cerro.add(arbusto);
+    }
+
+    const cristo = crearCristo();
+    cristo.position.y = 2.5;
+    cristo.rotation.y = -0.2;
+    cristo.scale.setScalar(1.2);
+    this.cerro.add(cristo);
+
+    const tramo = (a, b, radio, mat) => {
+      const dir = new THREE.Vector3().subVectors(b, a);
+      const m = new THREE.Mesh(new THREE.CylinderGeometry(radio, radio, dir.length(), 6), mat);
+      m.position.copy(a).add(b).multiplyScalar(0.5);
+      m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.normalize());
+      return m;
+    };
+    const matCable = new THREE.MeshBasicMaterial({ color: 0x3a3a44 });
+    const matEstacion = new THREE.MeshStandardMaterial({ color: 0xece6da, roughness: 0.8 });
+    const matCabina = new THREE.MeshStandardMaterial({ color: 0xd8342f, roughness: 0.5 });
+    const abajoEst = new THREE.Vector3(-8.5, 0.75, 5.5);
+    const arribaEst = new THREE.Vector3(-1.9, 2.75, 1.2);
+    this.cerro.add(colocar(new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.7, 0.7), matEstacion), abajoEst.x, 0.35, abajoEst.z));
+    this.cerro.add(colocar(new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.6, 0.6), matEstacion), arribaEst.x, arribaEst.y - 0.4, arribaEst.z));
+    for (const lado of [-0.12, 0.12]) {
+      const desfase = new THREE.Vector3(0, 0, lado);
+      this.cerro.add(tramo(abajoEst.clone().add(desfase), arribaEst.clone().add(desfase), 0.012, matCable));
+    }
+    for (const [f, subiendo] of [[0.22, 1], [0.48, -1], [0.74, 1]]) {
+      const punto = abajoEst.clone().lerp(arribaEst, f);
+      const cabina = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.24, 0.2), matCabina);
+      cabina.position.set(punto.x, punto.y - 0.2, punto.z + subiendo * 0.12);
+      this.cerro.add(cabina, tramo(punto.clone().setZ(punto.z + subiendo * 0.12), cabina.position, 0.008, matCable));
+    }
+    this.cerro.position.set(6, 0, -21);
+    this.cerro.scale.setScalar(0.62);
     e.add(this.cerro);
 
     // edificio del Paseo Aranjuez
@@ -372,8 +541,9 @@ export class Avatar3D {
     const letrero = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 0.6), new THREE.MeshBasicMaterial({ map: texturaLetrero() }));
     letrero.position.set(0, 3.15, 1.0);
     this.paseo.add(letrero);
-    this.paseo.position.set(-7, 0, -11);
-    this.paseo.rotation.y = 0.35;
+    this.paseo.position.set(-7, 0, -15);
+    this.paseo.rotation.y = 0.4;
+    this.paseo.scale.setScalar(0.75);
     e.add(this.paseo);
 
     // plataforma con anillo de aguayo y halo que cambia de color según el estado
@@ -449,7 +619,7 @@ export class Avatar3D {
     T.add(this._pieza(new THREE.LatheGeometry(perfilTorso.map(([r, y]) => new THREE.Vector2(r, y)), 48), this._toon(C.blusa, { side: THREE.DoubleSide }), 0.02));
 
     // perfil de abajo hacia arriba: si no, las caras miran adentro y el contorno negro tapa la manta
-    const perfilManta = [[0.3, 0.97], [0.298, 1.07], [0.285, 1.19], [0.245, 1.29], [0.16, 1.35], [0.075, 1.385]];
+    const perfilManta = [[0.295, 1.07], [0.293, 1.14], [0.282, 1.22], [0.245, 1.3], [0.16, 1.355], [0.075, 1.385]];
     const aguayo = texturaAguayo();
     aguayo.flipY = false;
     this.manta = this._pieza(
@@ -478,22 +648,68 @@ export class Avatar3D {
     T.add(this.cabeza);
   }
 
+  /** Brazo: la manta cubre hasta el codo, luego la manga de la blusa con volado y la mano. */
   _brazo(s) {
+    const largoBrazo = 0.28;
+    const largoAntebrazo = 0.255;
     const hombro = new THREE.Group();
-    hombro.position.set(s * 0.2, 1.27, 0);
-    hombro.add(this._pieza(new THREE.CapsuleGeometry(0.042, 0.19, 6, 12).translate(0, -0.12, 0), this._toon(C.blusa), 0.03));
+    hombro.position.set(s * 0.245, 1.255, 0.01);
+    hombro.add(this._pieza(new THREE.CapsuleGeometry(0.054, 0.21, 6, 16).translate(0, -0.13, 0), this._toon(C.manta), 0.03));
+    for (const [y, color] of [[-0.2, 0xf2b705], [-0.22, 0x1f9d55], [-0.238, 0x2b59c3]]) {
+      const franja = new THREE.Mesh(new THREE.CylinderGeometry(0.0565, 0.0565, 0.016, 24, 1, true), this._toon(color, { side: THREE.DoubleSide }));
+      franja.position.y = y;
+      hombro.add(franja);
+    }
+
     const codo = new THREE.Group();
-    codo.position.y = -0.25;
-    codo.add(this._pieza(new THREE.CapsuleGeometry(0.038, 0.17, 6, 12).translate(0, -0.11, 0), this._toon(C.blusa), 0.03));
-    const mano = this._pieza(new THREE.SphereGeometry(0.042, 16, 12), this._toon(C.piel), 0.04);
-    mano.scale.set(0.8, 1, 0.6);
-    mano.position.y = -0.235;
+    codo.position.y = -largoBrazo;
+    codo.add(this._pieza(new THREE.CapsuleGeometry(0.04, 0.15, 6, 14).translate(0, -0.1, 0), this._toon(C.blusa), 0.03));
+    const volado = new THREE.Mesh(new THREE.TorusGeometry(0.04, 0.014, 8, 24), this._toon(C.blusa));
+    volado.rotation.x = Math.PI / 2;
+    volado.position.y = -0.2;
+    codo.add(volado);
+
+    const piel = this._toon(C.piel);
+    const mano = new THREE.Group();
+    mano.position.y = -largoAntebrazo;
+    const palma = this._pieza(new THREE.SphereGeometry(0.04, 18, 14), piel, 0.05);
+    palma.scale.set(1, 1.05, 0.62);
+    const dedos = this._pieza(new THREE.SphereGeometry(0.034, 16, 12), piel, 0.05);
+    dedos.scale.set(1, 1.15, 0.55);
+    dedos.position.y = -0.042;
+    const pulgar = this._pieza(new THREE.CapsuleGeometry(0.012, 0.03, 4, 8), piel, 0.08);
+    pulgar.position.set(-s * 0.034, -0.008, 0.01);
+    pulgar.rotation.z = -s * 0.5;
+    mano.add(palma, dedos, pulgar);
     codo.add(mano);
     hombro.add(codo);
+
     const pose = POSES.normal(s);
-    hombro.rotation.set(pose[0], pose[1], pose[2]);
-    codo.rotation.set(pose[3], pose[4], pose[5]);
-    return { s, hombro, codo };
+    const brazo = {
+      s, hombro, codo, largoBrazo, largoAntebrazo,
+      mano: new THREE.Vector3(...pose.mano),
+      polo: new THREE.Vector3(...pose.codo),
+    };
+    this._resolverBrazo(brazo);
+    return brazo;
+  }
+
+  /** IK de dos huesos: orienta hombro y codo para que la mano llegue a brazo.mano, con el codo hacia brazo.polo. */
+  _resolverBrazo(b) {
+    const S = b.hombro.position;
+    const haciaMano = tmp.a.subVectors(b.mano, S);
+    const d = THREE.MathUtils.clamp(haciaMano.length(), 0.05, b.largoBrazo + b.largoAntebrazo - 0.002);
+    const dir = haciaMano.normalize();
+    const cosA = (b.largoBrazo ** 2 + d ** 2 - b.largoAntebrazo ** 2) / (2 * b.largoBrazo * d);
+    const angulo = Math.acos(THREE.MathUtils.clamp(cosA, -1, 1));
+    const lado = tmp.b.copy(b.polo).addScaledVector(dir, -b.polo.dot(dir)).normalize();
+    const codo = tmp.c.copy(S)
+      .addScaledVector(dir, Math.cos(angulo) * b.largoBrazo)
+      .addScaledVector(lado, Math.sin(angulo) * b.largoBrazo);
+    b.hombro.quaternion.setFromUnitVectors(ABAJO, tmp.d.subVectors(codo, S).normalize());
+    const antebrazo = tmp.d.copy(S).addScaledVector(dir, d).sub(codo).normalize()
+      .applyQuaternion(tmp.q.copy(b.hombro.quaternion).invert());
+    b.codo.quaternion.setFromUnitVectors(ABAJO, antebrazo);
   }
 
   _trenza(s) {
@@ -669,9 +885,10 @@ export class Avatar3D {
     const anchoLibre = Math.max(0.3, (w - izquierda - derecha) / w);
     // de la mitad de la pollera (y≈0.45) a la copa del sombrero (y≈2.07), con el brazo en alto para saludar
     this.distancia = Math.max(0.86 / (tanV * altoLibre), 0.52 / (tanV * cam.aspect * anchoLibre));
-    const mitad = (prof) => tanV * cam.aspect * (this.distancia + prof);
-    this.cerro.position.x = Math.min(7, mitad(14) * 0.6);
-    this.paseo.position.x = -Math.min(8.5, mitad(11) * 0.68);
+    // medio ancho visible (sin los paneles) a esa profundidad: el Cristo y el Paseo quedan a la vista, no detrás de la interfaz
+    const libre = (objeto) => tanV * cam.aspect * anchoLibre * (this.distancia - objeto.position.z);
+    this.cerro.position.x = Math.min(12, libre(this.cerro) * 0.78);
+    this.paseo.position.x = -Math.min(9, libre(this.paseo) * 0.7);
     const dx = (derecha - izquierda) / 2;
     const dy = (abajo - arriba) / 2;
     if (dx || dy) cam.setViewOffset(w, h, dx, dy, w, h);
@@ -766,14 +983,12 @@ export class Avatar3D {
     if (this.finGesto && ahora > this.finGesto) { this.gestoActual = "normal"; this.finGesto = 0; }
     for (const b of this.brazos) {
       const pose = POSES[this.gestoActual](b.s);
-      if (this.gestoActual === "saludar" && b.s > 0) pose[5] += Math.sin(t * 9) * 0.4;
-      const k = suave(6);
-      b.hombro.rotation.x += (pose[0] - b.hombro.rotation.x) * k;
-      b.hombro.rotation.y += (pose[1] - b.hombro.rotation.y) * k;
-      b.hombro.rotation.z += (pose[2] - b.hombro.rotation.z) * k;
-      b.codo.rotation.x += (pose[3] - b.codo.rotation.x) * k;
-      b.codo.rotation.y += (pose[4] - b.codo.rotation.y) * k;
-      b.codo.rotation.z += (pose[5] - b.codo.rotation.z) * k;
+      const [x, y, z] = pose.mano;
+      const saluda = this.gestoActual === "saludar" && b.s > 0;
+      const mano = new THREE.Vector3(x + (saluda ? Math.sin(t * 9) * 0.06 : 0), y + Math.sin(t * 1.7) * 0.004, z);
+      b.mano.lerp(mano, suave(saluda ? 10 : 6));
+      b.polo.lerp(new THREE.Vector3(...pose.codo), suave(6));
+      this._resolverBrazo(b);
     }
 
     // plataforma: color del estado, pulso con la voz

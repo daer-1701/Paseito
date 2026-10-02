@@ -62,7 +62,16 @@ def prueba_voz():
     return RedirectResponse("/prueba-voz.html")
 
 
+class FrontendSinCache(StaticFiles):
+    """El navegador revalida cada archivo (304 si no cambió): el kiosco nunca se queda con JS viejo."""
+
+    async def get_response(self, path, scope):
+        respuesta = await super().get_response(path, scope)
+        respuesta.headers["Cache-Control"] = "no-cache"
+        return respuesta
+
+
 # Comodidad para desarrollo y para el kiosco: si el frontend está al lado, se sirve en la raíz.
 # Va al final para que las rutas de la API tengan prioridad.
 if FRONTEND_DIR and FRONTEND_DIR.is_dir():
-    app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")
+    app.mount("/", FrontendSinCache(directory=FRONTEND_DIR, html=True), name="frontend")
