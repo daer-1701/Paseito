@@ -23,6 +23,16 @@ Los contratos entre equipos se documentan en `packages/contracts`.
 
 ## Correr Jarvis
 
+Para la **torre Windows 11 + WSL2 + RTX 4070**, seguir el
+[arranque con Docker y voz local](docs/arranque-torre-windows.md).
+Una vez instalados Docker Desktop y el controlador NVIDIA:
+
+```bash
+bash scripts/start-tower.sh
+```
+
+Para desarrollo directo en la Mac:
+
 ```bash
 cd apps/jarvis-backend
 python3 -m jarvis.seed

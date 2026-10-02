@@ -11,7 +11,7 @@ from urllib.parse import unquote, urlparse
 from .agent import chat
 from .stimulus import gaze
 from .store import connect, delete, upsert
-from .voice import MAX_AUDIO_BYTES, VoiceUnavailable, status as voice_status, synthesize, transcribe
+from .voice import MAX_AUDIO_BYTES, VoiceUnavailable, status as voice_status, synthesize, transcribe, stream_speech
 
 
 WEB_DIR = Path(__file__).resolve().parents[1] / "web"
@@ -115,7 +115,38 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self) -> None:
         path = urlparse(self.path).path
-        if path == "/chat":
+        if path == "/voice/stream":
+            stream = None
+            started = False
+            try:
+                payload = self.read_json()
+                stream = stream_speech(payload.get("text"))
+                first = next(stream, None)
+                if not first:
+                    raise VoiceUnavailable("empty speech stream")
+                self.send_response(200)
+                self.send_header("Content-Type", "application/x-ndjson")
+                self.send_header("Cache-Control", "no-store")
+                self.send_header("X-Accel-Buffering", "no")
+                self.send_header("Connection", "close")
+                self.end_headers()
+                started = True
+                self.wfile.write(first)
+                self.wfile.flush()
+                for chunk in stream:
+                    self.wfile.write(chunk)
+                    self.wfile.flush()
+            except (BrokenPipeError, ConnectionResetError):
+                pass
+            except (ValueError, VoiceUnavailable) as exc:
+                if not started:
+                    self.send_json(400 if isinstance(exc, ValueError) else 503, {"error": str(exc)})
+                # After headers, close the incomplete stream; never append a second HTTP response.
+            finally:
+                self.close_connection = True
+                if stream:
+                    stream.close()
+        elif path == "/chat":
             try:
                 payload = self.read_json()
                 with connect() as db:

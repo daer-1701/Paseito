@@ -35,6 +35,13 @@ origen exacto; no se habilita CORS abierto por defecto.
 
 ## Voz local
 
+El perfil [Windows + RTX 4070](../../docs/arranque-torre-windows.md) usa
+`compose.yaml` desde la raíz: modelos residentes, Whisper en CUDA y Kokoro en
+español. `POST /voice/stream` entrega PCM16/24 kHz en tramas NDJSON y el kiosco
+reproduce por segmentos. `JARVIS_TTS_PROVIDER=gpu` y `JARVIS_VOICE_URL` habilitan
+ese adaptador; no requiere una clave de OpenAI. Las instrucciones siguientes
+describen el modo local anterior, que continúa disponible en la Mac.
+
 La página ofrece grabación de hasta 12 segundos con botón. Envía WAV mono de
 16 kHz a `POST /voice/transcribe`, consulta `/chat` y pide el audio de respuesta
 a `POST /voice/synthesize`. `GET /voice/status` indica qué adaptadores están

@@ -3,6 +3,12 @@
 **Estado:** propuesta de arquitectura para después de la hackatón
 **Decisión inicial:** servidor central local en la torre con RTX 4070; kioscos ligeros; nube sólo donde aporta valor.
 
+Ya existe una configuración de arranque para el piloto en
+[Windows 11, WSL2 y RTX 4070](arranque-torre-windows.md), con Docker Compose,
+Whisper/Kokoro residentes y audio por segmentos. Está pendiente validar el build
+CUDA y medir la latencia en la torre. Las fases posteriores de este documento
+siguen siendo propuestas, no capacidades desplegadas.
+
 ## 1. Qué se está construyendo
 
 Jarvis debe pasar de ser un directorio que responde preguntas a ser el conserje

@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import importlib.util
+import base64
+import io
 import json
 import os
 import re
@@ -26,6 +28,17 @@ class VoiceUnavailable(RuntimeError):
 
 
 def status() -> dict:
+    service = os.getenv("JARVIS_VOICE_URL", "").rstrip("/")
+    if os.getenv("JARVIS_TTS_PROVIDER") == "gpu":
+        ready = False
+        try:
+            with urllib.request.urlopen(service + "/health", timeout=2) as response:
+                ready = json.loads(response.read(4096)).get("status") == "ready"
+        except (OSError, ValueError):
+            pass
+        return {"transcription": ready, "synthesis": "gpu" if ready else "browser",
+                "ready": ready, "streaming": ready, "prefer_server_stt": True,
+                "silence_ms": 650, "max_recording_seconds": MAX_SECONDS}
     whisper = os.getenv("JARVIS_WHISPER_BIN") or shutil.which("whisper-cli")
     model = os.getenv("JARVIS_WHISPER_MODEL", str(MODEL_DIR / "ggml-base.bin"))
     piper_model = os.getenv("JARVIS_PIPER_MODEL", str(MODEL_DIR / "es_MX-ald-medium.onnx"))
@@ -56,12 +69,26 @@ def _validate_wav(data: bytes) -> None:
                     raise ValueError("audio must be mono 16-bit PCM at 16 kHz")
                 if not 0 < wav.getnframes() / 16000 <= MAX_SECONDS:
                     raise ValueError("audio duration must be between 0 and 15 seconds")
+                if len(wav.readframes(wav.getnframes())) != wav.getnframes() * 2:
+                    raise ValueError("truncated WAV audio")
         except wave.Error as exc:
             raise ValueError("invalid WAV audio") from exc
 
 
 def transcribe(data: bytes) -> str:
     _validate_wav(data)
+    service = os.getenv("JARVIS_VOICE_URL", "").rstrip("/")
+    if service:
+        request = urllib.request.Request(service + "/transcribe", data=data,
+                                         headers={"Content-Type": "audio/wav"}, method="POST")
+        try:
+            with urllib.request.urlopen(request, timeout=30) as response:
+                result = json.loads(response.read(16384))
+            if not isinstance(result.get("text"), str):
+                raise ValueError("invalid transcription")
+            return result["text"][:2000]
+        except (OSError, ValueError) as exc:
+            raise VoiceUnavailable("GPU transcription unavailable or busy") from exc
     whisper = os.getenv("JARVIS_WHISPER_BIN") or shutil.which("whisper-cli")
     model = os.getenv("JARVIS_WHISPER_MODEL", str(MODEL_DIR / "ggml-base.bin"))
     if not whisper or not model or not Path(model).is_file():
@@ -158,8 +185,10 @@ def synthesize(text: str) -> tuple[bytes, str]:
         raise ValueError("text must contain 1 to 2000 characters")
     spoken = _speakable(text)
     provider = os.getenv("JARVIS_TTS_PROVIDER", "local").lower()
+    if provider == "gpu":
+        return _gpu_wav(spoken)
     if provider not in {"local", "openai", "auto"}:
-        raise ValueError("JARVIS_TTS_PROVIDER must be local, openai or auto")
+        raise ValueError("JARVIS_TTS_PROVIDER must be local, openai, auto or gpu")
     if provider in {"openai", "auto"} and os.getenv("OPENAI_API_KEY"):
         try:
             return _openai_synthesize(spoken)
@@ -167,3 +196,57 @@ def synthesize(text: str) -> tuple[bytes, str]:
             if os.getenv("JARVIS_TTS_STRICT_OPENAI") == "1":
                 raise
     return _local_synthesize(spoken)
+
+
+def stream_speech(text):
+    """Forward framed PCM as it arrives; closing the generator closes upstream."""
+    if not isinstance(text, str) or not 0 < len(text.strip()) <= 2000:
+        raise ValueError("text must contain 1 to 2000 characters")
+    service = os.getenv("JARVIS_VOICE_URL", "").rstrip("/")
+    if not service or os.getenv("JARVIS_TTS_PROVIDER") != "gpu":
+        raise VoiceUnavailable("streaming requires the GPU voice service")
+    request = urllib.request.Request(service + "/speech", method="POST",
+        data=json.dumps({"text": _speakable(text)}).encode(), headers={"Content-Type": "application/json"})
+    try:
+        with urllib.request.urlopen(request, timeout=30) as response:
+            if response.headers.get_content_type() != "application/x-ndjson":
+                raise VoiceUnavailable("unexpected speech stream format")
+            total = 0
+            while True:
+                chunk = response.read1(8192)
+                if not chunk:
+                    break
+                total += len(chunk)
+                if total > MAX_TTS_BYTES * 2:
+                    raise VoiceUnavailable("speech stream too large")
+                yield chunk
+    except OSError as exc:
+        raise VoiceUnavailable("GPU speech unavailable or busy") from exc
+
+
+def _gpu_wav(text):
+    """Compatibility for clients that still request a complete WAV."""
+    pending = b""
+    pcm = bytearray()
+    done = False
+    for chunk in stream_speech(text):
+        pending += chunk
+        while b"\n" in pending:
+            line, pending = pending.split(b"\n", 1)
+            event = json.loads(line)
+            if event.get("error"):
+                raise VoiceUnavailable("speech stream interrupted")
+            if "pcm" in event:
+                if event.get("sample_rate") != 24000:
+                    raise VoiceUnavailable("unexpected sample rate")
+                pcm.extend(base64.b64decode(event["pcm"], validate=True))
+                if len(pcm) > MAX_TTS_BYTES:
+                    raise VoiceUnavailable("speech too large")
+            done = done or event.get("done", False)
+    if not done or not pcm or len(pcm) % 2:
+        raise VoiceUnavailable("incomplete speech stream")
+    output = io.BytesIO()
+    with wave.open(output, "wb") as wav:
+        wav.setparams((1, 2, 24000, 0, "NONE", "not compressed"))
+        wav.writeframes(pcm)
+    return output.getvalue(), "audio/wav"

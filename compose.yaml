@@ -1,0 +1,63 @@
+name: paseo-jarvis
+services:
+  voice:
+    build:
+      context: .
+      dockerfile: services/voice/Dockerfile
+    platform: linux/amd64
+    restart: unless-stopped
+    environment:
+      WHISPER_MODEL: ${WHISPER_MODEL:-small}
+      KOKORO_VOICE: ${KOKORO_VOICE:-ef_dora}
+      HF_HUB_OFFLINE: ${HF_HUB_OFFLINE:-0}
+    volumes:
+      - voice-models:/models
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      start_period: 20m
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+  jarvis:
+    build:
+      context: .
+      dockerfile: apps/jarvis-backend/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      voice:
+        condition: service_healthy
+    environment:
+      JARVIS_TTS_PROVIDER: gpu
+      JARVIS_VOICE_URL: http://voice:8001
+      JARVIS_RESPONSE_MODE: strict
+      JARVIS_INGEST_TOKEN: ${JARVIS_INGEST_TOKEN:?Run bash scripts/start-tower.sh first}
+    ports:
+      - "127.0.0.1:${JARVIS_PUBLIC_PORT:-8000}:8000"
+    volumes:
+      - jarvis-data:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+volumes:
+  voice-models:
+  jarvis-data:
