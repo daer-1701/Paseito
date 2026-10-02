@@ -40,3 +40,6 @@ escogerlos y compartir únicamente los contratos de integración.
 
 La [recomendación técnica](docs/decisiones-tecnicas.md) propone un stack y los
 acuerdos de datos que el equipo debe cerrar antes de integrar la demo.
+La [propuesta de Jarvis presencial](docs/propuesta-jarvis-presencial.md) describe
+la experiencia, el servidor central, las garantías sobre fuentes y la
+demostración para el jurado.

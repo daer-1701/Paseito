@@ -4,25 +4,26 @@ Fecha: 2 de octubre de 2026. Objetivo: una demo funcional de Jarvis,
 PaseoYa y Paseo Points antes del domingo a las 10:00. Suposiciones: demo en
 navegador, USD 10 iniciales para la API de OpenAI y datos preparados por el equipo.
 
+**Actualización:** Jarvis se plantea como un [asistente presencial con servidor
+central](propuesta-jarvis-presencial.md). Esa propuesta define el despliegue y
+la experiencia de la demo; las opciones de esta página sirven para decidir
+integraciones y una evolución posterior.
+
 ## Recomendación
 
 | Capa | Elegir ahora | Motivo |
 | --- | --- | --- |
-| Web | Next.js + TypeScript, una experiencia web con rutas de Jarvis, PaseoYa y Points | Una sesión y navegación coherentes; el monorepo puede desplegar proyectos por directorio. |
-| Backend Jarvis | Python + FastAPI + Pydantic | Reutiliza la lógica Python existente y genera documentación OpenAPI para el resto del equipo. |
-| Datos e identidad | Un proyecto Supabase: PostgreSQL + Auth | Catálogo, pedidos y puntos consultables desde un mismo lugar con reglas de acceso. |
-| Búsqueda inicial | PostgreSQL Full Text Search sobre negocios, productos, promociones, eventos y FAQ | El catálogo de la demo será pequeño y cambia con frecuencia. |
+| Web | Página de kiosco actual y enlaces al frontend del equipo | Permite demostrar voz, fuentes y continuidad por QR sin rehacer la interfaz antes del domingo. |
+| Backend Jarvis | Servicio Python actual; FastAPI después de estabilizar la demo | Mantiene funcional la lógica existente. OpenAPI será útil al ampliar las integraciones. |
+| Datos e identidad | Catálogo SQLite para demo; PaseoYa y Points como dueños de sus datos | Permite actualizaciones inmediatas y evita copiar saldos o pedidos privados al RAG. |
+| Búsqueda inicial | Campos estructurados y búsqueda de texto local; PostgreSQL al crecer | El catálogo inicial será pequeño y cambia con frecuencia. |
 | Modelo de texto | OpenAI GPT-6 Luna mediante Responses API | Costo bajo para respuestas breves basadas en datos recuperados; `reasoning.effort=none` evita gastar tokens de razonamiento en el MVP. |
 | Voz | Whisper local para transcribir + Piper local para hablar | Reduce el consumo de la API y reutiliza `/chat`; la primera versión funciona por turnos. |
-| Despliegue | Vercel para web y FastAPI como proyectos separados del mismo Git; Supabase para datos | Evita depender del disco local de una función. Mantener también una demo local preparada. |
+| Despliegue | Un servidor central local y kioscos en navegador | Mantiene modelos de voz y catálogo cargados; permite varios puntos con una fuente común. |
 
-La elección de Next.js depende de que el equipo frontend ya sepa React. Si
-conoce mejor otra herramienta, mantener el contrato HTTP de Jarvis y escoger
-la que permita terminar la demo. Vercel admite proyectos separados por carpeta
-de un monorepo y despliegue de FastAPI, pero su runtime Python está en beta.
-[Next.js](https://nextjs.org/docs/app), [Vercel monorepos](https://vercel.com/docs/monorepos),
-[FastAPI en Vercel](https://vercel.com/docs/frameworks/backend/fastapi),
-[runtime Python](https://vercel.com/docs/functions/runtimes/python).
+La página de Jarvis puede correr en un navegador del kiosco y el resto del
+equipo puede conservar su framework web. Las integraciones se acuerdan mediante
+contratos HTTP e IDs estables.
 
 ## Cómo debe responder Jarvis
 
@@ -80,16 +81,12 @@ de integrarse a la demo.
 
 ## Despliegue y orden de entrega
 
-Vercel permite desplegar FastAPI como una función y organizar
-proyectos separados por directorio. Su runtime Python está en beta. Si falla
-la integración, Render permite desplegar FastAPI; su instancia gratuita se
-duerme tras 15 minutos de inactividad y pierde el SQLite local al reiniciarse.
-Para una demo sin ese arranque lento, su instancia Starter figura a USD 7/mes
-o USD 0,05/hora. En ambos casos, usar Supabase para persistir datos.
-[Vercel FastAPI](https://vercel.com/docs/frameworks/backend/fastapi),
-[Render FastAPI](https://render.com/docs/deploy-fastapi),
-[Render Free](https://render.com/docs/free),
-[Render pricing](https://render.com/pricing).
+Para el jurado, el Mac actual puede alojar Jarvis y servir la página del
+kiosco en la red local. Para operación 24/7, usar un servidor central dedicado
+con almacenamiento persistente, refrigeración, monitoreo y respaldo de energía;
+los kioscos solo capturan interacción y muestran resultados. Las aplicaciones
+PaseoYa y Points pueden desplegarse por separado y conservar sus propios
+datos. La API de Jarvis consulta sus datos privados únicamente con identidad.
 
 La secuencia de entrega es texto → fuentes e integración → voz por turnos.
 La voz llama la misma lógica de consultas de Jarvis. Medir transcripción,
@@ -101,14 +98,14 @@ El backend actual en `apps/jarvis-backend` es una base local: usa
 `http.server`, SQLite y coincidencia de palabras. Antes de integrarlo con la
 web compartida:
 
-1. Pasar la API a FastAPI con modelos de entrada/salida Pydantic y publicar
-   `/openapi.json` para los otros equipos.
-2. Definir tablas y permisos en Supabase. Puntos y pedidos se consultan con
-   identidad del visitante, no se agregan al índice público.
-3. Sustituir la búsqueda lineal local por consultas de PostgreSQL. Mantener
-   `source_id`, `updated_at`, `starts_at` y `ends_at` en las respuestas.
-4. Verificar una llamada real de OpenAI con la clave del servidor y probar la
+1. Definir contratos mínimos con PaseoYa y Points. Puntos y pedidos se
+   consultan con identidad del visitante y no se agregan al índice público.
+2. Cargar datos reales con `source_id`, `updated_at`, `starts_at` y `ends_at`;
+   retirar automáticamente información vencida.
+3. Verificar una llamada real de OpenAI con la clave del servidor y probar la
    página de voz local con el catálogo definitivo.
+4. Tras la demo, pasar a FastAPI/OpenAPI y PostgreSQL si la operación y el
+   tamaño del catálogo lo justifican.
 
 FastAPI genera documentación OpenAPI y valida modelos con Pydantic. Supabase
 recomienda Row Level Security para controlar el acceso de las aplicaciones a
@@ -125,7 +122,8 @@ PostgreSQL.
   fuente y vigencia; suficientes para una demo honesta.
 - Una clave del proyecto OpenAI configurada en el servidor y un límite de gasto
   acorde con los USD 10 cargados; verificar el modelo y monitorear el uso.
-- URL pública de la web y del API, con una demo local ya cargada como respaldo.
+- Dirección estable del servidor en la red local y una demo cargada que funcione
+  aunque falle internet.
 
 Para el jurado, preparar tres recorridos: recomendar un regalo, mostrar un
 producto para retiro presencial en PaseoYa y consultar puntos autenticados.
