@@ -120,6 +120,8 @@
   #microfono:disabled { filter: grayscale(1); opacity: .6; }
   #microfono .onda { position: absolute; inset: 0; border-radius: 50%; border: 3px solid var(--rojo); opacity: 0; pointer-events: none; }
   #microfono.escuchando { background: radial-gradient(circle at 35% 30%, #ff8fa0, var(--rojo) 60%, #c2183b); }
+  #microfono::after { content: ""; position: absolute; inset: -5px; border-radius: 50%; border: 3px solid var(--verde); pointer-events: none;
+                      opacity: calc(var(--nivel, 0) * 1.6); transform: scale(calc(1 + var(--nivel, 0) * .45)); transition: transform .08s, opacity .08s; }
   #microfono.escuchando .onda { animation: onda 1.6s infinite ease-out; }
   #microfono.escuchando .onda:nth-child(2) { animation-delay: .5s; }
   #microfono.escuchando .onda:nth-child(3) { animation-delay: 1s; }
@@ -559,40 +561,182 @@ setInterval(() => {
 }, 5000);
 
 // ---------- Micrófono ----------
+// Primero el reconocimiento del navegador (Chrome/Edge, con texto en vivo). Si no existe o no tiene servicio
+// (p. ej. navegadores embebidos sin acceso a los servidores de Google), se graba aquí y Gemini transcribe en /voz/escuchar.
 const Reconocimiento = window.SpeechRecognition || window.webkitSpeechRecognition;
-if (!Reconocimiento) {
-  $("microfono").disabled = true;
-  $("microfono").title = "Usa Chrome o Edge para hablar";
-} else {
-  const rec = new Reconocimiento();
+const SIN_SERVICIO = ["network", "service-not-allowed", "language-not-supported"];
+const ERRORES_MICROFONO = {
+  "not-allowed": "Permite el micrófono: toca el candado junto a la dirección",
+  "audio-capture": "No encuentro un micrófono conectado",
+  NotAllowedError: "Permite el micrófono: toca el candado junto a la dirección",
+  NotFoundError: "No encuentro un micrófono conectado",
+  NotReadableError: "Otro programa está usando el micrófono",
+};
+const UMBRAL_VOZ = 0.02;
+const SILENCIO_FIN_MS = 1300;
+const ESPERA_SIN_VOZ_MS = 7000;
+const MAX_GRABACION_MS = 15000;
+
+let modoMicrofono = Reconocimiento ? "navegador" : "servidor";
+let escuchando = false;
+let preparando = false;
+let detenerGrabacion = null;
+
+function marcarEscucha(activo) {
+  escuchando = activo;
+  $("microfono").classList.toggle("escuchando", activo);
+  if (activo) estado("Escuchando…", "escuchando");
+  else if (avatar.estado === "escuchando") estado("");
+}
+
+let rec = null;
+if (Reconocimiento) {
+  rec = new Reconocimiento();
   rec.lang = "es-BO";
   rec.interimResults = true;
-  let escuchando = false;
-  rec.onstart = () => { escuchando = true; $("microfono").classList.add("escuchando"); estado("Escuchando…", "escuchando"); };
-  rec.onend = () => {
-    escuchando = false;
-    $("microfono").classList.remove("escuchando");
-    if (avatar.estado === "escuchando") estado("");
+  rec.onstart = () => marcarEscucha(true);
+  rec.onend = () => { if (modoMicrofono === "navegador") marcarEscucha(false); };
+  rec.onerror = (e) => {
+    if (SIN_SERVICIO.includes(e.error)) {
+      console.info("Reconocimiento del navegador sin servicio (%s); uso Gemini en el servidor", e.error);
+      modoMicrofono = "servidor";
+      marcarEscucha(false);
+      escucharConServidor();
+    } else if (ERRORES_MICROFONO[e.error]) {
+      aviso(ERRORES_MICROFONO[e.error]);
+    }
   };
-  rec.onerror = (e) => { if (e.error !== "no-speech" && e.error !== "aborted") aviso("Micrófono: " + e.error); };
   rec.onresult = (e) => {
     ultimaActividad = Date.now();
     const r = e.results[e.results.length - 1];
     oyente(r[0].transcript);
     if (r.isFinal) preguntar(r[0].transcript);
   };
-  const alternar = () => {
-    if (enBienvenida) salirBienvenida(false);
-    avatar.desbloquear();
-    if (escuchando) return rec.stop();
-    callar();
-    try { rec.start(); } catch { /* ya estaba escuchando */ }
-  };
-  $("microfono").onclick = alternar;
-  addEventListener("keydown", (e) => {
-    if (e.code === "Space" && document.activeElement !== $("texto")) { e.preventDefault(); alternar(); }
-  });
 }
+
+async function aWav(blob, ctx) {
+  const original = await ctx.decodeAudioData(await blob.arrayBuffer());
+  const tasa = 16000;
+  const offline = new OfflineAudioContext(1, Math.ceil(original.duration * tasa), tasa);
+  const fuente = offline.createBufferSource();
+  fuente.buffer = original;
+  fuente.connect(offline.destination);
+  fuente.start();
+  const datos = (await offline.startRendering()).getChannelData(0);
+  const v = new DataView(new ArrayBuffer(44 + datos.length * 2));
+  const escribir = (o, s) => [...s].forEach((c, i) => v.setUint8(o + i, c.charCodeAt(0)));
+  escribir(0, "RIFF"); v.setUint32(4, 36 + datos.length * 2, true); escribir(8, "WAVE");
+  escribir(12, "fmt "); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, tasa, true); v.setUint32(28, tasa * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+  escribir(36, "data"); v.setUint32(40, datos.length * 2, true);
+  datos.forEach((m, i) => v.setInt16(44 + i * 2, Math.max(-1, Math.min(1, m)) * 0x7fff, true));
+  return new Blob([v], { type: "audio/wav" });
+}
+
+async function transcribir(trozos, tipo, ctx) {
+  estado("Entendiendo…", "pensando");
+  try {
+    const wav = await aWav(new Blob(trozos, { type: tipo }), ctx);
+    const r = await fetch("/voz/escuchar", { method: "POST", headers: { "Content-Type": "audio/wav" }, body: wav });
+    const datos = await r.json();
+    if (!r.ok) throw new Error(datos.detail || r.status);
+    if (!datos.texto) { estado(""); aviso("No te entendí, ¿puedes repetirlo?"); return; }
+    preguntar(datos.texto);
+  } catch (error) {
+    console.warn("Transcripción falló", error);
+    estado("");
+    aviso("No pude entender el audio, intenta de nuevo");
+  } finally {
+    ctx.close();
+  }
+}
+
+async function escucharConServidor() {
+  if (preparando || escuchando) return;
+  preparando = true;
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
+  } catch (e) {
+    aviso(ERRORES_MICROFONO[e.name] || "No pude abrir el micrófono");
+    return;
+  } finally {
+    preparando = false;
+  }
+
+  const ctx = new AudioContext();
+  await ctx.resume();
+  const analizador = ctx.createAnalyser();
+  analizador.fftSize = 1024;
+  ctx.createMediaStreamSource(stream).connect(analizador);
+  const muestras = new Float32Array(analizador.fftSize);
+  const grabadora = new MediaRecorder(stream);
+  const trozos = [];
+  grabadora.ondataavailable = (e) => { if (e.data.size) trozos.push(e.data); };
+
+  const inicio = performance.now();
+  let hablo = false;
+  let ultimaVoz = inicio;
+  let terminado = false;
+  const terminar = () => {
+    if (terminado) return;
+    terminado = true;
+    detenerGrabacion = null;
+    grabadora.stop();
+  };
+  detenerGrabacion = terminar;
+
+  grabadora.onstop = () => {
+    stream.getTracks().forEach((t) => t.stop());
+    $("microfono").style.setProperty("--nivel", 0);
+    marcarEscucha(false);
+    if (!hablo) {
+      ctx.close();
+      aviso("No te escuché. Revisa que el micrófono de Windows correcto esté activo");
+      return;
+    }
+    transcribir(trozos, grabadora.mimeType, ctx);
+  };
+  grabadora.start(250);
+  marcarEscucha(true);
+
+  const medir = () => {
+    if (terminado) return;
+    analizador.getFloatTimeDomainData(muestras);
+    let suma = 0;
+    for (const m of muestras) suma += m * m;
+    const nivel = Math.sqrt(suma / muestras.length);
+    $("microfono").style.setProperty("--nivel", Math.min(1, nivel * 10).toFixed(2));
+    const ahora = performance.now();
+    if (nivel > UMBRAL_VOZ) { hablo = true; ultimaVoz = ahora; ultimaActividad = Date.now(); }
+    const callado = hablo && ahora - ultimaVoz > SILENCIO_FIN_MS;
+    if (callado || (!hablo && ahora - inicio > ESPERA_SIN_VOZ_MS) || ahora - inicio > MAX_GRABACION_MS) return terminar();
+    requestAnimationFrame(medir);
+  };
+  medir();
+}
+
+function alternar() {
+  if (enBienvenida) salirBienvenida(false);
+  avatar.desbloquear();
+  if (escuchando) {
+    if (detenerGrabacion) detenerGrabacion();
+    else rec?.stop();
+    return;
+  }
+  callar();
+  if (modoMicrofono === "servidor") return escucharConServidor();
+  try { rec.start(); } catch { /* ya estaba escuchando */ }
+}
+
+if (!navigator.mediaDevices?.getUserMedia && !Reconocimiento) {
+  $("microfono").disabled = true;
+  $("microfono").title = "Este navegador no permite usar el micrófono";
+}
+$("microfono").onclick = alternar;
+addEventListener("keydown", (e) => {
+  if (e.code === "Space" && document.activeElement !== $("texto")) { e.preventDefault(); alternar(); }
+});
 </script>
 </body>
 </html>
