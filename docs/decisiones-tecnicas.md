@@ -2,8 +2,7 @@
 
 Fecha: 2 de octubre de 2026. Objetivo: una demo funcional de Jarvis,
 PaseoYa y Paseo Points antes del domingo a las 10:00. Suposiciones: demo en
-navegador, presupuesto bajo, datos preparados por el equipo y proveedor de IA
-aún por elegir.
+navegador, USD 10 iniciales para la API de OpenAI y datos preparados por el equipo.
 
 ## Recomendación
 
@@ -13,8 +12,8 @@ aún por elegir.
 | Backend Jarvis | Python + FastAPI + Pydantic | Reutiliza la lógica Python existente y genera documentación OpenAPI para el resto del equipo. |
 | Datos e identidad | Un proyecto Supabase: PostgreSQL + Auth | Catálogo, pedidos y puntos consultables desde un mismo lugar con reglas de acceso. |
 | Búsqueda inicial | PostgreSQL Full Text Search sobre negocios, productos, promociones, eventos y FAQ | El catálogo de la demo será pequeño y cambia con frecuencia. |
-| Modelo de texto | Gemini 3.1 Flash-Lite | Tiene capa compatible con Chat Completions, funciones, salidas estructuradas y nivel gratuito sujeto a límites. |
-| Voz | Gemini 3.1 Flash Live Preview si el texto ya funciona | Tiene conversación de audio y llamadas a funciones; la vista web obtiene un token efímero desde el backend. |
+| Modelo de texto | OpenAI GPT-6 Luna mediante Responses API | Costo bajo para respuestas breves basadas en datos recuperados; `reasoning.effort=none` evita gastar tokens de razonamiento en el MVP. |
+| Voz | GPT-Live sobre WebRTC, después de integrar el texto | Conversación natural en navegador; el servidor conserva la clave y delega las consultas de datos a Jarvis. |
 | Despliegue | Vercel para web y FastAPI como proyectos separados del mismo Git; Supabase para datos | Evita depender del disco local de una función. Mantener también una demo local preparada. |
 
 La elección de Next.js depende de que el equipo frontend ya sepa React. Si
@@ -54,41 +53,33 @@ indexadas se actualizan con la misma transacción. Supabase permite webhooks de
 sincronizarla. Las promociones llevan `starts_at`, `ends_at` y estado.
 [Supabase Database Webhooks](https://supabase.com/docs/guides/database/webhooks).
 
-## Elección de modelos y voz
+## OpenAI: modelos, voz y presupuesto
 
-**Primera opción: Gemini.** Gemini 3.1 Flash-Lite ofrece un nivel gratuito y
-puede usarse mediante un endpoint compatible con Chat Completions, por lo que
-el adaptador configurable del prototipo Jarvis puede conectarse sin cambiar
-el formato general de petición. Gemini 3.1 Flash Live Preview ofrece audio y
-funciones, pero es un modelo preview: revisar el límite real del proyecto en
-AI Studio y preparar una ruta de texto. Los tokens efímeros de Live se crean
-en el servidor para una conexión del navegador.
-[Modelo de texto](https://ai.google.dev/gemini-api/docs/models/gemini-3.1-flash-lite),
-[compatibilidad OpenAI](https://ai.google.dev/gemini-api/docs/openai),
-[precios](https://ai.google.dev/gemini-api/docs/pricing),
-[límites](https://ai.google.dev/gemini-api/docs/rate-limits),
-[Live y herramientas](https://ai.google.dev/gemini-api/docs/live-api/tools),
-[tokens efímeros](https://ai.google.dev/gemini-api/docs/live-api/ephemeral-tokens).
-
-Configuración prevista para el adaptador de texto existente (pendiente de una
-prueba con la clave real del equipo):
-
-```bash
-JARVIS_LLM_URL=https://generativelanguage.googleapis.com/v1beta/openai/chat/completions
-JARVIS_LLM_MODEL=gemini-3.1-flash-lite
-JARVIS_LLM_API_KEY=<clave-del-proyecto>
-```
-
-**Alternativa con presupuesto: OpenAI.** GPT-6 Luna cuesta actualmente
-USD 0,10 por millón de tokens de entrada y USD 0,50 por millón de salida.
-GPT-Live cuesta USD 0,05 por minuto de sesión, además del trabajo del backend;
-permite mantener el agente de texto separado de la conversación hablada.
-Su guía recomienda WebRTC para voz en navegador. Confirmar acceso del
-proyecto antes de depender de esta opción.
+GPT-6 Luna cuesta USD 0,10 por millón de tokens de entrada y USD 0,50 por
+millón de salida. Una consulta estimada de 1.000 tokens de entrada y 300 de
+salida costaría alrededor de USD 0,00025; el consumo real depende del tamaño
+del contexto y de las respuestas. Jarvis usa Responses API con
+`reasoning.effort=none`, `store=false` y un máximo de 350 tokens de salida.
+La clave `OPENAI_API_KEY` vive solo en el backend. Hay que comprobar el acceso
+del proyecto al modelo con una llamada real antes de la demo.
 [GPT-6 Luna](https://developers.openai.com/api/docs/models/gpt-6-luna),
+[Responses API](https://developers.openai.com/api/docs/guides/text),
 [precios](https://developers.openai.com/api/docs/pricing),
+[lista de despliegue](https://developers.openai.com/api/docs/guides/deployment-checklist).
+
+GPT-Live cuesta USD 0,05 por minuto de sesión, además de las consultas que
+delegue al backend. Como referencia, USD 6 alcanzarían para 120 minutos de
+sesión **si no hubiera otros cargos**; reservar los otros USD 4 para texto,
+integración y pruebas deja margen, pero no garantiza una duración exacta.
+Iniciar WebRTC solo cuando el visitante pulse el micrófono, cerrar conexiones
+inactivas y observar el uso en el panel de OpenAI. El backend debe crear la
+sesión de voz y conservar la clave; las consultas de catálogo pasan por la
+misma lógica de Jarvis. Para llegar al domingo, primero probar texto y la
+integración de fuentes; después añadir la voz.
+[GPT-Live y costos](https://developers.openai.com/api/docs/pricing),
 [arquitecturas de voz](https://developers.openai.com/api/docs/guides/voice-agents),
-[WebRTC](https://developers.openai.com/api/docs/guides/voice-webrtc).
+[WebRTC](https://developers.openai.com/api/docs/guides/voice-webrtc),
+[delegación](https://developers.openai.com/api/docs/guides/live-delegation).
 
 ## Despliegue y orden de entrega
 
@@ -121,7 +112,7 @@ web compartida:
    identidad del visitante, no se agregan al índice público.
 3. Sustituir la búsqueda lineal local por consultas de PostgreSQL. Mantener
    `source_id`, `updated_at`, `starts_at` y `ends_at` en las respuestas.
-4. Configurar el proveedor de texto con una clave del servidor, y luego unir
+4. Verificar una llamada real de OpenAI con la clave del servidor, y luego unir
    la interfaz de voz a `/chat` o a funciones de lectura equivalentes.
 
 FastAPI genera documentación OpenAPI y valida modelos con Pydantic. Supabase
@@ -137,8 +128,8 @@ PostgreSQL.
 - IDs estables compartidos (`user_id`, `venue_id`, `product_id`) y moneda BOB.
 - Primeras 20–30 fichas de negocio/producto y 3–5 promociones/eventos con
   fuente y vigencia; suficientes para una demo honesta.
-- Una clave de Gemini y su límite real en AI Studio; si no funciona, una clave
-  de OpenAI con un presupuesto pequeño.
+- Una clave del proyecto OpenAI configurada en el servidor y un límite de gasto
+  acorde con los USD 10 cargados; verificar el modelo y monitorear el uso.
 - URL pública de la web y del API, con una demo local ya cargada como respaldo.
 
 Para el jurado, preparar tres recorridos: recomendar un regalo, mostrar un

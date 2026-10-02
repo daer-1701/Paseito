@@ -1,9 +1,11 @@
+import json
 import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from unittest.mock import patch
 
-from jarvis.agent import chat
+from jarvis.agent import chat, llm_answer
 from jarvis.store import connect, search, upsert, delete
 
 
@@ -57,6 +59,35 @@ class JarvisTests(unittest.TestCase):
         first = chat(self.db, "Busco café")
         second = chat(self.db, "¿Dónde queda?", first["session_id"])
         self.assertEqual(second["sources"][0]["id"], "venue:cafe")
+
+    def test_openai_responses_contract(self):
+        class Response:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *_):
+                pass
+
+            def read(self, *_):
+                return json.dumps({"output": [{"type": "message", "content": [
+                    {"type": "output_text", "text": "El café está en el piso 2."}]}]}).encode()
+
+        captured = []
+
+        def fake_urlopen(request, timeout):
+            captured.append((request, timeout))
+            return Response()
+
+        with patch.dict("os.environ", {"OPENAI_API_KEY": "test-key"}), \
+                patch("urllib.request.urlopen", fake_urlopen):
+            answer = llm_answer("¿Dónde está?", [{**self.record(), "attributes": {"floor": "2"}}], [])
+
+        self.assertEqual(answer, "El café está en el piso 2.")
+        request, timeout = captured[0]
+        self.assertEqual(request.full_url, "https://api.openai.com/v1/responses")
+        self.assertEqual(request.get_header("Authorization"), "Bearer test-key")
+        self.assertEqual(json.loads(request.data)["store"], False)
+        self.assertEqual(timeout, 12)
 
 
 if __name__ == "__main__":

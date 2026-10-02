@@ -1,8 +1,8 @@
 # Jarvis Paseo · backend MVP
 
 Agente conversacional para Paseo Aranjuez. La búsqueda de negocios, eventos y
-promociones sale de un catálogo actualizable; el proveedor de LLM es opcional y
-configurable. Si no hay proveedor, el servidor sigue respondiendo con evidencia
+promociones sale de un catálogo actualizable; OpenAI sintetiza la respuesta si
+se configura una clave. Si no hay conexión o saldo, el servidor sigue respondiendo con evidencia
 mediante un generador local, útil para probar toda la integración.
 
 ## Inicio rápido
@@ -70,12 +70,22 @@ devuelven 401. Las promociones deben incluir `expires_at`.
 
 ## Proveedor de LLM
 
-El servidor usa un endpoint HTTP de chat compatible con mensajes (`system` y
-`user`) si están configuradas `JARVIS_LLM_URL`, `JARVIS_LLM_MODEL` y
-`JARVIS_LLM_API_KEY`. El endpoint debe aceptar `model`, `messages` y
-`temperature`, y devolver `choices[0].message.content`. Las fuentes siguen
-siendo seleccionadas por el backend. Sin estas variables, usa el generador
-local. No se guardan claves en el repositorio.
+Configurar `OPENAI_API_KEY` **solo en el servidor**. Por defecto se usa
+`gpt-6-luna` con la API Responses; `OPENAI_TEXT_MODEL` permite cambiarlo por
+otro modelo que admita `reasoning.effort=none`. El backend selecciona las
+fuentes antes de llamar al modelo y limita la salida a 350 tokens. Si la clave
+falta o la llamada falla, usa el generador local. No guardar claves en Git ni
+en el navegador.
+
+```bash
+export OPENAI_API_KEY="tu-clave-local"
+python3 -m jarvis.api
+```
+
+La ruta de voz todavía no está implementada. La primera integración del
+frontend puede enviar texto transcrito a `/chat`; después se puede conectar
+GPT-Live con WebRTC y delegar las consultas a este backend. Cerrar sesiones de
+voz inactivas para controlar el gasto.
 
 ## Límites deliberados del MVP
 
