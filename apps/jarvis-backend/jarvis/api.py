@@ -1,9 +1,11 @@
 """Minimal JSON HTTP API with no third-party dependencies."""
 
 import json
+import mimetypes
 import os
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from typing import Optional, Tuple
 from urllib.parse import unquote, urlparse
 
 from .agent import chat
@@ -13,6 +15,20 @@ from .voice import MAX_AUDIO_BYTES, VoiceUnavailable, status as voice_status, sy
 
 
 WEB_DIR = Path(__file__).resolve().parents[1] / "web"
+KIOSK_DIR = WEB_DIR / "kiosk"
+
+
+def kiosk_asset(path: str) -> Optional[Tuple[Path, str]]:
+    relative = "index.html" if path in {"/", ""} else path.lstrip("/")
+    candidate = (KIOSK_DIR / relative).resolve()
+    if KIOSK_DIR.resolve() not in candidate.parents or not candidate.is_file():
+        return None
+    mime = mimetypes.guess_type(candidate.name)[0] or "application/octet-stream"
+    if candidate.suffix == ".js":
+        mime = "text/javascript; charset=utf-8"
+    elif candidate.suffix == ".html":
+        mime = "text/html; charset=utf-8"
+    return candidate, mime
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -66,9 +82,25 @@ class Handler(BaseHTTPRequestHandler):
                                  "openai_configured": bool(os.getenv("OPENAI_API_KEY"))})
         elif path == "/voice/status":
             self.send_json(200, voice_status())
-        elif path in {"/", "/app.js"}:
+        elif path in {"/", "/kiosk", "/kiosk/"}:
+            asset = kiosk_asset("/")
+            if not asset:
+                self.send_json(404, {"error": "kiosk assets not found"})
+                return
+            self.send_bytes(200, asset[0].read_bytes(), asset[1])
+        elif path.startswith("/kiosk/"):
+            asset = kiosk_asset(path.removeprefix("/kiosk/"))
+            if not asset:
+                self.send_json(404, {"error": "not found"})
+                return
+            self.send_bytes(200, asset[0].read_bytes(), asset[1])
+        elif path in {"/simple", "/app.js"}:
             filename = "index.html" if path == "/" else "app.js"
+            if path == "/simple":
+                filename = "index.html"
             mime = "text/html; charset=utf-8" if path == "/" else "text/javascript; charset=utf-8"
+            if path == "/simple":
+                mime = "text/html; charset=utf-8"
             self.send_bytes(200, (WEB_DIR / filename).read_bytes(), mime)
         else:
             self.send_json(404, {"error": "not found"})

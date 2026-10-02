@@ -1,24 +1,34 @@
 # Jarvis Paseo · backend MVP
 
 Agente conversacional para Paseo Aranjuez. La búsqueda de negocios, eventos y
-promociones sale de un catálogo actualizable; OpenAI sintetiza la respuesta si
-se configura una clave. Si no hay conexión o saldo, el servidor sigue respondiendo con evidencia
-mediante un generador local, útil para probar toda la integración.
+promociones sale de un catálogo actualizable y con fuente. El modo predeterminado
+es **estricto**: genera una respuesta determinista desde atributos tipados de las
+fichas recuperadas, sin una llamada a OpenAI.
 
 ## Inicio rápido
 
 ```bash
 cd apps/jarvis-backend
-python3 -m jarvis.seed
+python3 -m jarvis.seed --refresh
+python3 -m jarvis.import_official
 export JARVIS_INGEST_TOKEN="secreto-local-para-la-demo"
 python3 -m jarvis.api
 ```
 
-Abrir `http://localhost:8000` para usar la página funcional de chat. El backend
+Abrir `http://localhost:8000` para usar el kiosco de Jarvis. La interfaz simple
+de contingencia queda en `http://localhost:8000/simple`. El backend
 de texto solo usa la biblioteca estándar de Python 3.9 o superior. `JARVIS_DB`
-permite cambiar la ruta de SQLite. La semilla
-incluida está marcada como **datos de demostración**; reemplácenla por datos
-confirmados antes de presentarlos como información real.
+permite cambiar la ruta de SQLite. La semilla incluye 20 negocios encontrados en
+fuentes públicas, con un enlace por ficha en `data/venues.json`.
+`python3 -m jarvis.import_official` agrega las fichas que faltan desde el
+[directorio oficial del Paseo](https://paseoaranjuez.com/stores), sin sobrescribir
+las curadas. La última consulta de fuentes fue el 2 de octubre de 2026. Es un
+directorio inicial:
+el equipo debe confirmar con la administración que cada negocio continúa allí
+y completar los locales, horarios y catálogos que faltan. La semilla elimina
+solo los tres registros ficticios anteriores; preserva los datos añadidos por
+la API de ingesta. Si una ficha ya existe, `python3 -m jarvis.seed` la respeta;
+`python3 -m jarvis.seed --refresh` vuelve a importar las 20 fichas del JSON.
 La página integrada comparte origen con la API. Si otro frontend consume el
 backend desde un dominio distinto, establecer `JARVIS_CORS_ORIGIN` con ese
 origen exacto; no se habilita CORS abierto por defecto.
@@ -67,11 +77,11 @@ texto sigue disponible aunque falte la voz.
 {"message":"Quiero comprar un regalo y tomar un café", "session_id":"demo-1"}
 ```
 
-Devuelve `answer`, `sources`, `intent`, `suggestions` y `session_id`. Enviar el
-mismo `session_id` conserva los últimos turnos para preguntas de seguimiento.
-El servidor
-solo entrega al modelo registros encontrados en la base; si no hay evidencia,
-responde que no puede confirmarlo. El cliente puede mostrar las fuentes.
+Devuelve `answer`, `sources`, `intent`, `suggestions`, `grounded`, `answer_mode`
+y `session_id`. Enviar el mismo `session_id` conserva los últimos turnos para
+preguntas de seguimiento. El resultado incluye como máximo tres fuentes que
+corresponden a la respuesta. Si no hay evidencia, responde que no puede
+confirmarlo.
 
 ### `POST /admin/records`
 
@@ -105,7 +115,7 @@ aplica 12 segundos de espera por objetivo y sesión para evitar respuestas
 repetidas y gasto accidental.
 
 ```json
-{"session_id":"demo-1", "target_id":"venue:demo-cafe", "dwell_ms":1000}
+{"session_id":"demo-1", "target_id":"venue:crocs", "dwell_ms":1000}
 ```
 
 La respuesta tiene `triggered: false` y un motivo, o `triggered: true` y el
@@ -125,15 +135,17 @@ conectarse; este endpoint permite integrarlos sin cambiar el agente.
 
 ## Proveedor de LLM
 
-Configurar `OPENAI_API_KEY` **solo en el servidor**. Por defecto se usa
-`gpt-6-luna` con la API Responses; `OPENAI_TEXT_MODEL` permite cambiarlo por
-otro modelo que admita `reasoning.effort=none`. El backend selecciona las
-fuentes antes de llamar al modelo y limita la salida a 350 tokens. Si la clave
-falta o la llamada falla, usa el generador local. No guardar claves en Git ni
-en el navegador.
+Configurar `OPENAI_API_KEY` **solo en el servidor**. Para la demo no es
+necesario: Jarvis parte en modo estricto local. Cuando el equipo haya evaluado
+respuestas, puede habilitar el formateo experimental con
+`JARVIS_RESPONSE_MODE=experimental`; usa `gpt-6-luna` con la API Responses y
+recibe únicamente las tres fichas recuperadas. Si la clave falta o la llamada
+falla, se vuelve al generador estricto. No guardar claves en Git ni en el
+navegador.
 
 ```bash
 export OPENAI_API_KEY="tu-clave-local"
+export JARVIS_RESPONSE_MODE=experimental
 python3 -m jarvis.api
 ```
 
@@ -146,3 +158,6 @@ permite una demo confiable antes de implementar conversación simultánea.
   confirmación explícita.
 - No presenta como reales los registros de demostración.
 - No inventa precios, disponibilidad ni horarios cuando faltan en las fuentes.
+- El kiosco visual fue adaptado del trabajo de equipo en
+  [Paseito](https://github.com/daer-1701/Paseito); consume exclusivamente la
+  API local de Jarvis y sus recursos Three.js se sirven desde `web/kiosk/`.

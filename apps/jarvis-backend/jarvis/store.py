@@ -71,8 +71,8 @@ def validate_record(record: dict) -> dict:
     if not isinstance(attrs, dict):
         raise ValueError("attributes must be an object")
     url = record.get("source_url")
-    if url is not None and (not isinstance(url, str) or not url.startswith(("https://", "http://"))):
-        raise ValueError("source_url must be an HTTP URL")
+    if not isinstance(url, str) or not url.startswith(("https://", "http://")):
+        raise ValueError("source_url is required and must be an HTTP URL")
     return {**record, "attributes": attrs, "source_url": url,
             "updated_at": updated.astimezone(timezone.utc).isoformat(),
             "expires_at": expires.astimezone(timezone.utc).isoformat() if expires else None}
@@ -108,6 +108,7 @@ EXPANSIONS = {
     "cenar": {"comida", "restaurante", "gastronomia"},
     "regalo": {"regalos", "accesorios"},
     "cafe": {"cafeteria"},
+    "pizza": {"pizzas", "pizzeria"},
 }
 
 
@@ -120,17 +121,20 @@ def tokens(value: str) -> set[str]:
 def search(db: sqlite3.Connection, query: str, limit: int = 5, now: datetime | None = None) -> list[dict]:
     now = now or datetime.now(timezone.utc)
     terms = tokens(query)
-    terms |= {expanded for term in list(terms) for expanded in EXPANSIONS.get(term, set())}
+    expanded_terms = {expanded for term in terms for expanded in EXPANSIONS.get(term, set())} - terms
     if not terms:
         return []
     results = []
     for row in db.execute("SELECT * FROM records"):
+        if not row["source_url"]:
+            continue
         if row["expires_at"] and parse_timestamp(row["expires_at"]) <= now:
             continue
         attrs = json.loads(row["attributes"])
         title_terms = tokens(row["title"])
         body_terms = tokens(row["text"] + " " + " ".join(str(v) for v in attrs.values()))
-        score = 3 * len(terms & title_terms) + len(terms & body_terms)
+        score = (4 * len(terms & title_terms) + 2 * len(terms & body_terms)
+                 + len(expanded_terms & title_terms) + len(expanded_terms & body_terms))
         if score:
             results.append((score, row["updated_at"], {
                 "id": row["id"], "kind": row["kind"], "title": row["title"],

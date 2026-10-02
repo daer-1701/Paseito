@@ -1,0 +1,122 @@
+[
+  {
+    "id": "venue:tuc-toys", "kind": "venue", "title": "TUC TOYS",
+    "text": "Juguetería de TUC TOYS en Paseo Aranjuez, Cochabamba.",
+    "attributes": {"category": "juguetes", "area": "centro comercial", "evidence": "sitio del negocio"},
+    "source_url": "https://toys.tuctuc.com.bo/product-tag/paseo-aranjuez/"
+  },
+  {
+    "id": "venue:crocs", "kind": "venue", "title": "Crocs",
+    "text": "Tienda de calzado Crocs en Paseo Aranjuez.",
+    "attributes": {"category": "calzado", "area": "centro comercial", "floor": "2", "unit": "13", "evidence": "sitio del negocio"},
+    "source_url": "https://crocs.com.bo/nuestras-tiendas"
+  },
+  {
+    "id": "venue:impulse", "kind": "venue", "title": "Impulse",
+    "text": "Tienda Impulse en Paseo Aranjuez.",
+    "attributes": {"category": "ropa y calzado", "area": "centro comercial", "floor": "1", "unit": "101-102", "evidence": "sitio del negocio"},
+    "source_url": "https://www.impulse.bo/cms/page/view/page_id/7"
+  },
+  {
+    "id": "venue:legend", "kind": "venue", "title": "Legend",
+    "text": "Tienda Legend de Impulse en Paseo Aranjuez.",
+    "attributes": {"category": "ropa y calzado", "area": "centro comercial", "floor": "planta baja", "evidence": "sitio del negocio"},
+    "source_url": "https://www.impulse.bo/cms/page/view/page_id/7"
+  },
+  {
+    "id": "venue:sajama-store", "kind": "venue", "title": "Sajama Store",
+    "text": "Tienda de accesorios, gafas y relojes en Paseo Aranjuez.",
+    "attributes": {"category": "accesorios", "area": "centro comercial", "floor": "1", "evidence": "sitio del negocio"},
+    "source_url": "https://sajamastore.com/"
+  },
+  {
+    "id": "venue:totto", "kind": "venue", "title": "Totto",
+    "text": "Tienda de mochilas, accesorios y ropa Totto en Paseo Aranjuez.",
+    "attributes": {"category": "mochilas y accesorios", "area": "centro comercial", "floor": "2", "unit": "203", "evidence": "sitio del negocio; listado 2026"},
+    "source_url": "https://bo.totto.com/promociones-vigentes-26"
+  },
+  {
+    "id": "venue:gap", "kind": "venue", "title": "Gap",
+    "text": "Tienda de ropa Gap en Paseo Aranjuez, Cochabamba.",
+    "attributes": {"category": "ropa", "area": "centro comercial", "evidence": "anuncio 2026 del operador Grupo Fair Play"},
+    "source_url": "https://es.linkedin.com/posts/grupo-fair-play_gap-en-cochabamba-bolivia-activity-7421190386540285952-ds8O"
+  },
+  {
+    "id": "venue:gool-store", "kind": "venue", "title": "Gool Store",
+    "text": "Tienda de medias y calcetines en Paseo Aranjuez.",
+    "attributes": {"category": "medias", "area": "centro comercial", "floor": "2", "evidence": "directorio del negocio"},
+    "source_url": "https://linktr.ee/gool.store"
+  },
+  {
+    "id": "venue:top-collection", "kind": "venue", "title": "Top Collection",
+    "text": "Tienda de ropa masculina en Paseo Aranjuez.",
+    "attributes": {"category": "ropa masculina", "area": "centro comercial", "floor": "2", "unit": "212", "evidence": "publicaciones del negocio replicadas"},
+    "source_url": "https://www.findglocal.com/BO/Ciudad-Cochabamba/186197558218216/Top--Collection"
+  },
+  {
+    "id": "venue:opticas-pauker", "kind": "venue", "title": "Ópticas Pauker",
+    "text": "Óptica con gafas de sol y monturas en Paseo Aranjuez.",
+    "attributes": {"category": "óptica", "area": "centro comercial", "evidence": "sitio del negocio"},
+    "source_url": "https://opticaspauker.com/contacto/"
+  },
+  {
+    "id": "venue:lynx-samsung", "kind": "venue", "title": "LYNX / Samsung",
+    "text": "Punto de venta Samsung operado por LYNX en Paseo Aranjuez.",
+    "attributes": {"category": "tecnología y electrónica", "area": "centro comercial", "evidence": "directorio oficial de Samsung Bolivia"},
+    "source_url": "https://samsung.com.bo/tiendas-samsung"
+  },
+  {
+    "id": "venue:monalisa", "kind": "venue", "title": "Monalisa Bier Haus",
+    "text": "Restaurante y cervecería artesanal en Paseo Aranjuez.",
+    "attributes": {"category": "restaurante y cerveza artesanal", "area": "centro comercial", "floor": "4", "evidence": "publicaciones del negocio replicadas en 2026"},
+    "source_url": "https://www.restaurants10.com/BO/Cochabamba/1611985532425571/Monalisa-Bier-Haus"
+  },
+  {
+    "id": "venue:almacen-de-pizzas", "kind": "venue", "title": "Almacén de Pizzas",
+    "text": "Pizzería especializada en pizza en Paseo Aranjuez.",
+    "attributes": {"category": "pizzería", "area": "centro comercial", "floor": "3", "unit": "311", "evidence": "publicaciones del negocio replicadas en 2026"},
+    "source_url": "https://www.restaurants10.com/BO/Cochabamba/102219924763975/Almac%C3%A9n-de-Pizzas"
+  },
+  {
+    "id": "venue:brocheta-king", "kind": "venue", "title": "Brocheta King",
+    "text": "Restaurante de brochetas y parrilla en Paseo Aranjuez.",
+    "attributes": {"category": "brochetas y parrilla", "area": "centro comercial", "floor": "4", "evidence": "publicaciones del negocio replicadas en 2026"},
+    "source_url": "https://www.restaurants10.com/BO/Cochabamba/309213909917890/Brocheta-King"
+  },
+  {
+    "id": "venue:el-cuarto", "kind": "venue", "title": "El Cuarto by Paseo",
+    "text": "Bar y espacio de gastronomía y música en vivo en Paseo Aranjuez.",
+    "attributes": {"category": "bar y gastronomía", "area": "centro comercial", "floor": "4", "evidence": "publicaciones del negocio replicadas en 2026"},
+    "source_url": "https://www.findglocal.com/BO/Cochabamba/100111042144963/El-Cuarto-by-Paseo"
+  },
+  {
+    "id": "venue:lili-pink", "kind": "venue", "title": "Lili Pink",
+    "text": "Tienda de lencería y ropa interior en Paseo Aranjuez.",
+    "attributes": {"category": "lencería y ropa interior", "area": "centro comercial", "floor": "planta baja", "evidence": "publicaciones del negocio replicadas en 2026"},
+    "source_url": "https://www.yellowmega.com/BO/Santa-Cruz-de-la-Sierra/104016519033874/Lili-Pink-Bolivia"
+  },
+  {
+    "id": "venue:emperador", "kind": "venue", "title": "Emperador",
+    "text": "Tienda de moda masculina en Paseo Aranjuez.",
+    "attributes": {"category": "ropa masculina", "area": "centro comercial", "floor": "1", "evidence": "directorio del negocio replicado"},
+    "source_url": "https://www.findglocal.com/BO/Cochabamba/507687602975580/Emperador"
+  },
+  {
+    "id": "venue:rezzom-beauty", "kind": "venue", "title": "Rezzom Beauty",
+    "text": "Salón de belleza con color, corte, peinado y tratamientos capilares en Paseo Aranjuez.",
+    "attributes": {"category": "salón de belleza", "area": "torre de oficinas", "tower": "2", "floor": "5", "evidence": "sitio del negocio"},
+    "source_url": "https://www.rezzombeauty.com/"
+  },
+  {
+    "id": "venue:minerva-montero", "kind": "venue", "title": "Minerva Montero Dermatología y Estética",
+    "text": "Consultorio de dermatología y estética en Paseo Aranjuez.",
+    "attributes": {"category": "dermatología y estética", "area": "torre de oficinas", "tower": "2", "floor": "6", "unit": "oficina 608", "evidence": "publicaciones del consultorio replicadas en 2026"},
+    "source_url": "https://www.salons10.com/BO/Cochabamba/2001401150169622/Minerva-Montero-Dermatologia-y-Estetica"
+  },
+  {
+    "id": "venue:century-21-cochabamba", "kind": "venue", "title": "Century 21 Cochabamba",
+    "text": "Oficina de servicios inmobiliarios en Paseo Aranjuez.",
+    "attributes": {"category": "inmobiliaria", "area": "torre de oficinas", "floor": "6", "unit": "oficina 614", "evidence": "directorio del negocio replicado"},
+    "source_url": "https://www.findglocal.com/BO/Cochabamba/434833483039822/Century-21-Cochabamba"
+  }
+]
