@@ -24,6 +24,8 @@ def intent(message: str) -> str:
         return "loyalty"
     if words & {"pedido", "orden", "retiro"}:
         return "order"
+    if words & {"guiame", "guia", "llegar", "llego", "ruta", "direccion", "direcciones"}:
+        return "navigation"
     if words & {"clima", "tiempo", "lluvia", "llueve", "temperatura"}:
         return "weather"
     if words & {"abierto", "abierta", "cerrado", "cerrada", "horario", "abre", "cierra"}:
@@ -60,6 +62,22 @@ def local_answer(records: list[dict]) -> str:
             else "Ficha verificada en el directorio del Paseo."
         parts.append(f"{record['title']}: {detail}" + (f" Ubicación: {location}." if location else ""))
     return "Encontré estas opciones: " + " ".join(parts)
+
+
+def navigation_answer(record: dict | None) -> str:
+    if not record:
+        return FALLBACK
+    attrs = record["attributes"]
+    floor = attrs.get("floor")
+    unit = attrs.get("unit")
+    if not floor:
+        return f"Encontré {record['title']}, pero no tengo un piso confirmado para guiarte."
+    floor_text = str(floor).strip().lower()
+    location = "planta baja" if floor_text == "planta baja" else (
+        floor_text if "piso" in floor_text else f"piso {floor}")
+    if isinstance(unit, str) and unit.strip():
+        location += f", local {unit}"
+    return f"Te acompaño a {record['title']}. Dirígete al {location}."
 
 
 def llm_answer(message: str, records: list[dict], history: list[dict]) -> str | None:
@@ -131,14 +149,18 @@ def chat(db, message: str, session_id: str | None = None,
         records = records_override if records_override is not None else search(db, query)
         evidence = records[:3]
         response_mode = os.getenv("JARVIS_RESPONSE_MODE", STRICT_RESPONSE_MODE).lower()
-        answer = llm_answer(message, evidence, history) if response_mode == "experimental" and evidence else None
+        answer = llm_answer(message, evidence, history) if response_mode == "experimental" and evidence and mode != "navigation" else None
         result = {"session_id": session_id, "intent": mode,
-                  "answer": answer or local_answer(evidence),
+                  "answer": answer or (navigation_answer(evidence[0] if evidence else None)
+                                       if mode == "navigation" else local_answer(evidence)),
                   "sources": [{k: r[k] for k in ("id", "kind", "title", "attributes", "source_url", "updated_at")}
                               for r in evidence],
                   "suggestions": [r["title"] for r in evidence],
                   "grounded": True,
-                  "answer_mode": "experimental" if answer else STRICT_RESPONSE_MODE}
+                  "answer_mode": "experimental" if answer else STRICT_RESPONSE_MODE,
+                  "guide": {"destination_id": evidence[0]["id"], "floor": evidence[0]["attributes"].get("floor"),
+                            "unit": evidence[0]["attributes"].get("unit")}
+                  if mode == "navigation" and evidence else None}
     stamp = datetime.now(timezone.utc).isoformat()
     db.executemany("INSERT INTO turns(session_id, role, content, created_at) VALUES (?, ?, ?, ?)",
                    [(session_id, "user", message, stamp), (session_id, "assistant", result["answer"], stamp)])

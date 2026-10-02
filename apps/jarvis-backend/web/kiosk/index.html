@@ -39,6 +39,10 @@
   .marca b { display: block; font-size: 1.02rem; letter-spacing: .3px; }
   .marca small { color: var(--tenue); font-size: .78rem; }
   .derecha { display: flex; align-items: center; gap: 14px; }
+  .estado-confianza { display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; color: var(--oro-claro);
+                       background: rgba(231, 183, 58, .12); border: 1px solid rgba(231, 183, 58, .28); font-size: .72rem; font-weight: 700; }
+  .estado-confianza::before { content: "✓"; width: 15px; height: 15px; display: grid; place-items: center; border-radius: 50%;
+                              color: var(--vino-oscuro); background: var(--oro); font-size: .65rem; }
   #reloj { text-align: right; line-height: 1.1; }
   #reloj b { font-size: 1.25rem; font-variant-numeric: tabular-nums; }
   #reloj small { display: block; color: var(--tenue); font-size: .75rem; text-transform: capitalize; }
@@ -87,6 +91,28 @@
   .chip.piso { background: var(--oro); color: var(--vino-oscuro); }
   .chip.abierto { background: var(--verde); }
   .chip.cerrado { background: #c0392b; }
+  .guia-btn { margin-top: 8px; width: 100%; border: 1px solid rgba(231, 183, 58, .55); border-radius: 10px; padding: 7px 9px;
+               color: var(--oro-claro); font-size: .76rem; font-weight: 800; background: rgba(231, 183, 58, .12); }
+  .guia-btn:hover { color: var(--vino-oscuro); background: var(--oro); }
+
+  /* ---------- modo acompáñame ---------- */
+  #guia { position: absolute; inset: 12px; z-index: 4; display: none; flex-direction: column; gap: 14px; padding: 16px;
+           overflow: auto; border: 1px solid rgba(231, 183, 58, .52); border-radius: 18px; background: linear-gradient(155deg, rgba(63, 16, 38, .98), rgba(35, 8, 24, .98)); }
+  #guia.activa { display: flex; animation: aparece .28s ease-out; }
+  .guia-superior { display: flex; justify-content: space-between; align-items: center; }
+  .guia-etiqueta { color: var(--oro); font-size: .7rem; letter-spacing: 1.4px; font-weight: 800; }
+  #cerrar-guia { border: 0; border-radius: 50%; width: 30px; height: 30px; background: rgba(255,255,255,.1); font-size: 1.15rem; }
+  #guia-destino { margin: 0; font-size: 1.3rem; line-height: 1.15; }
+  #guia-resumen { color: var(--tenue); margin: -6px 0 0; font-size: .86rem; }
+  .ruta { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+  .ruta li { position: relative; min-height: 50px; padding: 0 0 14px 38px; font-size: .86rem; color: var(--tenue); }
+  .ruta li::before { content: ""; position: absolute; left: 10px; top: 5px; width: 14px; height: 14px; border-radius: 50%; background: var(--vino); border: 2px solid var(--oro); }
+  .ruta li:not(:last-child)::after { content: ""; position: absolute; left: 16px; top: 22px; bottom: -1px; border-left: 2px dashed rgba(231,183,58,.6); }
+  .ruta b { display: block; color: var(--crema); margin-bottom: 2px; }
+  .qr-bloque { display: flex; gap: 12px; align-items: center; padding: 10px; border-radius: 14px; background: rgba(255,255,255,.07); }
+  #qr-guia { width: 78px; height: 78px; border-radius: 8px; background: #fff; }
+  .qr-bloque p { margin: 0; font-size: .78rem; color: var(--tenue); line-height: 1.4; }
+  #abrir-ficha { display: block; text-align: center; padding: 11px; border-radius: 12px; color: var(--vino-oscuro); background: var(--oro); font-weight: 800; text-decoration: none; font-size: .86rem; }
 
   /* ---------- conversación ---------- */
   .chat { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 4px; }
@@ -110,6 +136,10 @@
   #sugerencias button { border: 1px solid var(--borde); background: rgba(255, 255, 255, .07); border-radius: 999px;
                         padding: 7px 11px; font-size: .84rem; transition: transform .15s, background .2s; }
   #sugerencias button:hover { background: var(--vino); transform: translateY(-2px); }
+  #contexto { display: flex; flex-wrap: wrap; gap: 6px; }
+  #contexto:empty { display: none; }
+  .contexto-chip { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 6px 9px; border-radius: 10px;
+                   background: rgba(255,255,255,.08); color: var(--tenue); font-size: .72rem; }
 
   /* ---------- barra del micrófono (bajo Jarvis) ---------- */
   #controles { position: fixed; bottom: var(--margen); left: calc(var(--panel) + var(--margen) * 2); right: calc(var(--panel) + var(--margen) * 2);
@@ -171,6 +201,7 @@
     .tarjeta { min-width: 240px; }
     #conversacion { top: auto; left: var(--margen); right: var(--margen); bottom: calc(var(--margen) + 86px); width: auto; height: clamp(170px, 25vh, 300px); }
     #conversacion h2 { display: none; }
+    #contexto { display: none; }
     #sugerencias { flex-wrap: nowrap; overflow-x: auto; }
     #sugerencias button { flex: none; }
     #controles { left: var(--margen); right: var(--margen); max-width: none; }
@@ -188,6 +219,7 @@
     <div><b>Jarvis</b><small>Asistente del Paseo Aranjuez · Cochabamba</small></div>
   </div>
   <div class="derecha">
+    <div class="estado-confianza">Fuentes verificadas</div>
     <button id="nueva" title="Empezar de nuevo">↺ Nueva conversación</button>
     <div id="reloj"><b>--:--</b><small></small></div>
     <div class="punto" title="En línea"></div>
@@ -195,7 +227,7 @@
 </header>
 
 <aside id="conversacion" class="vidrio panel">
-  <h2>CONVERSACIÓN</h2>
+  <h2>CONVERSACIÓN CON JARVIS</h2>
   <div class="chat" id="chat">
     <div id="oyente"></div>
     <div id="subtitulo">
@@ -203,6 +235,7 @@
       <div id="texto-respuesta">¡Hola! Pregúntame por tiendas, comida, eventos o servicios del Paseo.</div>
     </div>
   </div>
+  <div id="contexto" aria-live="polite"></div>
   <h2>PUEDES PREGUNTARME</h2>
   <div id="sugerencias"></div>
 </aside>
@@ -213,8 +246,16 @@
     <div class="escenario"><div class="pisos" id="capas"></div></div>
     <ul class="nombres" id="nombres-pisos"></ul>
   </div>
-  <h2>LO QUE ENCONTRÉ</h2>
+  <h2>RESULTADOS VERIFICADOS</h2>
   <div id="tarjetas"></div>
+  <section id="guia" aria-live="polite">
+    <div class="guia-superior"><span class="guia-etiqueta">MODO ACOMPAÑAME</span><button id="cerrar-guia" title="Cerrar guía">×</button></div>
+    <h3 id="guia-destino"></h3>
+    <p id="guia-resumen"></p>
+    <ol class="ruta" id="pasos-guia"></ol>
+    <div class="qr-bloque"><img id="qr-guia" alt="Código QR de la ficha del destino"><p>Escanea para guardar este destino y abrir su ficha verificada en tu teléfono.</p></div>
+    <a id="abrir-ficha" target="_blank" rel="noopener noreferrer">Abrir ficha verificada</a>
+  </section>
 </aside>
 
 <div id="controles" class="vidrio">
@@ -370,9 +411,10 @@ function tarjetasDeEvidencia(sources) {
   return (sources || []).map((source) => {
     const atributos = source.attributes || {};
     return {
+      id: source.id,
       tipo: "lugar",
       nombre: source.title,
-      categoria: atributos.category || "Negocio del Paseo",
+      categoria: atributos.category || atributos.scope || atributos.condition || "Información del Paseo",
       ubicacion: { piso: atributos.floor || "", local: atributos.unit || "", sector: atributos.area || "" },
       fuente_url: source.source_url || "",
     };
@@ -396,15 +438,20 @@ function tarjetaHtml(t, n) {
   const fuente = t.fuente_url
     ? `<a class="chip" href="${escapar(t.fuente_url)}" target="_blank" rel="noopener noreferrer">Fuente</a>`
     : "";
+  const guia = piso && t.fuente_url
+    ? `<button class="guia-btn" type="button" data-guia="${n}">✦ Guíame hasta aquí</button>`
+    : "";
   return `<div class="tarjeta" style="--n:${n}" data-piso="${piso || ""}" data-nombre="${nombre}" data-tipo="${escapar(t.tipo)}">
     <div class="icono">${icono(t)}</div>
-    <div class="info"><b>${escapar(titulo)}</b><small>${escapar(detalle)}</small>${extra}<div class="chips">${chips.join("")}${fuente}</div></div>
+    <div class="info"><b>${escapar(titulo)}</b><small>${escapar(detalle)}</small>${extra}<div class="chips">${chips.join("")}${fuente}</div>${guia}</div>
   </div>`;
 }
 
 let cuentasPisos = {};
+let tarjetasActuales = [];
 function mostrarTarjetas(tarjetas) {
   const lista = tarjetas.slice(0, 8);
+  tarjetasActuales = lista;
   $("tarjetas").innerHTML = lista.map(tarjetaHtml).join("");
   cuentasPisos = {};
   for (const t of lista) {
@@ -428,9 +475,58 @@ $("tarjetas").addEventListener("pointerout", (e) => {
   if (tarjeta && !tarjeta.contains(e.relatedTarget)) { tarjeta.style.transform = ""; marcarPisos(cuentasPisos); }
 });
 $("tarjetas").addEventListener("click", (e) => {
+  const botonGuia = e.target.closest("[data-guia]");
+  if (botonGuia) {
+    e.preventDefault();
+    abrirGuia(tarjetasActuales[Number(botonGuia.dataset.guia)]);
+    return;
+  }
   const tarjeta = e.target.closest(".tarjeta");
   if (tarjeta?.dataset.tipo === "lugar") preguntar(`¿Cómo llego a ${tarjeta.dataset.nombre}?`);
 });
+
+function abrirGuia(destino) {
+  if (!destino) return;
+  const ubicacion = destino.ubicacion || {};
+  const piso = clavePiso(ubicacion.piso);
+  const pisoTexto = piso === "PB" ? "planta baja" : piso === "S" ? "semisótano" : `piso ${piso || ubicacion.piso}`;
+  const local = ubicacion.local ? `local ${ubicacion.local}` : "el destino señalado";
+  const pasos = [
+    ["Punto de partida", "Ubícate en la entrada principal del Paseo."],
+    ["Sube al destino", `Dirígete al ${pisoTexto}.`],
+    ["Llegaste", `Busca ${local}: ${destino.nombre}.`],
+  ];
+  $("guia-destino").textContent = destino.nombre;
+  $("guia-resumen").textContent = `${pisoTexto}${ubicacion.local ? ` · local ${ubicacion.local}` : ""}`;
+  $("pasos-guia").innerHTML = pasos.map(([titulo, detalle]) => `<li><b>${escapar(titulo)}</b>${escapar(detalle)}</li>`).join("");
+  $("abrir-ficha").href = destino.fuente_url;
+  const qr = $("qr-guia");
+  const bloqueQr = $("guia").querySelector(".qr-bloque");
+  bloqueQr.hidden = true;
+  qr.onload = () => { bloqueQr.hidden = false; };
+  qr.onerror = () => { bloqueQr.hidden = true; };
+  qr.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(destino.fuente_url)}`;
+  $("guia").classList.add("activa");
+  marcarPisos(cuentasPisos, piso);
+  avatar.gesto("presentar", 2400);
+  hablar(`Te acompaño a ${destino.nombre}. Ve al ${pisoTexto}${ubicacion.local ? `, local ${ubicacion.local}` : ""}.`);
+}
+
+$("cerrar-guia").onclick = () => { $("guia").classList.remove("activa"); marcarPisos(cuentasPisos); };
+
+function actualizarContexto(datos) {
+  const fuentes = datos.sources || [];
+  const chips = [];
+  if (datos.intent === "weather" && fuentes[0]) {
+    const clima = fuentes[0].attributes || {};
+    chips.push(`☀ ${clima.condition || "Clima actualizado"} · ${Math.round(clima.temperature_c || 0)} °C`);
+  }
+  if (datos.intent === "hours") {
+    const abiertos = fuentes.filter((fuente) => fuente.attributes?.open_now).length;
+    chips.push(`◷ ${abiertos}/${fuentes.length} áreas publicadas abiertas`);
+  }
+  $("contexto").innerHTML = chips.map((chip) => `<span class="contexto-chip">${escapar(chip)}</span>`).join("");
+}
 
 // ---------- Subtítulos sincronizados ----------
 function dividirFrases(texto) {
@@ -533,7 +629,9 @@ async function preguntar(texto) {
     estado("", "normal");
     const tarjetas = tarjetasDeEvidencia(datos.sources);
     if (tarjetas.length) mostrarTarjetas(tarjetas);
-    await hablar(datos.answer, { presentar: tarjetas.length > 0 });
+    actualizarContexto(datos);
+    if (datos.intent === "navigation" && tarjetas[0]?.ubicacion?.piso) abrirGuia(tarjetas[0]);
+    else await hablar(datos.answer, { presentar: tarjetas.length > 0 });
   } catch (error) {
     avatar.gesto("normal");
     estado("", "normal");
@@ -551,6 +649,9 @@ async function reiniciar() {
   if (sessionId) fetch(`${API}/chat/${sessionId}`, { method: "DELETE" }).catch(() => {});
   sessionId = null;
   $("tarjetas").innerHTML = "";
+  tarjetasActuales = [];
+  $("guia").classList.remove("activa");
+  $("contexto").innerHTML = "";
   cuentasPisos = {};
   marcarPisos({});
   oyente("");

@@ -86,6 +86,15 @@ class JarvisTests(unittest.TestCase):
         self.assertEqual(result["intent"], "weather")
         self.assertEqual(result["sources"][0]["id"], "weather:cochabamba")
 
+    def test_navigation_returns_a_grounded_destination_without_llm(self):
+        upsert(self.db, self.record(title="Café Norte", attributes={"floor": "2", "unit": "201", "category": "cafetería"}))
+        with patch("jarvis.agent.llm_answer") as synthesis:
+            result = chat(self.db, "Guíame al Café Norte")
+        synthesis.assert_not_called()
+        self.assertEqual(result["intent"], "navigation")
+        self.assertEqual(result["guide"]["floor"], "2")
+        self.assertIn("local 201", result["answer"])
+
     def test_answer_includes_source_and_location(self):
         upsert(self.db, self.record())
         result = chat(self.db, "¿Dónde hay café?")
