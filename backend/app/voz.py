@@ -6,8 +6,9 @@ from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 
 import edge_tts
 from fastapi.concurrency import run_in_threadpool
+from google.genai import types
 
-from .agente import ErrorIA, IANoConfigurada, _cliente
+from .agente import ErrorIA, IANoConfigurada, _cliente, _es_transitorio, _modelos_disponibles
 from .config import (
     EDGE_TTS_VELOCIDAD, EDGE_TTS_VOZ, GEMINI_TTS_MODELS, GEMINI_TTS_TIMEOUT_S, GEMINI_TTS_VOZ, TTS_MOTOR,
 )
@@ -15,6 +16,10 @@ from .config import (
 log = logging.getLogger("jarvis")
 
 ESTILO_GEMINI = "Lee en español latinoamericano, con voz cálida, amable y a ritmo natural: "
+PROMPT_TRANSCRIPCION = (
+    "Transcribe exactamente lo que dice la persona (español de Bolivia; habla con la asistente del Paseo Aranjuez). "
+    "Devuelve solo el texto, sin comillas ni comentarios. Si no se entiende nada o solo hay ruido, devuelve vacío."
+)
 MAX_CACHE = 64
 
 # (motor, voz, texto) -> (mp3, origen). Los saludos y respuestas frecuentes no se vuelven a generar.
@@ -95,3 +100,34 @@ def _gemini_carrera(texto: str, voz: str) -> tuple[bytes, str]:
             return audio, modelo
 
     raise ErrorIA(f"No se pudo generar la voz: {str(error)[:200]}") from error
+
+
+def transcribir(audio: bytes, mime: str) -> tuple[str, str]:
+    """Pasa a texto lo que dijo el visitante. Devuelve (texto, modelo)."""
+    if _cliente is None:
+        raise IANoConfigurada("Falta GEMINI_API_KEY en backend/.env")
+
+    error: Exception | None = None
+    for modelo in _modelos_disponibles(None):
+        inicio = time.perf_counter()
+        try:
+            respuesta = _cliente.models.generate_content(
+                model=modelo,
+                contents=[types.Part.from_bytes(data=audio, mime_type=mime), PROMPT_TRANSCRIPCION],
+                config=types.GenerateContentConfig(
+                    temperature=0,
+                    thinking_config=types.ThinkingConfig(thinking_level="low"),
+                    automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
+                ),
+            )
+        except Exception as e:
+            error = e
+            if not _es_transitorio(e):
+                break
+            log.warning("Transcripción con %s falló (%s)", modelo, type(e).__name__)
+            continue
+        texto = (respuesta.text or "").strip().strip('"«»').strip()
+        log.info("STT %s en %.1fs: %r", modelo, time.perf_counter() - inicio, texto[:80])
+        return texto, modelo
+
+    raise ErrorIA(f"No se pudo transcribir el audio: {str(error)[:200]}") from error
