@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <base href="/kiosk/">
 <title>Jarvis · Paseo Aranjuez</title>
-<script type="importmap">{ "imports": { "three": "./vendor/three/three.module.js" } }</script>
+<script type="importmap">{ "imports": { "three": "/kiosk/vendor/three/three.module.js" } }</script>
 <style>
   :root {
     --vino: #7a1f3d; --vino-oscuro: #4a1026; --oro: #e7b73a; --oro-claro: #ffd977; --crema: #fffaf0;
@@ -254,12 +254,12 @@ let enBienvenida = true;
 
 // ---------- Avatar: 3D si hay WebGL, si no el 2D ----------
 try {
-  const { Avatar3D } = await import("./js/avatar3d.js");
+  const { Avatar3D } = await import("/kiosk/js/avatar3d.js");
   avatar = new Avatar3D($("escena3d"));
   document.body.classList.add("modo-3d");
 } catch (error) {
   console.warn("Sin WebGL; uso el avatar 2D", error);
-  const { Avatar } = await import("./js/avatar.js");
+  const { Avatar } = await import("/kiosk/js/avatar.js");
   avatar = new Avatar($("avatar2d"));
   document.body.classList.add("modo-2d");
 }

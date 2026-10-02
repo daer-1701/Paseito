@@ -94,6 +94,14 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_json(404, {"error": "not found"})
                 return
             self.send_bytes(200, asset[0].read_bytes(), asset[1])
+        elif path.startswith("/js/") or path.startswith("/vendor/"):
+            # Allows a browser holding an older cached kiosk HTML page to
+            # recover its avatar assets after the server is upgraded.
+            asset = kiosk_asset(path.lstrip("/"))
+            if not asset:
+                self.send_json(404, {"error": "not found"})
+                return
+            self.send_bytes(200, asset[0].read_bytes(), asset[1])
         elif path in {"/simple", "/app.js"}:
             filename = "index.html" if path == "/" else "app.js"
             if path == "/simple":
