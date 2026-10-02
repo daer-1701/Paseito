@@ -174,8 +174,12 @@ export class Avatar {
     if (contextoAudio.state === "suspended") contextoAudio.resume();
   }
 
+  // El avatar 2D no tiene brazos ni cámara: se aceptan para ser intercambiable con Avatar3D.
+  gesto() {}
+  encuadre() {}
+
   /** Reproduce un audio (URL) moviendo la boca con su volumen. Resuelve al terminar o al llamar a callar(). */
-  hablarAudio(url) {
+  hablarAudio(url, { alProgresar } = {}) {
     this.desbloquear();
     return new Promise((resolve, reject) => {
       const audio = new Audio(url);
@@ -189,8 +193,10 @@ export class Avatar {
       this.buffer = new Uint8Array(analizador.fftSize);
       const terminar = () => {
         if (this.audio === audio) { this.analizador = null; this.audio = null; }
+        alProgresar?.(1);
         resolve();
       };
+      audio.ontimeupdate = () => audio.duration && alProgresar?.(audio.currentTime / audio.duration);
       audio.onended = terminar;
       audio.onpause = terminar;
       audio.onerror = reject;
