@@ -57,6 +57,11 @@ ESTATICOS = Path(__file__).parent / "static"
 app.mount("/static", StaticFiles(directory=ESTATICOS), name="static")
 
 
+@app.get("/kiosco", include_in_schema=False)
+def kiosco():
+    return FileResponse(ESTATICOS / "kiosco.html")
+
+
 @app.get("/prueba-voz", include_in_schema=False)
 def prueba_voz():
     return FileResponse(ESTATICOS / "prueba-voz.html")
