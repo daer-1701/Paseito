@@ -868,6 +868,11 @@ export class Avatar3D {
       [7, -43, 2.2],
     ]);
     e.add(this.arboles);
+      this.arbolGrande = crearArboles('assets/modelos/arbol1.glb', [
+      [1.0, -6.5, 2.5],  
+    ]);
+    e.add(this.arbolGrande);
+     this.arbolGrande.position.y = -0.3;
     this.lucesEdificio = [];
     const materialFocoEdificio = new THREE.MeshStandardMaterial({
       color: 0xffb347, emissive: 0xff8a2a, emissiveIntensity: 0.2, roughness: 0.3,
@@ -883,6 +888,15 @@ export class Avatar3D {
       luzEdificio.position.set(x, 0.35, 1.1);
       this.paseo.add(luzEdificio);
       this.lucesEdificio.push({ luz: luzEdificio });
+    }
+    this.spotsTorre = [];
+    for (const x of [-1.5, 2.1]) {
+      const spot = new THREE.SpotLight(0xffa31a, 70, 18, 0.8, 0.6, 1);
+      spot.position.set(x, 2.0, 3.0);              // antes y = 3.0; más abajo
+      spot.target.position.set(x, 6.0, 0.0);       // antes 7.5; apunta más abajo
+      this.paseo.add(spot);
+      this.paseo.add(spot.target);
+      this.spotsTorre.push(spot);
     }
     // this.paseo = new THREE.Group();
     // const vidrio = new THREE.MeshStandardMaterial({ color: 0x9cc7e0, metalness: 0.35, roughness: 0.2, emissive: 0x1d3a4f });
