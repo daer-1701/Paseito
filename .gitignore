@@ -8,6 +8,7 @@ tmp/
 # Secretos y datos locales
 .env
 *.db
+*.pem
 # Material de los organizadores y descargas del sitio (no es código del proyecto)
 retos/
 # Python

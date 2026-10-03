@@ -32,3 +32,9 @@ CORS_ORIGINS = [o.strip() for o in os.getenv("CORS_ORIGINS", "*").split(",") if 
 _frontend = os.getenv("FRONTEND_DIR", str(BASE_DIR.parent / "frontend")).strip()
 FRONTEND_DIR = Path(_frontend) if _frontend else None
 ADMIN_TOKEN = os.getenv("ADMIN_TOKEN", "")
+
+# Paseo Points (fidelización): base MySQL de otro equipo, solo lectura. Vacío = integración apagada.
+PUNTOS_DATABASE_URL = os.getenv("PUNTOS_DATABASE_URL", "").strip()
+_ca = os.getenv("PUNTOS_DB_CA", "").strip()
+PUNTOS_DB_CA = (BASE_DIR / _ca).resolve() if _ca else None
+PUNTOS_TIMEOUT_S = int(os.getenv("PUNTOS_TIMEOUT_S", "6"))

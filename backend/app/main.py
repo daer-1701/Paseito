@@ -7,7 +7,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from sqlmodel import Session
 
-from . import agente
+from . import agente, puntos
 from .config import CORS_ORIGINS, FRONTEND_DIR, GEMINI_MODEL
 from .db import crear_tablas, engine
 from .rutas import admin, analitica, catalogo, chat, voz
@@ -22,6 +22,7 @@ async def lifespan(_: FastAPI):
     with Session(engine) as db:
         if sembrar(db):
             logging.getLogger("jarvis").info("Base de datos sembrada con los datos del Paseo")
+    puntos.iniciar()
     yield
 
 
@@ -49,7 +50,8 @@ app.include_router(voz.router)
 
 @app.get("/salud", tags=["sistema"])
 def salud():
-    return {"ok": True, "modelo": GEMINI_MODEL, "ia_configurada": agente.ia_configurada()}
+    return {"ok": True, "modelo": GEMINI_MODEL, "ia_configurada": agente.ia_configurada(),
+            "paseo_points": puntos.estado()}
 
 
 @app.get("/kiosco", include_in_schema=False)
