@@ -108,3 +108,13 @@ También funciona `uvicorn app.main:app --app-dir backend --port 8000`.
 `/health`, `/voice/status`, `/whatsapp/status` y `/points/programa` muestran capacidades
 reales. Una demo pública no prueba conexión a Points o entrega a un teléfono.
 Para el detalle completo, [estado de la versión](version-unica-estado.md).
+
+## Aportes del compañero: primera etapa
+
+La rama `feat/aportes-companero-etapa1` conserva la aplicación unificada e incorpora avatar cochabambino, imágenes, 120 productos y lector QR. Ver [registro de etapa 1](etapa1-aportes-companero.md).
+
+En el kiosco, el botón de cámara **Lee mi QR** abre el lector. La cámara se solicita solo al pulsar **Abrir cámara**; necesita localhost o HTTPS y permiso del navegador. También se puede escribir un código. **Ver ejemplo local** funciona cuando `JARVIS_DEMO_CATALOG=1` y no permite canjear.
+
+Para cupones reales se usa la conexión MySQL de Points ya configurada con CA. El QR de cliente se valida mediante `PUNTOS_API_URL` y `PUNTOS_API_KEY` (ruta `/api/integrations/customer-qr/verify`), o mediante `PUNTOS_QR_SECRET` dedicado como alternativa. Poner secretos únicamente en el entorno local. Las variables se propagan en Compose GPU y portable. `GET /cupones/status` informa capacidades sin revelar secretos.
+
+`POST /cupones/verificar` recibe `codigo` y `session_id`. No canjea, no consulta saldo por teléfono/correo y no envía QR al modelo. Con un código se muestra únicamente ese cupón; con QR de cliente validado se muestran hasta 20 cupones propios. El saldo y las políticas adicionales quedan para la segunda etapa.

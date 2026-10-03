@@ -16,6 +16,7 @@ export function tarjetasDeEvidencia(sources) {
     const fecha = a.starts_at ? new Intl.DateTimeFormat("es-BO", { timeZone: "America/La_Paz", dateStyle: "medium", timeStyle: "short" }).format(new Date(a.starts_at)) : "";
     return {
       id: source.id, tipo: tipos[source.kind] || "info", nombre: source.title, titulo: source.title,
+      foto: a.image_url || "",
       categoria: a.category || a.scope || a.condition || "Información del Paseo",
       ubicacion: { piso: a.floor || "", local: a.unit || "", sector: a.area || "", referencia: a.data_origin === 'synthetic_demo' ? '' : a.reference || "" },
       fuente_url: a.data_origin === "synthetic_demo" ? "/catalog/demo" : /^https?:\/\//.test(source.source_url || "") ? source.source_url : "",

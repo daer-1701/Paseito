@@ -97,3 +97,7 @@ esquemas estrictos y `store: false`, según la
 [documentación oficial](https://developers.openai.com/api/docs/guides/function-calling).
 El [modelo por defecto](https://developers.openai.com/api/docs/models/gpt-4.1-mini)
 es configurable; no se atribuye una calidad o latencia medida sin una llamada real.
+
+## Primera etapa posterior a la reversión de main
+
+Rama `feat/aportes-companero-etapa1`, sobre `985b72f`, incorpora selectivamente aportes de `6a28f76`. Catálogo de demo: 1.801 registros después de sumar 120 productos (Cayenna 71, Patanegra 47, Chipotle 2). Imágenes de 20 locales y avatar cochabambino conservados. API única con lector QR/códigos de cupones y ejemplo local. El conector real requiere MySQL con CA y validación de QR de cliente configurada; no se acredita conexión externa, lectura física de cámara o transacción de canje. El cambio de apertura de Cayenna sigue pendiente. Ver [detalle y límites de etapa 1](etapa1-aportes-companero.md).

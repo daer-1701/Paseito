@@ -1,0 +1,15 @@
+{
+  "source_commit": "6a28f76",
+  "products_received": 120,
+  "new_products": 120,
+  "existing_products": 0,
+  "price_conflicts": [],
+  "mapped_images": 20,
+  "hours_pending": [
+    {
+      "venue": "Cayenna",
+      "suggestion": "11:00",
+      "confirmed": false
+    }
+  ]
+}

@@ -42,6 +42,18 @@ def load_catalog():
                     db.execute("UPDATE records SET updated_at='2026-10-03T18:00:00+00:00' WHERE id=?", (row['id'],))
             db.commit()
             load_bundle(db, companion)
+        additions = Path(__file__).resolve().parents[1] / 'data' / 'companion-stage1-2026-10-03.json'
+        if additions.exists():
+            load_bundle(db, additions)
+            # The companion menu brings dishes absent from the original demo vocabulary.
+            # All channels use this vocabulary; do not route a precise dish to a generic menu.
+            from .conversation import TOPICS, FOOD, NOISE
+            from .store import tokens
+            for record in json.loads(additions.read_text(encoding='utf-8')):
+                if record['kind']=='product':
+                    words=tokens(record['title']) - NOISE - {'personal','familiar','grande','pequeno','copa','vaso','botella','clasico','especial'}
+                    TOPICS.update(words)
+                    FOOD.update(words)
 
 
 def main():

@@ -33,6 +33,15 @@ Si falta un dato indícalo brevemente. No pidas teléfono ni correo para consult
 se requiere autenticación verificada en Paseo Points. Sus herramientas son públicas.
 No repitas etiquetas de procedencia ni avisos de demo en cada frase; ya están en la interfaz.
 No saludes en cada turno ni fuerces modismos. No uses Markdown.'''
+PROMPT += '''
+Trato de tú, cercano y respetuoso, con identidad cochabambina. Reacciona con naturalidad
+solo cuando aporte; evita repetir tu nombre o frases como "Cabe destacar" o "Con gusto".
+Di horas y números como se pronuncian; normaliza las mayúsculas de nombres de tiendas.
+Modismos bolivianos con moderación; no uses modismos de otros países ni exageres el acento.
+Pregunta al cerrar solo si ayuda al diálogo. Si un lugar está cerrado, usa sus horarios
+registrados para ofrecer una alternativa. Las referencias de ubicación también requieren datos.
+Para ver cupones invita a tocar "Lee mi QR" en el kiosco. No pidas ni recibas QR por el chat:
+el lector los verifica directamente, sin enviarlos al modelo.'''
 
 _paused_until = 0.0
 _circuit_lock = threading.Lock()
@@ -254,6 +263,8 @@ def _chat(db, message, session_id=None, allow_external=True, channel='web'):
 
 
 def chat(db, message, session_id=None, allow_external=True, channel='web'):
+    if isinstance(message,str) and re.search(r'PP1\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+|\b[A-Z0-9]{5}-[A-Z0-9]{5}\b',message,re.I):
+        raise ValueError('Para consultar un QR o cupón usa Lee mi QR; no lo envíes por el chat.')
     session_id = session_id or str(uuid4())
     if not isinstance(session_id,str) or not 1 <= len(session_id) <= 100:
         raise ValueError('invalid session_id')

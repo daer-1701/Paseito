@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'backend'))
 sys.path.insert(0, str(ROOT / 'apps' / 'jarvis-backend'))
 from .config import FRONTEND_DIR, CORS_ORIGINS
-from . import puntos
+from . import puntos, cupones
 from jarvis.bootstrap import load_catalog
 from jarvis.store import connect, search, upsert, delete
 from jarvis.orchestrator import chat, configured
@@ -99,6 +99,42 @@ def health():
 async def conversation(request: Request):
     data = await payload(request)
     return await run_in_threadpool(with_db,chat,data.get('message') or data.get('mensaje'),data.get('session_id'),channel='web')
+
+
+@app.get('/cupones/status')
+def coupon_status():
+    return cupones.status()
+
+
+@app.post('/cupones/verificar')
+async def verify_coupon(request: Request):
+    import time
+    start = time.monotonic()
+    data = await payload(request)
+    session = data.get('session_id')
+    if not isinstance(session,str) or not 1<=len(session)<=100:
+        raise ValueError('session_id requerido')
+    result = await run_in_threadpool(cupones.verificar, data.get('codigo'))
+    with closing(connect()) as db:
+        venues = search(db,'',kinds={'venue'},browse=True,limit=1000)
+        from jarvis.store import tokens
+        for card in result.get('resultados',[]):
+            name = tokens(card.get('nombre',''))
+            matches = [v for v in venues if tokens(v['title'])==name or (name and name<tokens(v['title']))]
+            if len(matches)==1:
+                v=matches[0]; a=v['attributes']
+                card['venue_id']=v['id']
+                card['ubicacion']={'piso':a.get('floor',''),'local':a.get('unit',''),'sector':a.get('area','')}
+                card['fuente_url']='/catalog/demo' if result.get('demo') else v['source_url']
+                card['foto']=a.get('image_url','')
+        # No QR, customer identifiers or coupon codes in persisted analytics.
+        analytics.record(db,'Consulta de cupones mediante lector',
+            {'session_id':session,'tarjetas':result.get('resultados',[]),
+             'intent':'loyalty','answer_mode':'coupon_demo' if result.get('demo') else 'points_coupon'},
+            'web',round((time.monotonic()-start)*1000),
+            [{'nombre':'verificar_cupon','argumentos':{},'resultados':len(result.get('resultados',[]))}],
+            'points_unavailable' if result.get('error') else None)
+    return JSONResponse(result,headers={'Cache-Control':'no-store'})
 
 
 @app.delete('/chat/{session_id}')

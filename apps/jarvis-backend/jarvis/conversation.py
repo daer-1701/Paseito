@@ -177,7 +177,7 @@ def shopping_dialogue(db, message, mode, preferences, previous_ids):
                     (f' por hasta Bs {budget:g}.' if budget is not None else '.'))
             return response(text, [venue], 'catalog', ['Ver catálogo de ' + venue['title']])
         lines = [product_name(r) + (f" por Bs {r['attributes']['price_bs']:g}" if r['attributes'].get('price_bs') is not None else '') for r in shown]
-        answer = f'Te muestro {len(shown)} opciones de {venue["title"]}: ' + '; '.join(lines) + '. '
+        answer = f'Te muestro {len(shown)} {"opción" if len(shown)==1 else "opciones"} de {venue["title"]}: ' + '; '.join(lines) + '. '
         answer += '¿Cuál te interesa?' if start + len(shown) >= len(products) else '¿Cuál te interesa? También puedes pedirme más opciones.'
         preferences['shop_topic'] = preferences.get('shop_topic') or message
         next_option = 'Más opciones' if start + len(shown) < len(products) else 'Ver catálogo de ' + venue['title']

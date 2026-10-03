@@ -12,3 +12,6 @@ PUNTOS_DATABASE_URL = os.getenv('PUNTOS_DATABASE_URL', '').strip()
 _ca = os.getenv('PUNTOS_DB_CA', '').strip()
 PUNTOS_DB_CA = Path(_ca).resolve() if _ca else None
 PUNTOS_TIMEOUT_S = max(1, min(6, int(os.getenv('PUNTOS_TIMEOUT_S', '3'))))
+PUNTOS_API_URL = os.getenv('PUNTOS_API_URL','').strip().rstrip('/')
+PUNTOS_API_KEY = os.getenv('PUNTOS_API_KEY','').strip()
+PUNTOS_QR_SECRET = os.getenv('PUNTOS_QR_SECRET','').strip()

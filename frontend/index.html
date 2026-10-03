@@ -7,6 +7,19 @@
 <title>Paseito · Paseo Aranjuez</title>
 <script type="importmap">{ "imports": { "three": "/kiosk/vendor/three/three.module.js" } }</script>
 <style>
+  .icono img { width:100%;height:100%;object-fit:cover;border-radius:inherit; }
+  #leer-qr { flex:none;width:44px;height:44px;border:1px solid var(--borde);border-radius:12px;background:var(--vino-oscuro);font-size:1.25rem; }
+  .coupon-reader { width:min(94vw,540px);max-height:90dvh;overflow:auto;background:#2b1223;color:#fffaf0;border:1px solid #e7b73a;border-radius:20px;padding:22px;box-shadow:0 20px 70px #0008; }
+  .coupon-reader::backdrop { background:#160b17c9;backdrop-filter:blur(5px); }
+  .coupon-heading { display:flex;align-items:center;justify-content:space-between;gap:12px; }
+  .coupon-heading h2 { font-size:1.1rem;margin:0; }
+  .coupon-reader button { padding:12px 16px;min-height:44px;border-radius:12px;border:1px solid #e7b73a;background:#4a1026; }
+  .coupon-reader button:disabled { opacity:.55;cursor:wait; }
+  .coupon-reader p,.coupon-reader small { line-height:1.5; }
+  .coupon-reader small { display:block;margin-top:16px;color:#ddd; }
+  .coupon-reader video { width:100%;max-height:230px;background:#000;border-radius:12px; }
+  .coupon-reader form { display:grid;gap:10px;margin:18px 0; }
+  .coupon-reader input { width:100%;min-width:0;padding:12px;font:inherit;border:1px solid #e7b73a;border-radius:10px;background:#180b14;color:#fff; }
   :root {
     --vino: #7a1f3d; --vino-oscuro: #4a1026; --oro: #e7b73a; --oro-claro: #ffd977; --crema: #fffaf0;
     --vidrio: rgba(24, 10, 20, .58); --borde: rgba(255, 255, 255, .14); --tenue: rgba(255, 250, 240, .7);
@@ -288,6 +301,7 @@
 </aside>
 
 <div id="controles" class="vidrio">
+  <button id="leer-qr" type="button" title="Lee mi QR de Paseo Points" aria-label="Lee mi QR">📷</button>
   <button id="microfono" title="Hablar (barra espaciadora)"><span class="onda"></span><span class="onda"></span><span class="onda"></span>🎤</button>
   <input id="texto" aria-label="Tu consulta para Paseito" placeholder="Escribe o toca el micrófono…" autocomplete="off">
   <span id="estado"></span>
@@ -306,7 +320,7 @@
 const SALUDO = "¡Hola! Soy Paseito, tu asistente del Paseo Aranjuez. ¿En qué te puedo ayudar hoy?";
 const SUGERENCIAS = [
   ["🍽️", "¿Dónde puedo comer?"], ["☕", "Quiero tomar un café"], ["🎁", "Busco un regalo"],
-  ["⭐", "¿Qué recompensas hay en Paseo Points?"], ["🅿️", "¿Dónde estaciono?"], ["📅", "¿Qué eventos hay hoy?"], ["🕒", "¿Qué está abierto ahora?"],
+  ["📷", "Lee mi QR"], ["⭐", "¿Qué recompensas hay en Paseo Points?"], ["🅿️", "¿Dónde estaciono?"], ["📅", "¿Qué eventos hay hoy?"], ["🕒", "¿Qué está abierto ahora?"],
 ];
 const PISOS = [
   ["5", "Quinto y más"], ["4", "Cuarto piso"], ["3", "Tercer piso"], ["2", "Segundo piso"],
@@ -323,6 +337,7 @@ let sttAbort = null;
 let inputGeneration = 0;
 let cancelCapture = () => {};
 let recognitionGeneration = 0;
+let couponReader = null;
 
 const $ = (id) => document.getElementById(id);
 let avatar;
@@ -472,9 +487,11 @@ function tarjetaHtml(t, n) {
   if (t.tipo === "recompensa") { titulo = t.titulo; detalle = t.detalle || t.nombre || ""; chips.push(`<span class="chip">${escapar(t.costo_puntos)} puntos</span>`); if (t.nivel_minimo) chips.push(`<span class="chip">Desde ${escapar(t.nivel_minimo)}</span>`); }
   if (t.tipo === "mision") { detalle = t.descripcion || ""; chips.push(`<span class="chip">+${escapar(t.puntos)} puntos</span>`); }
   if (t.tipo === "nivel") detalle = `Multiplicador ×${t.multiplicador} · desde ${t.estatus_minimo} de estatus`;
+  if (t.tipo === "cupon") { titulo=t.titulo;detalle=`${t.detalle || ""} · ${t.nombre || "Paseo Points"}`;chips.push(`<span class="chip">${escapar(t.estado)}</span>`);if(t.puntos_usados!=null)chips.push(`<span class="chip">${escapar(t.puntos_usados)} puntos utilizados</span>`); }
   if (t.tipo === "evento" && t.puntos) chips.push(`<span class="chip">+${escapar(t.puntos)} puntos</span>`);
   if (t.tipo === "promocion" && t.vigente_hasta) detalle = t.descripcion || "";
   const extra = (u.sector ? `<small>Sector: ${escapar(u.sector)}</small>` : "") +
+    (t.tipo==='producto' && !t.demo && t.descripcion ? `<small>${escapar(t.descripcion)}</small>` : "") +
     (t.torre ? `<small>Torre: ${escapar(t.torre)}</small>` : "") +
     (u.referencia ? `<small>${escapar(u.referencia)}</small>` : "") +
     (t.horario ? `<small>🕒 ${escapar(t.horario)}</small>` : "") +
@@ -488,7 +505,7 @@ function tarjetaHtml(t, n) {
     ? `<button class="guia-btn" type="button" data-guia="${n}">✦ Guíame hasta aquí</button>`
     : "";
   return `<div class="tarjeta" style="--n:${n}" data-piso="${piso || ""}" data-nombre="${nombre}" data-tipo="${escapar(t.tipo)}">
-    <div class="icono">${icono(t)}</div>
+    <div class="icono">${/^\/img\/locales\/[a-z0-9-]+\.jpg$/.test(t.foto || "") ? `<img src="${escapar(t.foto)}" alt="" loading="lazy">` : t.tipo === "cupon" ? "🎟️" : icono(t)}</div>
     <div class="info"><b>${escapar(titulo)}</b><small>${escapar(detalle)}</small>${extra}<div class="chips">${chips.join("")}${fuente}</div>${guia}</div>
   </div>`;
 }
@@ -534,6 +551,7 @@ $("tarjetas").addEventListener("click", (e) => {
 
 function abrirGuia(destino) {
   if (!destino) return;
+  const destinoId=destino.venue_id || destino.id;
   cambiarVista("resultados");
   const ubicacion = destino.ubicacion || {};
   const piso = clavePiso(ubicacion.piso);
@@ -547,7 +565,7 @@ function abrirGuia(destino) {
   $("guia-destino").textContent = destino.nombre;
   $("guia-resumen").textContent = `${pisoTexto}${ubicacion.local ? ` · local ${ubicacion.local}` : ""}`;
   $("pasos-guia").innerHTML = pasos.map(([titulo, detalle]) => `<li><b>${escapar(titulo)}</b>${escapar(detalle)}</li>`).join("");
-  const fichaLocal = `${location.origin}/destination/${encodeURIComponent(destino.id)}`;
+  const fichaLocal = `${location.origin}/destination/${encodeURIComponent(destinoId)}`;
   $("abrir-ficha").href = fichaLocal;
   $("abrir-ficha").textContent = "Abrir ficha del destino";
   const qrHolder = $("qr-guia");
@@ -559,7 +577,7 @@ function abrirGuia(destino) {
   qr.onload = () => { qrHolder.replaceChildren(qr); bloqueQr.hidden = false; };
   qr.onerror = () => { bloqueQr.hidden = true; };
   bloqueQr.querySelector("p").textContent = baseMovil ? "Escanea para llevar la ficha del destino a tu teléfono." : "Escanea para abrir la fuente publicada. La ficha móvil necesita una URL accesible desde tu teléfono.";
-  qr.src = `/qr/destination/${encodeURIComponent(destino.id)}`;
+  qr.src = `/qr/destination/${encodeURIComponent(destinoId)}`;
   $("guia").classList.add("activa");
   marcarPisos(cuentasPisos, piso);
   avatar.gesto("presentar", 2400);
@@ -715,6 +733,7 @@ function señalarTarjetas() {
 }
 
 function callar() {
+  couponReader?.close();
   turno++;
   inputGeneration++;
   cancelCapture();
@@ -733,6 +752,7 @@ function callar() {
 async function preguntar(texto) {
   texto = (texto || "").trim();
   if (!texto) return;
+  if (/(?:lee(?:r)?\s+(?:mi\s+)?qr|mis\s+cupones|ver(?:ificar)?\s+(?:mi\s+)?cup[oó]n)/i.test(texto)) { couponReader?.open(); return; }
   if (enBienvenida) salirBienvenida(false);
   ultimaActividad = Date.now();
   callar();
@@ -1058,8 +1078,18 @@ if (!navigator.mediaDevices?.getUserMedia && !Reconocimiento) {
 }
 $("microfono").onclick = alternar;
 addEventListener("keydown", (e) => {
+  if (document.querySelector('.coupon-reader')?.open) return;
   if (e.code === "Space" && document.activeElement !== $("texto")) { e.preventDefault(); alternar(); }
 });
+const {installCouponReader}=await import('/kiosk/js/coupon-reader.js');
+couponReader=installCouponReader({api:API,sessionId:()=>sessionId,onOpen:()=>{
+  callar();ultimaActividad=Date.now();if(enBienvenida)salirBienvenida(false);
+},onError:aviso,onResult:async(data)=>{
+  callar();ultimaActividad=Date.now();oyente('Mis cupones');
+  pintarSubtitulo([data.respuesta]);mostrarTarjetas(data.resultados || []);
+  cambiarVista('resultados');await hablar(data.respuesta,{presentar:true});
+}});
+$('leer-qr').onclick=()=>couponReader.open();
 </script>
 </body>
 </html>

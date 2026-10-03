@@ -14,6 +14,8 @@ import tempfile
 import urllib.error
 import urllib.request
 import wave
+import threading
+from collections import OrderedDict
 from pathlib import Path
 
 
@@ -21,6 +23,23 @@ MAX_AUDIO_BYTES = 1_000_000
 MAX_SECONDS = 15
 MAX_TTS_BYTES = 8_000_000
 MODEL_DIR = Path(__file__).resolve().parents[1] / "models"
+_edge_cache = OrderedDict()
+_edge_cache_lock = threading.Lock()
+
+
+def _cached_edge(key):
+    with _edge_cache_lock:
+        if key in _edge_cache:
+            _edge_cache.move_to_end(key)
+            return _edge_cache[key]
+
+
+def _remember_edge(key, audio):
+    with _edge_cache_lock:
+        _edge_cache[key]=audio
+        while len(_edge_cache)>64 or sum(len(v[0]) for v in _edge_cache.values())>32_000_000:
+            _edge_cache.popitem(last=False)
+    return audio
 
 
 class VoiceUnavailable(RuntimeError):
@@ -190,6 +209,11 @@ def synthesize(text: str) -> tuple[bytes, str]:
     if provider == 'edge':
         import asyncio
         import edge_tts
+        voice_name=os.getenv('EDGE_TTS_VOZ','es-BO-SofiaNeural')
+        rate=os.getenv('EDGE_TTS_VELOCIDAD','+0%')
+        key=(voice_name,rate,spoken)
+        cached=_cached_edge(key) if len(spoken)<=300 else None
+        if cached: return cached
         async def collect():
             data = bytearray()
             async for chunk in edge_tts.Communicate(spoken, os.getenv('EDGE_TTS_VOZ','es-BO-SofiaNeural'),
@@ -199,7 +223,8 @@ def synthesize(text: str) -> tuple[bytes, str]:
             if not data: raise VoiceUnavailable('empty speech')
             return bytes(data), 'audio/mpeg'
         try:
-            return asyncio.run(asyncio.wait_for(collect(), timeout=8))
+            audio=asyncio.run(asyncio.wait_for(collect(), timeout=8))
+            return _remember_edge(key,audio) if len(spoken)<=300 else audio
         except Exception as exc:
             raise VoiceUnavailable('Edge speech unavailable; browser voice remains available') from exc
     if provider not in {"local", "openai", "auto"}:

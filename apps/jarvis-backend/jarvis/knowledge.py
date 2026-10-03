@@ -27,7 +27,7 @@ def matching_venues(db, query):
     matches = []
     for record in search(db, query, limit=1000, kinds={'venue'}, browse=True):
         title = tokens(record["title"])
-        aliases = []
+        aliases = [tokens(name) for name in record['attributes'].get('aliases',[]) if isinstance(name,str)]
         if {'almacen', 'pizzas'} <= title:
             aliases.append({'almacen'})
         if {'tuc', 'toys'} <= title:
