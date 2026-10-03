@@ -7,15 +7,12 @@ Prisma guarda las fechas en UTC; aquí se devuelven en hora de Bolivia.
 import base64
 import hashlib
 import hmac
-import copy
 import json
 import logging
-import os
-from pathlib import Path
 import re
 import threading
 import time
-from datetime import datetime, timezone
+from datetime import timezone
 from typing import Callable
 from urllib.parse import unquote, urlparse
 
@@ -28,8 +25,7 @@ from .config import (PUNTOS_API_KEY, PUNTOS_API_URL, PUNTOS_DATABASE_URL, PUNTOS
 log = logging.getLogger("jarvis")
 
 CACHE_S = 300
-MAX_STALE_S = 600
-INTENTOS = 1
+INTENTOS = 3
 CONEXION_S = 3
 LIMITE_TARJETAS = 6
 NO_DISPONIBLE = "Paseo Points no responde en este momento."
@@ -54,7 +50,7 @@ _candado = threading.Lock()
 
 
 def configurado() -> bool:
-    return bool(PUNTOS_DATABASE_URL and PUNTOS_DB_CA and PUNTOS_DB_CA.is_file())
+    return bool(PUNTOS_DATABASE_URL)
 
 
 def _conectar():
@@ -62,8 +58,7 @@ def _conectar():
     return pymysql.connect(
         host=url.hostname, port=url.port or 3306, database=url.path.lstrip("/"),
         user=unquote(url.username or ""), password=unquote(url.password or ""),
-        # ssl_ca y no ssl={"ca": ...}: con ssl_verify_* pymysql descarta el dict y valida contra el almacén del sistema
-        ssl_ca=str(PUNTOS_DB_CA), ssl_verify_cert=True, ssl_verify_identity=True,
+        ssl={"ca": str(PUNTOS_DB_CA)} if PUNTOS_DB_CA else None,
         connect_timeout=CONEXION_S, read_timeout=PUNTOS_TIMEOUT_S, write_timeout=PUNTOS_TIMEOUT_S,
         # autocommit: sin él, la conexión reutilizada vería siempre la misma foto de los datos
         autocommit=True, init_command="SET SESSION TRANSACTION READ ONLY",
@@ -104,7 +99,7 @@ def _vigente(alias: str) -> str:
 def _local(fecha) -> str | None:
     if fecha is None:
         return None
-    return fecha.replace(tzinfo=timezone.utc).astimezone(ZONA_HORARIA).isoformat(timespec="minutes")
+    return fecha.replace(tzinfo=timezone.utc).astimezone(ZONA_HORARIA).strftime("%Y-%m-%d %H:%M")
 
 
 def _num(valor) -> str:
@@ -145,7 +140,7 @@ def _leer_programa(c) -> dict:
     recompensas = [{
         "id": f"recompensa-{r['id']}", "tipo": "recompensa", "titulo": _beneficio(r),
         "detalle": r["description"], "costo_puntos": r["pointsCost"], "nivel_minimo": r["nivel"],
-        "nivel_estatus": r["nivel_estatus"] or 0, "nombre": r["negocio"], "vigente_hasta": _local(r["endsAt"]),
+        "nivel_estatus": r["nivel_estatus"] or 0, "nombre": r["negocio"],
         "ubicacion": {"piso": r["floor"], "local": r["localNumber"], "sector": r["sector"]},
     } for r in c.fetchall()]
 
@@ -191,42 +186,27 @@ def _leer_programa(c) -> dict:
 
 
 def _programa() -> dict:
-    """Chat never waits on MySQL; background refresh supplies a bounded public snapshot."""
-    saved = _cache.get("programa")
-    if not saved or time.monotonic() - saved[0] > MAX_STALE_S:
-        raise RuntimeError(NO_DISPONIBLE)
-    age = int(time.monotonic() - saved[0])
-    data = copy.deepcopy(saved[1])
-    now = datetime.now(timezone.utc)
-    _filter_expired(data, now)
-    data["freshness"] = {"age_seconds": age, "stale": age >= CACHE_S, "max_age_seconds": MAX_STALE_S, 'source':'points_mysql'}
-    return data
-
-
-def _filter_expired(data, now):
-    for key in ("recompensas", "promociones", "misiones", "eventos"):
-        data[key] = [item for item in data[key] if not (item.get("vigente_hasta") or item.get("termina")) or
-                     datetime.fromisoformat(item.get("vigente_hasta") or item["termina"]).astimezone(timezone.utc) > now]
-
-
-def _demo_programa():
-    if os.getenv('JARVIS_DEMO_CATALOG') != '1':
-        raise RuntimeError('Paseo Points no está conectado.')
-    data = json.loads((Path(__file__).parent/'datos'/'points-demo.json').read_text(encoding='utf-8'))
-    _filter_expired(data, datetime.now(timezone.utc))
-    data['freshness'] = {'age_seconds':0,'stale':False,'source':'synthetic_demo','external_connected':False}
-    for key in TEMAS[1:]:
-        for item in data[key]:
-            item.update(demo=True,fuente_url='/catalog/demo')
-    return data
+    """Datos públicos del programa, en caché unos minutos; si la base falla se usa la última copia."""
+    guardado = _cache.get("programa")
+    if guardado and time.monotonic() - guardado[0] < CACHE_S:
+        return guardado[1]
+    try:
+        datos = _consultar(_leer_programa)
+    except pymysql.MySQLError:
+        if guardado:
+            log.warning("Paseo Points no respondió; uso datos en caché", exc_info=True)
+            return guardado[1]
+        raise
+    _cache["programa"] = (time.monotonic(), datos)
+    return datos
 
 
 def _refrescar_siempre() -> None:
     while True:
         try:
             _cache["programa"] = (time.monotonic(), _consultar(_leer_programa))
-        except Exception as exc:
-            log.warning("No se pudo refrescar Paseo Points (%s)", type(exc).__name__)
+        except Exception:
+            log.warning("No se pudo refrescar Paseo Points", exc_info=True)
         time.sleep(CACHE_S - 30)
 
 
@@ -238,12 +218,11 @@ def iniciar() -> None:
 
 def estado() -> str:
     if not configurado():
-        return "demo público (sin conexión real)" if os.getenv('JARVIS_DEMO_CATALOG')=='1' else "apagado (URL y CA TLS requeridos)"
+        return "apagado"
     guardado = _cache.get("programa")
     if not guardado:
         return "conectando"
-    age = int(time.monotonic() - guardado[0])
-    return f"{'ok' if age < CACHE_S else 'stale' if age <= MAX_STALE_S else 'no disponible'} (datos de hace {age} s)"
+    return f"ok (datos de hace {int(time.monotonic() - guardado[0])} s)"
 
 
 def _publico(item: dict) -> dict:
@@ -253,17 +232,16 @@ def _publico(item: dict) -> dict:
 # ---------- Herramientas (firma (db, ...) como el resto; db es la base local y no se usa) ----------
 
 def programa_puntos(db, tema: str = "todo") -> dict:
+    if not configurado():
+        return {"error": "Paseo Points no está conectado.", "resultados": []}
     try:
-        datos = _programa() if configurado() else _demo_programa()
-    except (pymysql.MySQLError, RuntimeError):
-        log.warning("Programa público de Points no disponible")
-        try:
-            datos = _demo_programa()
-        except RuntimeError:
-            return {"error": NO_DISPONIBLE, "resultados": []}
+        datos = _programa()
+    except pymysql.MySQLError:
+        log.exception("Error leyendo Paseo Points")
+        return {"error": NO_DISPONIBLE, "resultados": []}
 
     tema = tema if tema in TEMAS else "todo"
-    respuesta = {"como_funciona": datos["como_funciona"], "comercios_participantes": datos["comercios_participantes"], "freshness": datos["freshness"]}
+    respuesta = {"como_funciona": datos["como_funciona"], "comercios_participantes": datos["comercios_participantes"]}
     for clave in TEMAS[1:]:
         if tema in ("todo", clave):
             respuesta[clave] = [_publico(x) for x in datos[clave]]
@@ -278,8 +256,74 @@ def _nivel_actual(niveles: list[dict], estatus: int) -> dict | None:
 
 
 def mis_puntos(db, celular: str = "", correo: str = "") -> dict:
-    """Disabled: personal data requires a verified external identity, not an identifier."""
-    return {"error": "Inicia sesión en Paseo Points para consultar tu saldo. La consulta personal aquí está deshabilitada hasta verificar identidad.", "resultados": []}
+    if not configurado():
+        return {"error": "Paseo Points no está conectado.", "resultados": []}
+    digitos = re.sub(r"\D", "", celular or "")[-8:]
+    correo = (correo or "").strip().lower()
+    if len(digitos) < 7 and "@" not in correo:
+        return {"error": "Falta el celular o el correo con el que la persona se registró en Paseo Points.",
+                "resultados": []}
+
+    def leer(c):
+        c.execute("""SELECT id, firstName, phone, email FROM User
+                     WHERE role = 'CUSTOMER' AND status = 'ACTIVE' AND deletedAt IS NULL
+                       AND ((%s <> '' AND LOWER(email) = %s) OR (%s <> '' AND phone LIKE %s))""",
+                  (correo, correo, digitos, f"%{digitos}"))
+        candidatos = [u for u in c.fetchall()
+                      if (correo and (u["email"] or "").lower() == correo)
+                      or (digitos and re.sub(r"\D", "", u["phone"] or "").endswith(digitos))]
+        if len(candidatos) != 1:
+            return {"encontrados": len(candidatos)}
+        u = candidatos[0]
+        c.execute("SELECT COALESCE(SUM(amount), 0) AS n FROM PointMovement WHERE userId = %s", (u["id"],))
+        saldo = int(c.fetchone()["n"])
+        c.execute("SELECT COALESCE(SUM(amount), 0) AS n FROM StatusMovement WHERE userId = %s", (u["id"],))
+        estatus = int(c.fetchone()["n"])
+        c.execute(f"""SELECT m.name, m.goal, m.rewardPoints, mp.progress FROM MissionProgress mp
+                      JOIN Mission m ON m.id = mp.missionId
+                      WHERE mp.userId = %s AND mp.completedAt IS NULL AND {_vigente('m')}""", (u["id"],))
+        misiones = [{"nombre": m["name"], "avance": f"{m['progress']} de {m['goal']}", "puntos": m["rewardPoints"]}
+                    for m in c.fetchall()]
+        c.execute("SELECT COUNT(*) AS n FROM Redemption WHERE userId = %s AND status = 'PENDING'", (u["id"],))
+        return {"encontrados": 1, "nombre": u["firstName"], "saldo": saldo, "estatus": estatus,
+                "misiones": misiones, "canjes_pendientes": c.fetchone()["n"]}
+
+    try:
+        cliente = _consultar(leer)
+        datos = _programa()
+    except pymysql.MySQLError:
+        log.exception("Error leyendo Paseo Points")
+        return {"error": NO_DISPONIBLE, "resultados": []}
+
+    if cliente["encontrados"] == 0:
+        return {"error": "No hay una cuenta de Paseo Points con ese dato.", "resultados": []}
+    if cliente["encontrados"] > 1:
+        return {"error": "Ese dato coincide con varias cuentas; pide el correo registrado.", "resultados": []}
+
+    saldo, estatus = cliente["saldo"], cliente["estatus"]
+    niveles = datos["niveles"]
+    actual = _nivel_actual(niveles, estatus)
+    siguiente = min((n for n in niveles if n["estatus_minimo"] > estatus), key=lambda n: n["estatus_minimo"],
+                    default=None)
+    permitidas = [r for r in datos["recompensas"] if r["nivel_estatus"] <= estatus]
+    alcanzables = [r for r in permitidas if r["costo_puntos"] <= saldo]
+    proxima = next((r for r in permitidas if r["costo_puntos"] > saldo), None)
+
+    nivel = actual["nombre"] if actual else None
+    return {
+        "cliente": cliente["nombre"],
+        "saldo_puntos": saldo,
+        "nivel": nivel,
+        "estatus": estatus,
+        "siguiente_nivel": siguiente and {"nombre": siguiente["nombre"],
+                                          "faltan_estatus": siguiente["estatus_minimo"] - estatus},
+        "recompensas_alcanzables": [_publico(r) for r in alcanzables],
+        "proxima_recompensa": proxima and {**_publico(proxima), "faltan_puntos": proxima["costo_puntos"] - saldo},
+        "misiones_en_curso": cliente["misiones"],
+        "canjes_pendientes": cliente["canjes_pendientes"],
+        "resultados": [{"id": "mis-puntos", "tipo": "puntos", "nombre": cliente["nombre"], "saldo": saldo,
+                        "nivel": nivel}] + [_publico(r) for r in alcanzables[:LIMITE_TARJETAS - 1]],
+    }
 
 
 # ---------- Cupones (canjes) leídos desde el QR que muestra la app ----------
@@ -390,15 +434,12 @@ def cupones_del_cliente(usuario: int) -> dict:
 
     try:
         datos = _consultar(leer)
+        nivel = _nivel_actual(_programa()["niveles"], datos["estatus"]) if datos else None
     except pymysql.MySQLError:
         log.exception("Error leyendo los cupones de un cliente de Paseo Points")
         return {"error": f"{NO_DISPONIBLE} Intenta de nuevo en un ratito.", "resultados": []}
     if not datos:
         return {"error": CUENTA_NO_ENCONTRADA, "resultados": []}
-    try:
-        nivel = _nivel_actual(_programa()["niveles"], datos["estatus"])
-    except RuntimeError:
-        nivel = None
     vigentes = [_cupon(f) for f in datos["vigentes"]]
     pasados = [_cupon(f) for f in datos["pasados"]]
     resumen = {"id": "mis-puntos", "tipo": "puntos", "nombre": datos["nombre"], "saldo": datos["saldo"],

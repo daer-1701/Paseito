@@ -48,7 +48,7 @@ def status() -> dict:
     provider = os.getenv("JARVIS_TTS_PROVIDER", "local").lower()
     openai_ready = bool(os.getenv("OPENAI_API_KEY"))
     local_synthesis = "piper" if piper_ready else ("system" if say_ready else "browser")
-    synthesis = 'edge' if provider == 'edge' else "openai" if provider in {"openai", "auto"} and openai_ready else local_synthesis
+    synthesis = "openai" if provider in {"openai", "auto"} and openai_ready else local_synthesis
     return {
         "transcription": bool(whisper and model and Path(model).is_file()),
         "synthesis": synthesis,
@@ -187,21 +187,6 @@ def synthesize(text: str) -> tuple[bytes, str]:
     provider = os.getenv("JARVIS_TTS_PROVIDER", "local").lower()
     if provider == "gpu":
         return _gpu_wav(spoken)
-    if provider == 'edge':
-        import asyncio
-        import edge_tts
-        async def collect():
-            data = bytearray()
-            async for chunk in edge_tts.Communicate(spoken, os.getenv('EDGE_TTS_VOZ','es-BO-SofiaNeural'),
-                                                   rate=os.getenv('EDGE_TTS_VELOCIDAD','+0%')).stream():
-                if chunk['type'] == 'audio': data.extend(chunk['data'])
-                if len(data)>MAX_TTS_BYTES: raise VoiceUnavailable('speech too large')
-            if not data: raise VoiceUnavailable('empty speech')
-            return bytes(data), 'audio/mpeg'
-        try:
-            return asyncio.run(asyncio.wait_for(collect(), timeout=8))
-        except Exception as exc:
-            raise VoiceUnavailable('Edge speech unavailable; browser voice remains available') from exc
     if provider not in {"local", "openai", "auto"}:
         raise ValueError("JARVIS_TTS_PROVIDER must be local, openai, auto or gpu")
     if provider in {"openai", "auto"} and os.getenv("OPENAI_API_KEY"):

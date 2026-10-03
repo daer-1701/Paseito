@@ -13,7 +13,10 @@ CATALOG = Path(__file__).resolve().parents[1] / "data" / "venues.json"
 OLD_DEMO_IDS = ("venue:demo-cafe", "venue:demo-regalos", "product:demo-taza")
 
 
-def main(refresh=False) -> None:
+def main() -> None:
+    if len(sys.argv) > 2 or (len(sys.argv) == 2 and sys.argv[1] != "--refresh"):
+        raise SystemExit("usage: python3 -m jarvis.seed [--refresh]")
+    refresh = len(sys.argv) == 2
     records = json.loads(CATALOG.read_text(encoding="utf-8"))
     if not isinstance(records, list) or len(records) != 20:
         raise ValueError("starter catalog must contain 20 venues")
@@ -36,6 +39,4 @@ def main(refresh=False) -> None:
 
 
 if __name__ == "__main__":
-    if len(sys.argv)>2 or len(sys.argv)==2 and sys.argv[1]!='--refresh':
-        raise SystemExit('usage: python -m jarvis.seed [--refresh]')
-    main(refresh='--refresh' in sys.argv)
+    main()

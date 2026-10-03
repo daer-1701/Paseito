@@ -46,7 +46,7 @@ def facts(record):
     details = []
     if record["kind"] == "venue":
         details.append(f"Categoría: {a['category']}." if a.get("category") else "Negocio del directorio del Paseo.")
-        if a.get("review_status") in {"approved", "sourced"} and a.get("description"):
+        if a.get("review_status") == "approved" and a.get("description"):
             details.append(a["description"])
         for label, field in (("Productos", "products"), ("Servicios", "services")):
             if a.get(field) and a.get("review_status") == "approved":

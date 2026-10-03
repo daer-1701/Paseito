@@ -1,5 +1,3 @@
-> Documento histórico. El arranque vigente y la aplicación única están en [docs/arranque-equipo.md](arranque-equipo.md). El backend Gemini y las APIs duplicadas se retiraron en `feat/version-unica-openai`.
-
 # Paseito
 
 Asistente inteligente del **Paseo Aranjuez** (Cochabamba, Bolivia), creado para la Hackathon By Paseo 2026.

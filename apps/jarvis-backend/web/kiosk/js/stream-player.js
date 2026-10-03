@@ -56,22 +56,10 @@ export class StreamPlayer {
     signal?.addEventListener("abort", stop, { once: true });
     onAnalyser?.(analyser);
     try {
-      let response;
-      for (let attempt=0; attempt<3; attempt++) {
-        signal?.throwIfAborted();
-        response = await fetch(url, {
-          method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text }), signal,
-        });
-        if (response.status !== 503 || attempt === 2) break;
-        await response.body?.cancel();
-        await new Promise((resolve,reject) => {
-          const finish = () => { signal?.removeEventListener('abort',cancel); resolve(); };
-          const timer = setTimeout(finish,300*(attempt+1));
-          const cancel = () => { clearTimeout(timer); reject(new DOMException('Aborted','AbortError')); };
-          signal?.addEventListener('abort',cancel,{once:true});
-        });
-      }
+      const response = await fetch(url, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }), signal,
+      });
       if (!response.ok) throw new Error(`Voz no disponible (${response.status})`);
       for await (const event of readFrames(response.body)) {
         signal?.throwIfAborted();

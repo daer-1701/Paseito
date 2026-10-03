@@ -1,9 +1,9 @@
 # Jarvis local en Windows 11 + WSL2 + RTX 4070
 
-Esta torre ejecuta la misma aplicación FastAPI y frontend responsive descritos en
-[arranque del equipo](arranque-equipo.md). OpenAI es el proveedor principal cuando
-se configura la clave en el `.env` raíz; sin clave funciona el respaldo local.
-La voz usa faster-whisper y Kokoro en CUDA. Los datos y sesiones son únicos.
+Esta configuración sirve para el piloto de un kiosco. La API, el catálogo y la
+voz funcionan en la torre. No requiere clave de OpenAI: Compose fija respuesta
+estricta, transcripción con faster-whisper y síntesis Kokoro en CUDA. La Mac
+conserva su modo de ejecución actual fuera de Docker.
 
 ## Preparación de Windows — una sola vez
 
@@ -35,7 +35,7 @@ Clonar en el filesystem de Linux, por ejemplo `~/Developer`, para evitar el
 coste de acceso a archivos de `/mnt/c`. Sustituir la URL por la del monorepo:
 
 ```bash
-git clone --branch feat/version-unica-openai https://github.com/daer-1701/Paseito.git paseo-aranjuez-digital
+git clone --branch feat/avatar-jarvis-auditoria-reto https://github.com/daer-1701/Paseito.git paseo-aranjuez-digital
 cd paseo-aranjuez-digital
 bash scripts/start-tower.sh
 ```

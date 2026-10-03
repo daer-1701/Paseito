@@ -8,15 +8,8 @@ services:
       dockerfile: apps/jarvis-backend/Dockerfile
     restart: unless-stopped
     environment:
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
-      OPENAI_TEXT_MODEL: ${OPENAI_TEXT_MODEL:-gpt-4.1-mini}
-      OPENAI_REASONING_EFFORT: ${OPENAI_REASONING_EFFORT:-}
-      OPENAI_TIMEOUT_S: ${OPENAI_TIMEOUT_S:-8}
-      PUNTOS_DATABASE_URL: ${PUNTOS_DATABASE_URL:-}
-      PUNTOS_DB_CA: ${PUNTOS_DB_CA:-}
-      PUNTOS_TIMEOUT_S: ${PUNTOS_TIMEOUT_S:-3}
-      JARVIS_STIMULUS_ENABLED: ${JARVIS_STIMULUS_ENABLED:-0}
-      JARVIS_TTS_PROVIDER: ${JARVIS_TTS_PROVIDER:-local}
+      JARVIS_RESPONSE_MODE: strict
+      JARVIS_TTS_PROVIDER: local
       JARVIS_DEMO_CATALOG: ${JARVIS_DEMO_CATALOG:-1}
       JARVIS_INGEST_TOKEN: ${JARVIS_INGEST_TOKEN:?Set a local ingestion token before starting}
       JARVIS_KIOSK_ORIGIN: ${JARVIS_KIOSK_ORIGIN:-Punto del kiosco pendiente de configurar}

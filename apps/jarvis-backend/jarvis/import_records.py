@@ -9,10 +9,7 @@ def load_bundle(db, path, missing_only=False):
     raw = json.loads(Path(path).read_text(encoding='utf-8'))
     if not isinstance(raw, list):
         raise ValueError('bundle must be a JSON list')
-    if any(not isinstance(r,dict) for r in raw):
-        raise ValueError('bundle records must be objects')
-    tombstones = {r[0] for r in db.execute('SELECT id FROM record_tombstones')}
-    records = [validate_record(r) for r in raw if r.get('id') not in tombstones]
+    records = [validate_record(r) for r in raw]
     if len({r['id'] for r in records}) != len(records):
         raise ValueError('duplicate record IDs')
     existing = {r[0] for r in db.execute("SELECT id FROM records WHERE kind='venue'")}
