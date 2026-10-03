@@ -14,6 +14,7 @@
 
 import * as THREE from "three";
 import { FORMAS, formaEn, formaPorVolumen, palabraEn, planDePalabra, prepararPlan } from "./habla.js";
+import { crearCristoGLB } from './cristoGLB.js';
 
 const C = {
   piel: 0xc68a5c, pielOscura: 0xa96f46, cabello: 0x1e1412, sombrero: 0xf7f3ea, cinta: 0x151515,
@@ -749,7 +750,7 @@ export class Avatar3D {
     }
     this.cerro.add(arbustos);
 
-    const cristo = crearCristo();
+    const cristo = crearCristoGLB(4);
     cristo.position.y = 2.5;
     cristo.rotation.y = -0.2;
     cristo.scale.setScalar(1.2);
