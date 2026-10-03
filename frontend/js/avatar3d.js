@@ -13,6 +13,10 @@
 //   avatar.encuadre({ arriba, abajo, izquierda, derecha });  // px que tapa la interfaz
 
 import * as THREE from "three";
+import { EffectComposer } from "https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/postprocessing/EffectComposer.js";
+import { RenderPass } from "https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/postprocessing/RenderPass.js";
+import { BokehPass } from "https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/postprocessing/BokehPass.js";
+import { OutputPass } from "https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/postprocessing/OutputPass.js";
 import { FORMAS, formaEn, formaPorVolumen, palabraEn, planDePalabra, prepararPlan } from "./habla.js";
 import { crearCristoGLB } from './cristoGLB.js';
 import { crearEdificioGLB } from './edificioGLB.js';
@@ -423,6 +427,19 @@ export class Avatar3D {
 
     this._construirEscena();
     this._construirPersonaje();
+    this.personaje.traverse((objeto) => objeto.layers.set(1));
+    this.escena.traverse((objeto) => {
+      if (objeto.isLight) objeto.layers.enable(1);
+    });
+    this.compositor = new EffectComposer(this.renderer);
+    this.compositor.addPass(new RenderPass(this.escena, this.camara));
+    this.desenfoque = new BokehPass(this.escena, this.camara, {
+      focus: 3.5,
+      aperture: 0.006,
+      maxblur: 0.006,
+    });
+    this.compositor.addPass(this.desenfoque);
+    this.compositor.addPass(new OutputPass());
 
     this.reloj = new THREE.Clock();
     this._redimensionar();
@@ -1256,6 +1273,7 @@ export class Avatar3D {
     const w = this.contenedor.clientWidth || innerWidth;
     const h = this.contenedor.clientHeight || innerHeight;
     this.renderer.setSize(w, h, false);
+    this.compositor?.setSize(w, h);
     const cam = this.camara;
     cam.aspect = w / h;
     const tanV = Math.tan(THREE.MathUtils.degToRad(cam.fov / 2));
@@ -1485,7 +1503,14 @@ export class Avatar3D {
     cam.position.set(px, this.objetivo.y + 0.1 + py, this.distancia);
     cam.lookAt(this.objetivo);
 
+    cam.layers.set(0);
+    this.compositor.render();
+    this.renderer.autoClear = false;
+    this.renderer.clearDepth();
+    cam.layers.set(1);
     this.renderer.render(this.escena, cam);
+    cam.layers.enable(0);
+    this.renderer.autoClear = true;
     this._ajustarCalidad(real, ahora);
   }
 
