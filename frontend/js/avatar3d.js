@@ -15,6 +15,7 @@
 import * as THREE from "three";
 import { FORMAS, formaEn, formaPorVolumen, palabraEn, planDePalabra, prepararPlan } from "./habla.js";
 import { crearCristoGLB } from './cristoGLB.js';
+import { crearEdificioGLB } from './edificioGLB.js';
 
 const C = {
   piel: 0xc68a5c, pielOscura: 0xa96f46, cabello: 0x1e1412, sombrero: 0xf7f3ea, cinta: 0x151515,
@@ -785,20 +786,25 @@ export class Avatar3D {
     e.add(this.cerro);
 
     // edificio del Paseo Aranjuez
-    this.paseo = new THREE.Group();
-    const vidrio = new THREE.MeshStandardMaterial({ color: 0x9cc7e0, metalness: 0.35, roughness: 0.2, emissive: 0x1d3a4f });
-    const losa = new THREE.MeshStandardMaterial({ color: 0xf2efe8, roughness: 0.7 });
-    this.paseo.add(colocar(new THREE.Mesh(new THREE.BoxGeometry(5, 2.7, 2.6), vidrio), 0, 1.35, 0));
-    for (const y of [0.05, 0.9, 1.8, 2.7]) {
-      this.paseo.add(colocar(new THREE.Mesh(new THREE.BoxGeometry(5.3, 0.12, 2.9), losa), 0, y, 0));
-    }
-    const letrero = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 0.6), new THREE.MeshBasicMaterial({ map: texturaLetrero() }));
-    letrero.position.set(0, 3.15, 1.0);
-    this.paseo.add(letrero);
-    this.paseo.position.set(-7, 0, -15);
+     this.paseo = crearEdificioGLB(7);
+    this.paseo.position.set(-7, 0.5, -15);
     this.paseo.rotation.y = 0.4;
-    this.paseo.scale.setScalar(0.75);
+    this.paseo.scale.setScalar(1);
     e.add(this.paseo);
+    // this.paseo = new THREE.Group();
+    // const vidrio = new THREE.MeshStandardMaterial({ color: 0x9cc7e0, metalness: 0.35, roughness: 0.2, emissive: 0x1d3a4f });
+    // const losa = new THREE.MeshStandardMaterial({ color: 0xf2efe8, roughness: 0.7 });
+    // this.paseo.add(colocar(new THREE.Mesh(new THREE.BoxGeometry(5, 2.7, 2.6), vidrio), 0, 1.35, 0));
+    // for (const y of [0.05, 0.9, 1.8, 2.7]) {
+    //   this.paseo.add(colocar(new THREE.Mesh(new THREE.BoxGeometry(5.3, 0.12, 2.9), losa), 0, y, 0));
+    // }
+    // const letrero = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 0.6), new THREE.MeshBasicMaterial({ map: texturaLetrero() }));
+    // letrero.position.set(0, 3.15, 1.0);
+    // this.paseo.add(letrero);
+    // this.paseo.position.set(-7, 0, -15);
+    // this.paseo.rotation.y = 0.4;
+    // this.paseo.scale.setScalar(0.75);
+    // e.add(this.paseo);
 
     // plataforma con anillo de aguayo y halo que cambia de color según el estado
     const base = new THREE.Mesh(
