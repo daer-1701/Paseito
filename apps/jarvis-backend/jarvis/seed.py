@@ -2,6 +2,7 @@
 
 import json
 import sys
+from contextlib import closing
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -24,9 +25,9 @@ def main() -> None:
     for record in records:
         if record.get("kind") != "venue" or not record.get("source_url"):
             raise ValueError("each venue needs a source URL")
-        prepared.append(validate_record({**record, "updated_at": updated}))
+        prepared.append(validate_record({**record, "updated_at": record.get('updated_at', updated)}))
     loaded = 0
-    with connect() as db:
+    with closing(connect()) as db:
         for record_id in OLD_DEMO_IDS:
             delete(db, record_id)
         for record in prepared:

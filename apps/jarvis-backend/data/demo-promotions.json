@@ -1,0 +1,170 @@
+[
+  {
+    "id": "promotion:demo:2026-10:01",
+    "kind": "promotion",
+    "title": "Pizza familiar de 8 porciones por Bs 59 · Almacén de Pizzas",
+    "text": "Pizza familiar de 8 porciones por Bs 59. Promoción en Almacén de Pizzas. Una pizza familiar de 8 porciones por Bs 59. Sabores margarita o pepperoni; consumo en local. No acumulable con otros descuentos.",
+    "source_url": "http://localhost:8000/catalog/demo",
+    "updated_at": "2026-10-03T13:05:56.313875+00:00",
+    "expires_at": "2026-10-11T23:59:00-04:00",
+    "attributes": {
+      "venue_id": "venue:almacen-de-pizzas",
+      "venue_name": "Almacén de Pizzas",
+      "starts_at": "2026-10-03T00:00:00-04:00",
+      "benefit": "Pizza familiar de 8 porciones por Bs 59",
+      "terms": "Una pizza familiar de 8 porciones por Bs 59. Sabores margarita o pepperoni; consumo en local. No acumulable con otros descuentos.",
+      "price_bs": 59,
+      "product_id": "product:demo:almacen-de-pizzas:05",
+      "data_origin": "synthetic_demo",
+      "source_type": "demo_promotion",
+      "review_status": "sourced"
+    }
+  },
+  {
+    "id": "promotion:demo:2026-10:02",
+    "kind": "promotion",
+    "title": "Combo clásico por Bs 39 · Bypass Burger",
+    "text": "Combo clásico por Bs 39. Promoción en Bypass Burger. Hamburguesa clásica, papas pequeñas y gaseosa por Bs 39. Consumo en local; una bebida por combo.",
+    "source_url": "http://localhost:8000/catalog/demo",
+    "updated_at": "2026-10-03T13:05:56.313875+00:00",
+    "expires_at": "2026-10-11T23:59:00-04:00",
+    "attributes": {
+      "venue_id": "venue:official-bypassburger",
+      "venue_name": "Bypass Burger",
+      "starts_at": "2026-10-03T00:00:00-04:00",
+      "benefit": "Combo clásico por Bs 39",
+      "terms": "Hamburguesa clásica, papas pequeñas y gaseosa por Bs 39. Consumo en local; una bebida por combo.",
+      "price_bs": 39,
+      "product_id": null,
+      "data_origin": "synthetic_demo",
+      "source_type": "demo_promotion",
+      "review_status": "sourced"
+    }
+  },
+  {
+    "id": "promotion:demo:2026-10:03",
+    "kind": "promotion",
+    "title": "Café y brownie por Bs 29 · Pawitos",
+    "text": "Café y brownie por Bs 29. Promoción en Pawitos. Café americano y brownie por Bs 29, de 15:00 a 18:00. Una porción por combo; consumo en local.",
+    "source_url": "http://localhost:8000/catalog/demo",
+    "updated_at": "2026-10-03T13:05:56.313875+00:00",
+    "expires_at": "2026-10-11T23:59:00-04:00",
+    "attributes": {
+      "venue_id": "venue:official-pawitos",
+      "venue_name": "Pawitos",
+      "starts_at": "2026-10-03T00:00:00-04:00",
+      "benefit": "Café y brownie por Bs 29",
+      "terms": "Café americano y brownie por Bs 29, de 15:00 a 18:00. Una porción por combo; consumo en local.",
+      "price_bs": 29,
+      "product_id": null,
+      "data_origin": "synthetic_demo",
+      "source_type": "demo_promotion",
+      "review_status": "sourced"
+    }
+  },
+  {
+    "id": "promotion:demo:2026-10:04",
+    "kind": "promotion",
+    "title": "Dos pastas por Bs 79 · Solo Pastas",
+    "text": "Dos pastas por Bs 79. Promoción en Solo Pastas. Dos pastas boloñesa o Alfredo por Bs 79; consumo en local. No incluye bebidas.",
+    "source_url": "http://localhost:8000/catalog/demo",
+    "updated_at": "2026-10-03T13:05:56.313875+00:00",
+    "expires_at": "2026-10-11T23:59:00-04:00",
+    "attributes": {
+      "venue_id": "venue:official-solopastas",
+      "venue_name": "Solo Pastas",
+      "starts_at": "2026-10-03T00:00:00-04:00",
+      "benefit": "Dos pastas por Bs 79",
+      "terms": "Dos pastas boloñesa o Alfredo por Bs 79; consumo en local. No incluye bebidas.",
+      "price_bs": 79,
+      "product_id": null,
+      "data_origin": "synthetic_demo",
+      "source_type": "demo_promotion",
+      "review_status": "sourced"
+    }
+  },
+  {
+    "id": "promotion:demo:2026-10:05",
+    "kind": "promotion",
+    "title": "Dos helados por Bs 25 · Helados Vacafría",
+    "text": "Dos helados por Bs 25. Promoción en Helados Vacafría. Dos helados de una porción por Bs 25. No incluye toppings; consumo en local.",
+    "source_url": "http://localhost:8000/catalog/demo",
+    "updated_at": "2026-10-03T13:05:56.313875+00:00",
+    "expires_at": "2026-10-11T23:59:00-04:00",
+    "attributes": {
+      "venue_id": "venue:official-heladosvacafria",
+      "venue_name": "Helados Vacafría",
+      "starts_at": "2026-10-03T00:00:00-04:00",
+      "benefit": "Dos helados por Bs 25",
+      "terms": "Dos helados de una porción por Bs 25. No incluye toppings; consumo en local.",
+      "price_bs": 25,
+      "product_id": null,
+      "data_origin": "synthetic_demo",
+      "source_type": "demo_promotion",
+      "review_status": "sourced"
+    }
+  },
+  {
+    "id": "promotion:demo:2026-10:06",
+    "kind": "promotion",
+    "title": "Rompecabezas y cubo por Bs 69 · TUC TOYS",
+    "text": "Rompecabezas y cubo por Bs 69. Promoción en TUC TOYS. Rompecabezas infantil y cubo Rubik por Bs 69. Un set por compra; modelos del catálogo.",
+    "source_url": "http://localhost:8000/catalog/demo",
+    "updated_at": "2026-10-03T13:05:56.313875+00:00",
+    "expires_at": "2026-10-11T23:59:00-04:00",
+    "attributes": {
+      "venue_id": "venue:tuc-toys",
+      "venue_name": "TUC TOYS",
+      "starts_at": "2026-10-03T00:00:00-04:00",
+      "benefit": "Rompecabezas y cubo por Bs 69",
+      "terms": "Rompecabezas infantil y cubo Rubik por Bs 69. Un set por compra; modelos del catálogo.",
+      "price_bs": 69,
+      "product_id": null,
+      "data_origin": "synthetic_demo",
+      "source_type": "demo_promotion",
+      "review_status": "sourced"
+    }
+  },
+  {
+    "id": "promotion:demo:2026-10:07",
+    "kind": "promotion",
+    "title": "Pack de dos poleras por Bs 129 · Gap",
+    "text": "Pack de dos poleras por Bs 129. Promoción en Gap. Dos poleras básicas por Bs 129. No acumulable con otros descuentos; no incluye prendas estampadas.",
+    "source_url": "http://localhost:8000/catalog/demo",
+    "updated_at": "2026-10-03T13:05:56.313875+00:00",
+    "expires_at": "2026-10-11T23:59:00-04:00",
+    "attributes": {
+      "venue_id": "venue:gap",
+      "venue_name": "Gap",
+      "starts_at": "2026-10-03T00:00:00-04:00",
+      "benefit": "Pack de dos poleras por Bs 129",
+      "terms": "Dos poleras básicas por Bs 129. No acumulable con otros descuentos; no incluye prendas estampadas.",
+      "price_bs": 129,
+      "product_id": null,
+      "data_origin": "synthetic_demo",
+      "source_type": "demo_promotion",
+      "review_status": "sourced"
+    }
+  },
+  {
+    "id": "promotion:demo:2026-10:08",
+    "kind": "promotion",
+    "title": "Mochila urbana por Bs 199 · Totto",
+    "text": "Mochila urbana por Bs 199. Promoción en Totto. Mochila urbana del catálogo por Bs 199. No incluye mochilas para laptop ni maletas.",
+    "source_url": "http://localhost:8000/catalog/demo",
+    "updated_at": "2026-10-03T13:05:56.313875+00:00",
+    "expires_at": "2026-10-11T23:59:00-04:00",
+    "attributes": {
+      "venue_id": "venue:totto",
+      "venue_name": "Totto",
+      "starts_at": "2026-10-03T00:00:00-04:00",
+      "benefit": "Mochila urbana por Bs 199",
+      "terms": "Mochila urbana del catálogo por Bs 199. No incluye mochilas para laptop ni maletas.",
+      "price_bs": 199,
+      "product_id": "product:demo:totto:01",
+      "data_origin": "synthetic_demo",
+      "source_type": "demo_promotion",
+      "review_status": "sourced"
+    }
+  }
+]

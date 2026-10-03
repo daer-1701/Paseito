@@ -66,7 +66,8 @@ def import_directory(db, stores: list[dict], observed_at: str | None = None) -> 
             "category": category,
             "floor": floor,
             "source_type": "official_directory",
-            "verified_at": observed_at,
+            "observed_at": observed_at,
+            "review_status": "sourced",
         }
         upsert(db, {
             "id": record_id(title), "kind": "venue", "title": title, "text": text,

@@ -35,6 +35,7 @@ Para desarrollo directo en la Mac:
 
 ```bash
 cd apps/jarvis-backend
+python3 -m pip install -r requirements.txt
 python3 -m jarvis.seed
 export JARVIS_INGEST_TOKEN="un-secreto-para-la-demo"
 python3 -m jarvis.api
@@ -56,3 +57,14 @@ demostración para el jurado.
 El [plan de implementación futura](docs/implementacion-futura-jarvis.md) define
 la transición hacia kioscos Raspberry Pi, un servidor central, voz local y el
 uso posterior de Vercel y AWS.
+
+El [estado actual de datos e investigación](docs/investigacion-datos-publicos.md)
+documenta fuentes, horarios contradictorios, límites del catálogo y pendientes.
+El [acceso móvil](docs/acceso-movil.md) explica el QR local y la pasarela opcional.
+
+El [estado de requerimientos, catálogo demo y WhatsApp](docs/estado-requerimientos-y-whatsapp.md) detalla lo implementado y las consultas pendientes. El catálogo ficticio se habilita con `JARVIS_DEMO_CATALOG=1`; su procedencia se conserva en los datos y en la indicación general de modo demo.
+
+La [demo conversacional y el respaldo de WhatsApp](docs/whatsapp-mvp-y-presentacion.md)
+explican el flujo de tiendas → catálogo, horarios, promociones y el conector Twilio.
+Abrir `http://localhost:8000/whatsapp/demo` para el respaldo local sin cuenta externa.
+El alcance de los datos se indica una vez mediante “Modo demo”, sin repetirlo en cada respuesta.

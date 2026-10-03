@@ -1,0 +1,17 @@
+# Optional public-facts gateway. Default remains localhost until a LAN IP is chosen.
+services:
+  mobile:
+    image: nginx:1.28.0-alpine
+    restart: unless-stopped
+    depends_on:
+      jarvis:
+        condition: service_healthy
+    ports:
+      - "${JARVIS_MOBILE_BIND:-127.0.0.1}:${JARVIS_MOBILE_PORT:-8080}:8080"
+    volumes:
+      - ./deploy/mobile.conf:/etc/nginx/conf.d/default.conf:ro
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: "2"

@@ -1,4 +1,5 @@
 """Private GPU service. WAV input; framed PCM output, one model load per process."""
+import anyio
 import asyncio
 import base64
 from contextlib import asynccontextmanager
@@ -165,17 +166,17 @@ async def speech(payload: SpeechInput, request: Request):
     iterator = request.app.state.engine.speech(parts, cancelled)
 
     async def next_frame():
-        # Finish an active inference before closing its generator on disconnect.
-        work = asyncio.create_task(asyncio.to_thread(advance, iterator))
-        try:
-            return await asyncio.shield(work)
-        except asyncio.CancelledError:
-            cancelled.set()
-            await work
-            iterator.close()
-            raise
+        # Starlette uses AnyIO level cancellation. Its worker must finish before
+        # output() closes this generator; asyncio.shield alone is insufficient.
+        return await anyio.to_thread.run_sync(advance, iterator, abandon_on_cancel=False)
 
-    first = await next_frame()
+    try:
+        first = await next_frame()
+        await anyio.lowlevel.checkpoint_if_cancelled()
+    except BaseException:
+        cancelled.set()
+        iterator.close()
+        raise
 
     async def output():
         try:

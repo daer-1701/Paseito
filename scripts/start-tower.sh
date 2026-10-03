@@ -9,7 +9,7 @@ if [[ ! -f .env ]]; then
   umask 077
   cp .env.example .env
   token=$(openssl rand -hex 32)
-  sed -i "s/^JARVIS_INGEST_TOKEN=$/JARVIS_INGEST_TOKEN=$token/" .env
+  sed -i "s/^JARVIS_INGEST_TOKEN=.*/JARVIS_INGEST_TOKEN=$token/" .env
 fi
 docker compose config --quiet
 echo 'Verificando acceso a la GPU NVIDIA desde Docker…'

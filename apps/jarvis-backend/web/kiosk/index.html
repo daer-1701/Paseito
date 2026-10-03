@@ -35,7 +35,7 @@
   .marca { display: flex; align-items: center; gap: 12px; }
   .logo { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; font-weight: 800; font-size: 1.2rem;
           color: var(--vino-oscuro); background: linear-gradient(135deg, var(--oro-claro), var(--oro));
-          box-shadow: 0 4px 14px rgba(231, 183, 58, .5); transform: perspective(200px) rotateY(-12deg); }
+          box-shadow: 0 4px 14px rgba(0, 0, 0, .3); transform: perspective(200px) rotateY(-12deg); }
   .marca b { display: block; font-size: 1.02rem; letter-spacing: .3px; }
   .marca small { color: var(--tenue); font-size: .78rem; }
   .derecha { display: flex; align-items: center; gap: 14px; }
@@ -48,7 +48,7 @@
   #reloj small { display: block; color: var(--tenue); font-size: .75rem; text-transform: capitalize; }
   #nueva { border: 1px solid var(--borde); background: rgba(255, 255, 255, .08); border-radius: 12px; padding: 8px 12px; font-size: .85rem; }
   #nueva:hover { background: rgba(255, 255, 255, .16); }
-  .punto { width: 9px; height: 9px; border-radius: 50%; background: var(--verde); box-shadow: 0 0 10px var(--verde); }
+  .punto { width: 9px; height: 9px; border-radius: 50%; background: var(--verde); }
 
   /* ---------- paneles laterales ---------- */
   .panel { position: fixed; top: var(--arriba); bottom: var(--margen); width: var(--panel); border-radius: 22px; padding: 16px;
@@ -64,7 +64,7 @@
   @keyframes girar { to { transform: rotateX(60deg) rotateZ(318deg) translateZ(-60px); } }
   .capa { position: absolute; inset: 0; border-radius: 10px; transform: translateZ(calc(var(--i) * 20px));
           background: rgba(255, 255, 255, .07); border: 1.5px solid rgba(255, 255, 255, .28); transition: all .35s; }
-  .capa.con { background: rgba(231, 183, 58, .35); border-color: var(--oro); box-shadow: 0 0 22px rgba(231, 183, 58, .7); }
+  .capa.con { background: rgba(231, 183, 58, .35); border-color: var(--oro); }
   .capa.activa { background: rgba(255, 217, 119, .85); border-color: #fff; transform: translateZ(calc(var(--i) * 20px + 8px)); }
   .nombres { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; font-size: .8rem; }
   .nombres li { display: flex; justify-content: space-between; padding: 3px 8px; border-radius: 8px; color: var(--tenue); transition: all .3s; }
@@ -77,14 +77,14 @@
   .tarjeta { position: relative; display: grid; grid-template-columns: 46px 1fr; gap: 12px; padding: 12px; border-radius: 16px;
              background: linear-gradient(135deg, rgba(255, 255, 255, .13), rgba(255, 255, 255, .04)); border: 1px solid var(--borde);
              transform-style: preserve-3d; transition: transform .15s ease-out, box-shadow .2s; cursor: pointer;
-             animation: entra .55s cubic-bezier(.2, .9, .3, 1.2) both; animation-delay: calc(var(--n) * 70ms); }
+             animation: entra .55s cubic-bezier(.22, 1, .36, 1) both; animation-delay: calc(var(--n) * 70ms); }
   .tarjeta:hover { box-shadow: 0 14px 30px rgba(0, 0, 0, .35), 0 0 0 1px var(--oro) inset; }
   @keyframes entra { from { opacity: 0; transform: rotateY(-55deg) translateX(40px); } }
   .icono { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; font-size: 1.45rem;
            background: linear-gradient(135deg, var(--vino), var(--vino-oscuro)); border: 1px solid rgba(231, 183, 58, .5);
            transform: translateZ(24px); box-shadow: 0 6px 14px rgba(0, 0, 0, .3); }
   .info { transform: translateZ(14px); min-width: 0; }
-  .info b { display: block; font-size: .98rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .info b { display: block; font-size: .98rem; overflow-wrap: anywhere; }
   .info small { display: block; color: var(--tenue); font-size: .8rem; margin-top: 2px; }
   .chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; }
   .chip { font-size: .7rem; font-weight: 700; padding: 3px 8px; border-radius: 999px; background: rgba(255, 255, 255, .12); }
@@ -110,7 +110,8 @@
   .ruta li:not(:last-child)::after { content: ""; position: absolute; left: 16px; top: 22px; bottom: -1px; border-left: 2px dashed rgba(231,183,58,.6); }
   .ruta b { display: block; color: var(--crema); margin-bottom: 2px; }
   .qr-bloque { display: flex; gap: 12px; align-items: center; padding: 10px; border-radius: 14px; background: rgba(255,255,255,.07); }
-  #qr-guia { width: 78px; height: 78px; border-radius: 8px; background: #fff; }
+  .qr-bloque[hidden] { display: none; }
+  #qr-guia img { width: 78px; height: 78px; border-radius: 8px; background: #fff; }
   .qr-bloque p { margin: 0; font-size: .78rem; color: var(--tenue); line-height: 1.4; }
   #abrir-ficha { display: block; text-align: center; padding: 11px; border-radius: 12px; color: var(--vino-oscuro); background: var(--oro); font-weight: 800; text-decoration: none; font-size: .86rem; }
 
@@ -121,7 +122,7 @@
   #oyente.visible { display: block; animation: aparece .3s ease-out; }
   @keyframes aparece { from { opacity: 0; transform: translateY(8px); } }
   #subtitulo { align-self: stretch; padding: 12px 16px 14px; border-radius: 4px 18px 18px 18px;
-               background: rgba(255, 255, 255, .08); border: 1px solid var(--borde); border-left: 3px solid var(--oro); }
+               background: rgba(255, 255, 255, .08); border: 1px solid var(--borde); border: 1px solid var(--borde); }
   #subtitulo .quien { font-size: .7rem; letter-spacing: 1.4px; color: var(--oro); font-weight: 700; margin-bottom: 6px; }
   #texto-respuesta { font-size: clamp(.98rem, .55vw + 1.1vh, 1.3rem); line-height: 1.5; }
   #texto-respuesta .p { opacity: .4; transition: opacity .2s, color .2s; }
@@ -146,7 +147,7 @@
                max-width: 600px; margin: 0 auto; display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 999px; z-index: 2; }
   #microfono { position: relative; flex: none; width: 60px; height: 60px; border-radius: 50%; border: none; font-size: 1.6rem;
                background: radial-gradient(circle at 35% 30%, var(--oro-claro), var(--oro) 60%, #b8860b);
-               box-shadow: 0 8px 22px rgba(231, 183, 58, .55), inset 0 -4px 8px rgba(0, 0, 0, .2); transition: transform .15s; }
+               box-shadow: 0 8px 22px rgba(0, 0, 0, .3), inset 0 -4px 8px rgba(0, 0, 0, .2); transition: transform .15s; }
   #microfono:hover { transform: scale(1.05); }
   #microfono:disabled { filter: grayscale(1); opacity: .6; }
   #microfono .onda { position: absolute; inset: 0; border-radius: 50%; border: 3px solid var(--rojo); opacity: 0; pointer-events: none; }
@@ -168,14 +169,14 @@
   #inicio { position: fixed; inset: 0; z-index: 5; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
             padding-bottom: 9vh; cursor: pointer; transition: opacity .6s;
             background: linear-gradient(to top, rgba(40, 8, 24, .82), rgba(40, 8, 24, .25) 45%, transparent 70%); }
-  #inicio.fuera { opacity: 0; pointer-events: none; }
+  #inicio.fuera { opacity: 0; visibility: hidden; pointer-events: none; }
   #inicio h1 { margin: 0; font-size: clamp(2.2rem, 6vh, 4rem); text-shadow: 0 6px 24px rgba(0, 0, 0, .4); }
   #inicio h1 span { color: var(--oro-claro); }
   #inicio p { margin: 8px 0 26px; font-size: clamp(1rem, 2.3vh, 1.35rem); color: var(--tenue); }
   #inicio .boton { padding: 16px 34px; border-radius: 999px; font-weight: 700; font-size: 1.15rem; color: var(--vino-oscuro);
-                   background: linear-gradient(135deg, var(--oro-claro), var(--oro)); box-shadow: 0 10px 30px rgba(231, 183, 58, .55);
+                   background: linear-gradient(135deg, var(--oro-claro), var(--oro)); box-shadow: 0 10px 30px rgba(0, 0, 0, .3);
                    animation: latido 1.6s infinite; }
-  @keyframes latido { 50% { transform: scale(1.06); box-shadow: 0 14px 40px rgba(231, 183, 58, .75); } }
+  @keyframes latido { 50% { transform: scale(1.06); box-shadow: 0 14px 40px rgba(0, 0, 0, .35); } }
 
   #aviso { position: fixed; top: calc(var(--arriba) + 6px); left: 50%; transform: translate(-50%, -20px); padding: 10px 18px; border-radius: 14px;
            z-index: 6; opacity: 0; transition: all .3s; pointer-events: none; }
@@ -191,22 +192,44 @@
     #sugerencias button:nth-child(n+5) { display: none; }
   }
 
-  /* vertical o angosta: resultados arriba, conversación y micrófono abajo */
-  @media (max-width: 900px) {
-    :root { --panel: 0px; }
-    #reloj small, .marca small { display: none; }
-    #resultados { left: var(--margen); right: var(--margen); bottom: auto; width: auto; height: 116px; padding: 10px; }
-    #resultados h2, .torre { display: none; }
-    #tarjetas { flex-direction: row; overflow-x: auto; overflow-y: hidden; }
-    .tarjeta { min-width: 240px; }
-    #conversacion { top: auto; left: var(--margen); right: var(--margen); bottom: calc(var(--margen) + 86px); width: auto; height: clamp(170px, 25vh, 300px); }
-    #conversacion h2 { display: none; }
-    #contexto { display: none; }
-    #sugerencias { flex-wrap: nowrap; overflow-x: auto; }
-    #sugerencias button { flex: none; }
-    #controles { left: var(--margen); right: var(--margen); max-width: none; }
-    body.modo-2d #avatar2d { left: 0; right: 0; top: 140px; bottom: calc(clamp(170px, 25vh, 300px) + 110px); }
+  a.chip { color: var(--oro-claro); }
+  #vistas-movil { display: none; }
+  button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid var(--oro-claro); outline-offset: 3px; }
+  .panel, .chat, #tarjetas { min-height: 0; }
+  @media (max-width: 1100px) and (min-width: 901px) {
+    :root { --panel: 30vw; }
+    .marca small, #reloj { display: none; }
+    #controles { left: 32vw; right: 32vw; flex-wrap: wrap; border-radius: 20px; }
+    #estado { width: 100%; text-align: center; }
   }
+  @media (max-width: 900px) {
+    :root { --panel: 0px; --margen: 10px; --arriba: 136px; --teclado: 0px; }
+    html, body { background: #28101f; }
+    header { padding: 0 10px; gap: 8px; }
+    .marca { gap: 8px; } .marca small, #reloj, .punto { display: none; }
+    .derecha { gap: 6px; } .estado-confianza { font-size: .65rem; padding: 5px; max-width: 118px; }
+    #nueva { font-size: .75rem; padding: 6px; min-height: 44px; max-width: 110px; }
+    #vistas-movil { position: fixed; z-index: 3; top: 76px; left: 10px; right: 10px; display: flex; gap: 8px; }
+    #vistas-movil button { flex: 1; min-height: 44px; background: #3f1a30; border: 1px solid var(--borde); border-radius: 12px; }
+    #vistas-movil button[aria-pressed="true"] { background: var(--oro); color: var(--vino-oscuro); font-weight: 700; }
+    #conversacion, #resultados { top: var(--arriba); left: 10px; right: 10px; bottom: calc(110px + env(safe-area-inset-bottom) + var(--teclado)); width: auto; height: auto; padding: 14px; background: rgba(35, 12, 28, .97); }
+    #resultados { display: none; } body[data-vista="resultados"] #resultados { display: flex; }
+    body[data-vista="resultados"] #conversacion { display: none; }
+    #tarjetas { flex-direction: column; overflow-x: hidden; overflow-y: auto; }
+    .tarjeta { min-width: 0; transform: none !important; animation: none; }
+    .torre { grid-template-columns: 100px 1fr; } .escenario { height: 110px; }
+    #controles { left: 10px; right: 10px; bottom: calc(10px + env(safe-area-inset-bottom) + var(--teclado)); max-width: none; border-radius: 18px; gap: 6px; flex-wrap: wrap; background: #3f1a30; }
+    #microfono, #enviar { width: 44px; height: 44px; } #texto { font-size: 16px; }
+    #estado { width: 100%; text-align: center; white-space: normal; }
+    #sugerencias { flex-wrap: nowrap; overflow-x: auto; } #sugerencias button { flex: none; min-height: 44px; }
+    .guia-btn { min-height: 44px; } a.chip { min-height: 44px; display: inline-flex; align-items: center; }
+    .info small { font-size: .86rem; line-height: 1.4; } #guia { inset: 6px; }
+    body.modo-2d #avatar2d { left: 0; right: 0; top: 70px; bottom: 100px; }
+    #inicio { padding: 24px 20px 14vh; text-align: center; } #inicio p { line-height: 1.5; }
+  }
+  @media (max-width: 360px) { .estado-confianza { max-width: 70px; font-size: .65rem; } }
+  @media (max-height: 540px) and (max-width: 900px) { .torre, #contexto { display: none; } #sugerencias { max-height: 48px; } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
 </head>
 <body>
@@ -219,18 +242,19 @@
     <div><b>Jarvis</b><small>Asistente del Paseo Aranjuez · Cochabamba</small></div>
   </div>
   <div class="derecha">
-    <div class="estado-confianza">Fuentes verificadas</div>
+    <a class="estado-confianza" href="/catalog/demo" style="color:var(--oro-claro);text-decoration:none">Respuestas con fuentes</a>
     <button id="nueva" title="Empezar de nuevo">↺ Nueva conversación</button>
     <div id="reloj"><b>--:--</b><small></small></div>
     <div class="punto" title="En línea"></div>
   </div>
 </header>
+<nav id="vistas-movil" aria-label="Vista del asistente"><button id="vista-chat" type="button" aria-pressed="true" aria-controls="conversacion">Conversación</button><button id="vista-resultados" type="button" aria-pressed="false" aria-controls="resultados">Resultados <span id="cuenta-resultados"></span></button></nav>
 
 <aside id="conversacion" class="vidrio panel">
   <h2>CONVERSACIÓN CON JARVIS</h2>
   <div class="chat" id="chat">
     <div id="oyente"></div>
-    <div id="subtitulo">
+    <div id="subtitulo" role="status" aria-live="polite">
       <div class="quien">✦ JARVIS</div>
       <div id="texto-respuesta">¡Hola! Pregúntame por tiendas, comida, eventos o servicios del Paseo.</div>
     </div>
@@ -246,21 +270,21 @@
     <div class="escenario"><div class="pisos" id="capas"></div></div>
     <ul class="nombres" id="nombres-pisos"></ul>
   </div>
-  <h2>RESULTADOS VERIFICADOS</h2>
+  <h2>RESULTADOS CON FUENTES</h2>
   <div id="tarjetas"></div>
   <section id="guia" aria-live="polite">
     <div class="guia-superior"><span class="guia-etiqueta">MODO ACOMPAÑAME</span><button id="cerrar-guia" title="Cerrar guía">×</button></div>
     <h3 id="guia-destino"></h3>
     <p id="guia-resumen"></p>
     <ol class="ruta" id="pasos-guia"></ol>
-    <div class="qr-bloque"><img id="qr-guia" alt="Código QR de la ficha del destino"><p>Escanea para guardar este destino y abrir su ficha verificada en tu teléfono.</p></div>
-    <a id="abrir-ficha" target="_blank" rel="noopener noreferrer">Abrir ficha verificada</a>
+    <div class="qr-bloque" hidden><div id="qr-guia"></div><p>Escanea para abrir la fuente de este destino en tu teléfono.</p></div>
+    <a id="abrir-ficha" target="_blank" rel="noopener noreferrer">Abrir fuente publicada</a>
   </section>
 </aside>
 
 <div id="controles" class="vidrio">
   <button id="microfono" title="Hablar (barra espaciadora)"><span class="onda"></span><span class="onda"></span><span class="onda"></span>🎤</button>
-  <input id="texto" placeholder="Escribe o toca el micrófono…" autocomplete="off">
+  <input id="texto" aria-label="Tu consulta para Jarvis" placeholder="Escribe o toca el micrófono…" autocomplete="off">
   <span id="estado"></span>
   <button id="enviar" title="Enviar">➤</button>
 </div>
@@ -268,7 +292,7 @@
 <div id="inicio">
   <h1>¡Hola! Soy <span>Jarvis</span></h1>
   <p>Tu asistente del Paseo Aranjuez. Pregúntame lo que necesites.</p>
-  <div class="boton">Toca para empezar 👆</div>
+  <button class="boton" type="button">Toca para empezar 👆</button>
 </div>
 <div id="aviso" class="vidrio"></div>
 
@@ -366,20 +390,8 @@ $("sugerencias").onclick = (e) => { const b = e.target.closest("button"); if (b)
 $("capas").innerHTML = PISOS.map(([clave], i) => `<div class="capa" data-piso="${clave}" style="--i:${PISOS.length - 1 - i}"></div>`).join("");
 $("nombres-pisos").innerHTML = PISOS.map(([clave, nombre]) => `<li data-piso="${clave}">${nombre}<span></span></li>`).join("");
 
-function clavePiso(texto = "") {
-  const t = texto.toLowerCase();
-  if (t.includes("planta baja")) return "PB";
-  if (t.includes("primer")) return "1";
-  if (t.includes("segundo")) return "2";
-  if (t.includes("tercer")) return "3";
-  if (t.includes("cuarto")) return "4";
-  if (t.includes("quinto")) return "5";
-  if (/s[oó]tano|parqueo/.test(t)) return "S";
-  return null;
-}
-
 function marcarPisos(cuentas, activo = null) {
-  for (const el of document.querySelectorAll("[data-piso]")) {
+  for (const el of document.querySelectorAll(".capa[data-piso], #nombres-pisos [data-piso]")) {
     const n = cuentas[el.dataset.piso] || 0;
     el.classList.toggle("con", n > 0);
     el.classList.toggle("activa", el.dataset.piso === activo);
@@ -412,19 +424,22 @@ function escapar(valor) {
   })[caracter]);
 }
 
-function tarjetasDeEvidencia(sources) {
-  return (sources || []).map((source) => {
-    const atributos = source.attributes || {};
-    return {
-      id: source.id,
-      tipo: "lugar",
-      nombre: source.title,
-      categoria: atributos.category || atributos.scope || atributos.condition || "Información del Paseo",
-      ubicacion: { piso: atributos.floor || "", local: atributos.unit || "", sector: atributos.area || "" },
-      fuente_url: source.source_url || "",
-    };
-  });
+const { tarjetasDeEvidencia, clavePiso } = await import("/kiosk/js/evidence.mjs");
+function cambiarVista(vista) {
+  document.body.dataset.vista = vista;
+  $("vista-chat").setAttribute("aria-pressed", String(vista === "chat"));
+  $("vista-resultados").setAttribute("aria-pressed", String(vista === "resultados"));
 }
+$("vista-chat").onclick = () => cambiarVista("chat");
+$("vista-resultados").onclick = () => cambiarVista("resultados");
+if (window.visualViewport) {
+  const ajustarTeclado = () => document.documentElement.style.setProperty("--teclado", `${Math.max(0, innerHeight - visualViewport.height - visualViewport.offsetTop)}px`);
+  visualViewport.addEventListener("resize", ajustarTeclado);
+  visualViewport.addEventListener("scroll", ajustarTeclado);
+}
+let puntoKiosco = "Punto del kiosco pendiente de configurar";
+let baseMovil = "";
+fetch("/kiosk/config").then(r => r.json()).then(c => { puntoKiosco = c.origin; baseMovil = c.public_base_url || ""; if (c.demo_catalog) { const label = document.querySelector(".estado-confianza"); label.textContent = "Modo demo"; label.title = "Catálogo, promociones y algunos horarios son datos de prueba. Consulta /catalog/demo para conocer su alcance."; } }).catch(() => {});
 
 function tarjetaHtml(t, n) {
   const u = t.ubicacion || t.tienda || {};
@@ -434,14 +449,19 @@ function tarjetaHtml(t, n) {
   if (u.local) chips.push(`<span class="chip">Local ${escapar(u.local)}</span>`);
   if (t.abierto_ahora != null) chips.push(`<span class="chip ${t.abierto_ahora ? "abierto" : "cerrado"}">${t.abierto_ahora ? "Abierto" : "Cerrado"}</span>`);
   let titulo = t.nombre, detalle = t.categoria || u.sector || "";
-  if (t.tipo === "producto") detalle = `Bs ${t.precio_bs} · ${t.tienda?.nombre || ""}`;
-  if (t.tipo === "promocion") { titulo = t.titulo; detalle = t.tienda?.nombre || t.descripcion || ""; }
-  if (t.tipo === "evento") detalle = `${t.fecha} · ${t.hora_inicio || ""} · ${t.lugar || ""}`;
+  if (t.tipo === "producto") detalle = `${t.precio_bs != null ? "Bs " + t.precio_bs : "Consulta el precio"} · ${t.tienda?.nombre || ""}`;
+  if (t.tipo === "promocion") { titulo = t.titulo; detalle = `${t.descripcion} · ${t.tienda?.nombre || ""} · ${t.condiciones}`; }
+  if (t.tipo === "evento") detalle = `${t.fecha} · ${t.lugar || ""} · ${t.descripcion_evento}`;
   if (t.tipo === "info") { titulo = t.pregunta; detalle = t.respuesta || ""; }
-  const extra = t.horario ? `<small>🕒 ${t.horario}</small>` : "";
+  const extra = (u.sector ? `<small>Sector: ${escapar(u.sector)}</small>` : "") +
+    (t.torre ? `<small>Torre: ${escapar(t.torre)}</small>` : "") +
+    (u.referencia ? `<small>${escapar(u.referencia)}</small>` : "") +
+    (t.horario ? `<small>🕒 ${escapar(t.horario)}</small>` : "") +
+    (t.demo ? "" : `<small>${escapar(t.verificacion)}${t.verificado_en ? " · " + escapar(t.verificado_en.slice(0, 10)) : ""}</small>`) +
+    (t.vence ? `<small>Vigencia: ${escapar(t.vence)}</small>` : "");
   const nombre = escapar(t.nombre || titulo || "");
-  const fuente = t.fuente_url
-    ? `<a class="chip" href="${escapar(t.fuente_url)}" target="_blank" rel="noopener noreferrer">Fuente</a>`
+  const fuente = t.fuente_url && !t.demo
+    ? `<a class="chip" href="${escapar(t.fuente_url)}" target="_blank" rel="noopener noreferrer">${t.demo ? "Sobre la demo" : "Fuente"}</a>`
     : "";
   const guia = piso && t.fuente_url
     ? `<button class="guia-btn" type="button" data-guia="${n}">✦ Guíame hasta aquí</button>`
@@ -457,6 +477,7 @@ let tarjetasActuales = [];
 function mostrarTarjetas(tarjetas) {
   const lista = tarjetas.slice(0, 8);
   tarjetasActuales = lista;
+  $("cuenta-resultados").textContent = lista.length ? `(${lista.length})` : "";
   $("tarjetas").innerHTML = lista.map(tarjetaHtml).join("");
   cuentasPisos = {};
   for (const t of lista) {
@@ -487,30 +508,37 @@ $("tarjetas").addEventListener("click", (e) => {
     return;
   }
   const tarjeta = e.target.closest(".tarjeta");
-  if (tarjeta?.dataset.tipo === "lugar") preguntar(`¿Cómo llego a ${tarjeta.dataset.nombre}?`);
+  if (tarjeta?.dataset.tipo === "lugar") preguntar(`Muéstrame el catálogo de ${tarjeta.dataset.nombre}`);
 });
 
 function abrirGuia(destino) {
   if (!destino) return;
+  cambiarVista("resultados");
   const ubicacion = destino.ubicacion || {};
   const piso = clavePiso(ubicacion.piso);
   const pisoTexto = piso === "PB" ? "planta baja" : piso === "S" ? "semisótano" : `piso ${piso || ubicacion.piso}`;
   const local = ubicacion.local ? `local ${ubicacion.local}` : "el destino señalado";
   const pasos = [
-    ["Punto de partida", "Ubícate en la entrada principal del Paseo."],
-    ["Sube al destino", `Dirígete al ${pisoTexto}.`],
-    ["Llegaste", `Busca ${local}: ${destino.nombre}.`],
+    ["Punto de partida", puntoKiosco],
+    ["Ubicación publicada", `Destino en ${pisoTexto}. No tengo un recorrido interior validado.`],
+    ["Referencia", `${ubicacion.local ? "Busca " + local : "Número de local pendiente"}: ${destino.nombre}.${ubicacion.referencia ? " " + ubicacion.referencia : ""}`],
   ];
   $("guia-destino").textContent = destino.nombre;
   $("guia-resumen").textContent = `${pisoTexto}${ubicacion.local ? ` · local ${ubicacion.local}` : ""}`;
   $("pasos-guia").innerHTML = pasos.map(([titulo, detalle]) => `<li><b>${escapar(titulo)}</b>${escapar(detalle)}</li>`).join("");
-  $("abrir-ficha").href = destino.fuente_url;
-  const qr = $("qr-guia");
+  const fichaLocal = `${location.origin}/destination/${encodeURIComponent(destino.id)}`;
+  $("abrir-ficha").href = fichaLocal;
+  $("abrir-ficha").textContent = "Abrir ficha del destino";
+  const qrHolder = $("qr-guia");
+  qrHolder.replaceChildren();
+  const qr = new Image();
+  qr.alt = baseMovil ? "Código QR de la ficha del destino" : "Código QR de la fuente del destino";
   const bloqueQr = $("guia").querySelector(".qr-bloque");
   bloqueQr.hidden = true;
-  qr.onload = () => { bloqueQr.hidden = false; };
+  qr.onload = () => { qrHolder.replaceChildren(qr); bloqueQr.hidden = false; };
   qr.onerror = () => { bloqueQr.hidden = true; };
-  qr.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(destino.fuente_url)}`;
+  bloqueQr.querySelector("p").textContent = baseMovil ? "Escanea para llevar la ficha del destino a tu teléfono." : "Escanea para abrir la fuente publicada. La ficha móvil necesita una URL accesible desde tu teléfono.";
+  qr.src = `/qr/destination/${encodeURIComponent(destino.id)}`;
   $("guia").classList.add("activa");
   marcarPisos(cuentasPisos, piso);
   avatar.gesto("presentar", 2400);
@@ -530,6 +558,8 @@ function actualizarContexto(datos) {
     const abiertos = fuentes.filter((fuente) => fuente.attributes?.open_now).length;
     chips.push(`◷ ${abiertos}/${fuentes.length} áreas publicadas abiertas`);
   }
+  if (datos.preferences?.budget_bs != null) chips.push(`Presupuesto: Bs ${datos.preferences.budget_bs}`);
+  if (datos.preferences?.recipient === "infantil") chips.push("Regalo para niño/a");
   $("contexto").innerHTML = chips.map((chip) => `<span class="contexto-chip">${escapar(chip)}</span>`).join("");
 }
 
@@ -563,20 +593,25 @@ function pensando() {
 }
 
 // ---------- Voz ----------
+function textoParaVoz(texto) {
+  return texto.replace(/\bBs\.?\s*(\d+(?:[.,]\d+)?)/gi, "$1 bolivianos").replace(/(\d{1,2}:\d{2})[–—](\d{1,2}:\d{2})/g, "$1 a $2");
+}
+
 async function pedirAudio(texto, signal) {
-  const r = await fetch(`${API}/voice/synthesize`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: texto }), signal });
+  const r = await fetch(`${API}/voice/synthesize`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: textoParaVoz(texto) }), signal });
   if (!r.ok) throw new Error(r.status);
   return URL.createObjectURL(await r.blob());
 }
 
 function vozNavegador(texto, alProgresar) {
   return new Promise((resolve) => {
-    const u = new SpeechSynthesisUtterance(texto);
+    const hablado = textoParaVoz(texto);
+    const u = new SpeechSynthesisUtterance(hablado);
     const voces = speechSynthesis.getVoices().filter((v) => v.lang.startsWith("es"));
     u.voice = voces.find((v) => /BO|419|MX|US/.test(v.lang)) || voces[0] || null;
     u.lang = u.voice?.lang || "es-419";
     u.onstart = () => avatar.hablarSimulado(true);
-    u.onboundary = (e) => alProgresar(e.charIndex / texto.length);
+    u.onboundary = (e) => alProgresar(e.charIndex / hablado.length);
     u.onend = u.onerror = () => { avatar.hablarSimulado(false); alProgresar(1); resolve(); };
     speechSynthesis.speak(u);
   });
@@ -596,7 +631,7 @@ async function hablar(texto, { presentar = false } = {}) {
       estado("");
       if (presentar) avatar.gesto("presentar", 2600);
       try {
-        await streamPlayer.play(`${API}/voice/stream`, texto, {
+        await streamPlayer.play(`${API}/voice/stream`, textoParaVoz(texto), {
           signal: controller.signal,
           onAnalyser: (analyser) => {
             if (miTurno !== turno) return;
@@ -678,8 +713,12 @@ async function preguntar(texto) {
     avatar.gesto("normal");
     estado("", "normal");
     const tarjetas = tarjetasDeEvidencia(datos.sources);
-    if (tarjetas.length) mostrarTarjetas(tarjetas);
+    $("guia").classList.remove("activa");
+    mostrarTarjetas(tarjetas);
     actualizarContexto(datos);
+    if (datos.suggestions?.length) {
+      $("sugerencias").innerHTML = datos.suggestions.slice(0, 5).map(text => `<button data-p="${escapar(text)}">${escapar(text)}</button>`).join("");
+    }
     if (datos.intent === "navigation" && tarjetas[0]?.ubicacion?.piso) abrirGuia(tarjetas[0]);
     else await hablar(datos.answer, { presentar: tarjetas.length > 0 });
   } catch (error) {

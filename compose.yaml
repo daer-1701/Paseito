@@ -10,6 +10,7 @@ services:
       WHISPER_MODEL: ${WHISPER_MODEL:-small}
       KOKORO_VOICE: ${KOKORO_VOICE:-ef_dora}
       HF_HUB_OFFLINE: ${HF_HUB_OFFLINE:-0}
+      LD_LIBRARY_PATH: /opt/conda/lib/python3.11/site-packages/nvidia/cudnn/lib:/opt/conda/lib/python3.11/site-packages/nvidia/cublas/lib:/usr/local/nvidia/lib:/usr/local/nvidia/lib64
     volumes:
       - voice-models:/models
     deploy:
@@ -42,6 +43,13 @@ services:
       JARVIS_TTS_PROVIDER: gpu
       JARVIS_VOICE_URL: http://voice:8001
       JARVIS_RESPONSE_MODE: strict
+      JARVIS_DEMO_CATALOG: ${JARVIS_DEMO_CATALOG:-0}
+      JARVIS_WHATSAPP_PROVIDER: ${JARVIS_WHATSAPP_PROVIDER:-disabled}
+      JARVIS_WHATSAPP_WEBHOOK_URL: ${JARVIS_WHATSAPP_WEBHOOK_URL:-}
+      JARVIS_WHATSAPP_SESSION_SECRET: ${JARVIS_WHATSAPP_SESSION_SECRET:-}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
+      JARVIS_KIOSK_ORIGIN: ${JARVIS_KIOSK_ORIGIN:-Punto del kiosco pendiente de configurar}
+      JARVIS_MOBILE_BASE_URL: ${JARVIS_MOBILE_BASE_URL:-}
       JARVIS_INGEST_TOKEN: ${JARVIS_INGEST_TOKEN:?Run bash scripts/start-tower.sh first}
     ports:
       - "127.0.0.1:${JARVIS_PUBLIC_PORT:-8000}:8000"

@@ -1,15 +1,20 @@
-"""Minimal JSON HTTP API with no third-party dependencies."""
+"""Minimal JSON HTTP API with public destination pages and locally generated QR."""
 
 import json
 import mimetypes
 import os
+import re
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Optional, Tuple
 from urllib.parse import unquote, urlparse
 
 from .agent import chat
+from .quality import report
+from .destination import destination_page
+from .qr import destination_qr
 from .stimulus import gaze
+from .whatsapp import config_status as whatsapp_status, validate_twilio, incoming as whatsapp_incoming, twiml
 from .store import connect, delete, upsert
 from .voice import MAX_AUDIO_BYTES, VoiceUnavailable, status as voice_status, synthesize, transcribe, stream_speech
 
@@ -80,6 +85,39 @@ class Handler(BaseHTTPRequestHandler):
                 count = db.execute("SELECT count(*) FROM records").fetchone()[0]
             self.send_json(200, {"status": "ok", "records": count,
                                  "openai_configured": bool(os.getenv("OPENAI_API_KEY"))})
+        elif path == "/admin/quality":
+            if not self.authorized():
+                self.send_json(401, {"error": "unauthorized"})
+                return
+            with connect() as db:
+                self.send_json(200, report(db))
+        elif path.startswith('/qr/destination/'):
+            with connect() as db:
+                svg = destination_qr(db, unquote(path.removeprefix('/qr/destination/')))
+            if svg is None:
+                self.send_json(404, {'error': 'destination QR unavailable'})
+            else:
+                self.send_bytes(200, svg, 'image/svg+xml')
+        elif path.startswith('/destination/'):
+            with connect() as db:
+                page = destination_page(db, unquote(path.removeprefix('/destination/')))
+            if page is None:
+                self.send_json(404, {'error': 'destination unavailable'})
+            else:
+                self.send_bytes(200, page.encode('utf-8'), 'text/html; charset=utf-8')
+        elif path == "/kiosk/config":
+            self.send_json(200, {"origin": os.getenv("JARVIS_KIOSK_ORIGIN", "Punto del kiosco pendiente de configurar"),
+                "public_base_url": os.getenv('JARVIS_MOBILE_BASE_URL', ''),
+                "demo_catalog": os.getenv('JARVIS_DEMO_CATALOG') == '1'})
+        elif path == '/whatsapp/status':
+            self.send_json(200, whatsapp_status())
+        elif path == '/whatsapp/demo':
+            if os.getenv('JARVIS_DEMO_CATALOG') != '1':
+                self.send_json(404, {'error': 'demo unavailable'})
+            else:
+                self.send_bytes(200, (WEB_DIR / 'whatsapp.html').read_bytes(), 'text/html; charset=utf-8')
+        elif path == '/catalog/demo':
+            self.send_bytes(200, '<!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Modo demo</title><main style="font:18px/1.6 system-ui;max-width:650px;margin:40px auto;padding:20px"><h1>Modo demo</h1><p>El catálogo, sus precios y promociones, y los horarios que faltaban son datos de prueba para demostrar Jarvis. No constituyen ofertas, inventario confirmado ni horarios oficiales. Los horarios reales ya documentados se conservan. Los nombres y ubicaciones de los negocios provienen de las fuentes públicas citadas en sus fichas.</p><a href="/">Volver a Jarvis</a></main></html>'.encode('utf-8'), 'text/html; charset=utf-8')
         elif path == "/voice/status":
             self.send_json(200, voice_status())
         elif path in {"/", "/kiosk", "/kiosk/"}:
@@ -115,7 +153,37 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self) -> None:
         path = urlparse(self.path).path
-        if path == "/voice/stream":
+        if path == '/whatsapp/webhook':
+            try:
+                if self.headers.get('Content-Type', '').split(';')[0].strip().lower() != 'application/x-www-form-urlencoded':
+                    raise ValueError('form content type required')
+                length = int(self.headers.get('Content-Length', '0'))
+                if not 1 <= length <= 65536:
+                    raise ValueError('invalid form body length')
+                sender, sid, message = validate_twilio(self.rfile.read(length), self.headers.get('X-Twilio-Signature'), self.path)
+                result = whatsapp_incoming(sender, sid, message)
+                self.send_bytes(200, twiml(result), 'application/xml; charset=utf-8')
+            except PermissionError:
+                self.send_json(403, {'error': 'invalid signature'})
+            except RuntimeError:
+                self.send_json(503, {'error': 'WhatsApp connector not configured'})
+            except (ValueError, UnicodeDecodeError):
+                self.send_json(400, {'error': 'invalid webhook message'})
+        elif path == '/whatsapp/demo/message':
+            if os.getenv('JARVIS_DEMO_CATALOG') != '1':
+                self.send_json(404, {'error': 'demo unavailable'})
+                return
+            try:
+                payload = self.read_json()
+                identity = payload.get('session_id')
+                if not isinstance(identity, str) or not re.fullmatch(r'[a-zA-Z0-9-]{8,80}', identity):
+                    raise ValueError('invalid demo session')
+                result = whatsapp_incoming(identity, payload.get('message_id'), payload.get('message'), 'local_demo')
+                self.send_json(200, {'answer': result['channel_answer'], 'suggestions': result.get('suggestions', []),
+                                     'duplicate': result['duplicate'], 'local_only': True})
+            except (ValueError, RuntimeError, json.JSONDecodeError) as exc:
+                self.send_json(400, {'error': str(exc)})
+        elif path == "/voice/stream":
             stream = None
             started = False
             try:
@@ -204,6 +272,15 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_DELETE(self) -> None:
         path = urlparse(self.path).path
+        if path.startswith("/chat/"):
+            session_id = unquote(path.removeprefix("/chat/"))
+            with connect() as db:
+                db.execute("DELETE FROM turns WHERE session_id=?", (session_id,))
+                db.execute("DELETE FROM session_context WHERE session_id=?", (session_id,))
+                db.execute("DELETE FROM session_preferences WHERE session_id=?", (session_id,))
+                db.commit()
+            self.send_json(200, {"deleted": True})
+            return
         if not path.startswith("/admin/records/"):
             self.send_json(404, {"error": "not found"})
             return

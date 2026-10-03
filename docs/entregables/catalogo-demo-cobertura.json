@@ -1,0 +1,476 @@
+[
+  {
+    "venue_id": "venue:official-appleland",
+    "title": "APPLE LAND",
+    "profile": "tecnologia",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:almacen-de-pizzas",
+    "title": "Almacén de Pizzas",
+    "profile": "pizza",
+    "count": 10
+  },
+  {
+    "venue_id": "venue:official-altocavaliere",
+    "title": "Alto Cavaliere",
+    "profile": "ropa",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-amore",
+    "title": "Amore",
+    "profile": "ropa",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-atractivamakeup",
+    "title": "Atractiva Makeup",
+    "profile": "belleza",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-ayvannareverbolivia",
+    "title": "Ayvanna Rever Bolivia",
+    "profile": "ropa",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-acaigolden",
+    "title": "Açaí Golden",
+    "profile": "postres",
+    "count": 10
+  },
+  {
+    "venue_id": "venue:official-beluboutique",
+    "title": "BELU Boutique",
+    "profile": "ropa",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-blancetblancjoyasdeautor",
+    "title": "BLANC ET BLANC - Joyas de Autor",
+    "profile": "joyas",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-babycorp",
+    "title": "Baby Corp",
+    "profile": "infantil",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-bold",
+    "title": "Bold",
+    "profile": "calzado",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-boliviafitness",
+    "title": "Bolivia Fitness",
+    "profile": "ropa",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:brocheta-king",
+    "title": "Brocheta King",
+    "profile": "criolla",
+    "count": 10
+  },
+  {
+    "venue_id": "venue:official-burbank",
+    "title": "Burbank",
+    "profile": "ropa",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-bypassburger",
+    "title": "Bypass Burger",
+    "profile": "hamburguesa",
+    "count": 10
+  },
+  {
+    "venue_id": "venue:official-cayenna",
+    "title": "CAYENNA",
+    "profile": "bar",
+    "count": 10
+  },
+  {
+    "venue_id": "venue:century-21-cochabamba",
+    "title": "Century 21 Cochabamba",
+    "count": 0,
+    "reason": "Oficina o consultorio: no inventar catálogo minorista."
+  },
+  {
+    "venue_id": "venue:official-chipotlemexicanfood",
+    "title": "Chipotle Mexican Food",
+    "profile": "mexicana",
+    "count": 10
+  },
+  {
+    "venue_id": "venue:official-chottomatte",
+    "title": "Chotto Matte",
+    "profile": "japonesa",
+    "count": 10
+  },
+  {
+    "venue_id": "venue:official-churroscalientes",
+    "title": "Churros Calientes",
+    "profile": "postres",
+    "count": 10
+  },
+  {
+    "venue_id": "venue:official-cinnabon",
+    "title": "Cinnabon",
+    "profile": "postres",
+    "count": 10
+  },
+  {
+    "venue_id": "venue:official-cosbelle",
+    "title": "Cosbelle",
+    "profile": "belleza",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-cottonviu",
+    "title": "Cotton Viu",
+    "profile": "ropa",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:crocs",
+    "title": "Crocs",
+    "profile": "calzado",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-culturemen",
+    "title": "Culture Men",
+    "profile": "ropa",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-deaguayo",
+    "title": "DEAGUAYO",
+    "profile": "artesania",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-delistambul",
+    "title": "Deli Stambul",
+    "profile": "turca",
+    "count": 10
+  },
+  {
+    "venue_id": "venue:official-eelenceria",
+    "title": "E&E Lenceria",
+    "profile": "lenceria",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:el-cuarto",
+    "title": "El Cuarto by Paseo",
+    "profile": "bar",
+    "count": 10
+  },
+  {
+    "venue_id": "venue:emperador",
+    "title": "Emperador",
+    "profile": "ropa",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-facephone",
+    "title": "Face Phone",
+    "profile": "tecnologia",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-fairplaykids",
+    "title": "Fair Play Kids",
+    "profile": "juguetes",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-flavorburst",
+    "title": "Flavor Burst",
+    "profile": "postres",
+    "count": 10
+  },
+  {
+    "venue_id": "venue:official-floristeriaflordeamor",
+    "title": "Floristeria Flor de Amor",
+    "profile": "flores",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-fossil",
+    "title": "Fossil",
+    "profile": "joyas",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-gameshop",
+    "title": "Game Shop",
+    "profile": "juguetes",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:gap",
+    "title": "Gap",
+    "profile": "ropa",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:gool-store",
+    "title": "Gool Store",
+    "profile": "medias",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-hoyhay",
+    "title": "HOY HAY",
+    "profile": "criolla",
+    "count": 10
+  },
+  {
+    "venue_id": "venue:official-hauscenter",
+    "title": "Hauscenter",
+    "profile": "hogar",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-heladosvacafria",
+    "title": "Helados Vacafría",
+    "profile": "postres",
+    "count": 10
+  },
+  {
+    "venue_id": "venue:official-hermassi",
+    "title": "Hermassi",
+    "profile": "ropa",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:impulse",
+    "title": "Impulse",
+    "profile": "ropa",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-joyasdiego",
+    "title": "Joyas DIEGO",
+    "profile": "joyas",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-joyeriaimperio",
+    "title": "Joyería Imperio",
+    "profile": "joyas",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-kosijeans",
+    "title": "KOSI Jeans",
+    "profile": "ropa",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:lynx-samsung",
+    "title": "LYNX / Samsung",
+    "profile": "tecnologia",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-lasangucheriacafe",
+    "title": "La Sanguchería Cafe",
+    "profile": "hamburguesa",
+    "count": 10
+  },
+  {
+    "venue_id": "venue:legend",
+    "title": "Legend",
+    "profile": "ropa",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:lili-pink",
+    "title": "Lili Pink",
+    "profile": "lenceria",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-maybelline",
+    "title": "Maybelline",
+    "profile": "belleza",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:minerva-montero",
+    "title": "Minerva Montero Dermatología y Estética",
+    "count": 0,
+    "reason": "Oficina o consultorio: no inventar catálogo minorista."
+  },
+  {
+    "venue_id": "venue:official-miskisimi",
+    "title": "Miski Simi",
+    "profile": "ropa",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:monalisa",
+    "title": "Monalisa Bier Haus",
+    "profile": "bar",
+    "count": 10
+  },
+  {
+    "venue_id": "venue:official-mrmrsfragrance",
+    "title": "Mr&Mrs Fragrance",
+    "profile": "perfumes",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-muymimados",
+    "title": "Muy Mimados",
+    "profile": "juguetes",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-nailsexpressgel",
+    "title": "Nails Express Gel",
+    "profile": "salon",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-pacha",
+    "title": "PACHA",
+    "profile": "joyas",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-parrilleros",
+    "title": "PARRILLEROS",
+    "profile": "criolla",
+    "count": 10
+  },
+  {
+    "venue_id": "venue:official-puma",
+    "title": "PUMA",
+    "profile": "ropa",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-patanegracocinaespanola",
+    "title": "Patanegra, cocina española",
+    "profile": "espanola",
+    "count": 10
+  },
+  {
+    "venue_id": "venue:official-pawitos",
+    "title": "Pawitos",
+    "profile": "cafe",
+    "count": 10
+  },
+  {
+    "venue_id": "venue:rezzom-beauty",
+    "title": "Rezzom Beauty",
+    "profile": "salon",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-rissis",
+    "title": "Rissi's",
+    "profile": "pasta",
+    "count": 10
+  },
+  {
+    "venue_id": "venue:sajama-store",
+    "title": "Sajama Store",
+    "profile": "accesorios",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-sassycherry",
+    "title": "Sassy Cherry",
+    "profile": "accesorios",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-sento",
+    "title": "Sento",
+    "profile": "belleza",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:sky-games",
+    "title": "Sky Games",
+    "profile": "entretenimiento",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-solopastas",
+    "title": "Solo Pastas",
+    "profile": "pasta",
+    "count": 10
+  },
+  {
+    "venue_id": "venue:official-status",
+    "title": "Status",
+    "profile": "ropa",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:tuc-toys",
+    "title": "TUC TOYS",
+    "profile": "juguetes",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-tigo",
+    "title": "Tigo",
+    "profile": "tecnologia",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:top-collection",
+    "title": "Top Collection",
+    "profile": "ropa",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:totto",
+    "title": "Totto",
+    "profile": "accesorios",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-tuctuc",
+    "title": "TucTuc",
+    "profile": "infantil",
+    "count": 25
+  },
+  {
+    "venue_id": "venue:official-tunariexpress",
+    "title": "Tunari Express",
+    "profile": "criolla",
+    "count": 10
+  },
+  {
+    "venue_id": "venue:official-waffleking",
+    "title": "Waffle King",
+    "profile": "postres",
+    "count": 10
+  },
+  {
+    "venue_id": "venue:official-yummycandybar",
+    "title": "Yummy Candy Bar",
+    "profile": "postres",
+    "count": 10
+  },
+  {
+    "venue_id": "venue:opticas-pauker",
+    "title": "Ópticas Pauker",
+    "profile": "optica",
+    "count": 25
+  }
+]

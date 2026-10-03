@@ -64,12 +64,14 @@ class GPUVoiceTests(unittest.TestCase):
                 patch("urllib.request.urlopen", side_effect=AssertionError("startup must be offline")):
             bootstrap.main()
             with connect() as db:
-                self.assertEqual(db.execute("SELECT count(*) FROM records").fetchone()[0], 78)
+                self.assertEqual(db.execute("SELECT count(*) FROM records").fetchone()[0], 84)
                 row = db.execute("SELECT id FROM records LIMIT 1").fetchone()
                 db.execute("UPDATE records SET title='Administración actualizó' WHERE id=?", (row[0],))
+            db.close()
             bootstrap.main()
             with connect() as db:
                 self.assertEqual(db.execute("SELECT title FROM records WHERE id=?", (row[0],)).fetchone()[0], "Administración actualizó")
+            db.close()
 
 
 if __name__ == "__main__":

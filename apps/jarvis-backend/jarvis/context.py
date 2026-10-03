@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 
 PASEO_URL = "https://paseoaranjuez.com/"
+SCHEDULE_OBSERVED_AT = "2026-10-03T00:00:00-04:00"
 BOLIVIA = ZoneInfo("America/La_Paz")
 
 # These are area schedules published on the official Paseo page.  They do not
@@ -48,12 +49,14 @@ def _range(area: dict, now: datetime) -> tuple[str, str]:
     return tuple(attrs["mon_sat"])
 
 
-def _is_open(opens: str, closes: str, now: datetime) -> bool:
+def _is_open(area: dict, now: datetime) -> bool:
     current = now.hour * 60 + now.minute
+    opens, closes = _range(area, now)
     start, end = _minutes(opens), _minutes(closes)
-    if end <= start:  # Closes after midnight.
-        return current >= start or current < end
-    return start <= current < end
+    opened_today = current >= start and (end <= start or current < end)
+    previous_opens, previous_closes = _range(area, now - timedelta(days=1))
+    previous_start, previous_end = _minutes(previous_opens), _minutes(previous_closes)
+    return opened_today or (previous_end <= previous_start and current < previous_end)
 
 
 def opening_status(now: datetime | None = None) -> dict:
@@ -64,9 +67,10 @@ def opening_status(now: datetime | None = None) -> dict:
         entries.append({
             "id": area["id"], "kind": "faq", "title": area["title"],
             "attributes": {**area["attributes"], "opens": opens, "closes": closes,
-                           "open_now": _is_open(opens, closes, now)},
+                           "open_now": _is_open(area, now),
+                           "review_status": "sourced", "observed_at": SCHEDULE_OBSERVED_AT},
             "source_url": PASEO_URL,
-            "updated_at": now.isoformat(),
+            "updated_at": SCHEDULE_OBSERVED_AT,
         })
     labels = []
     for entry in entries:
@@ -76,4 +80,5 @@ def opening_status(now: datetime | None = None) -> dict:
     holiday_note = " El horario de domingo también aplica a feriados." if now.weekday() == 6 else ""
     answer = f"Ahora son las {now:%H:%M} en Cochabamba. " + "; ".join(labels) + "." + holiday_note
     answer += " Los locales individuales pueden tener horarios distintos."
+    answer += " Si hoy es feriado, confirma el horario especial; no tengo un calendario de feriados cargado."
     return {"answer": answer, "sources": entries}
