@@ -4,4 +4,5 @@
 // Para otro servidor, cámbialo aquí o abre la página con ?api=https://mi-backend.com
 window.PASEITO_API =
   new URLSearchParams(location.search).get("api") ??
-  (location.port === "8000" ? "" : `${location.protocol}//${location.hostname}:8000`);
+  // Sin puerto (túneles, dominios) o en el 8000 lo sirve el propio backend: mismo origen.
+  (!location.port || location.port === "8000" ? "" : `${location.protocol}//${location.hostname}:8000`);

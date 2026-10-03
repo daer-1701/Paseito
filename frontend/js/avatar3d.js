@@ -1,5 +1,6 @@
-// Paseito en 3D (Three.js): cochabambina con sombrero blanco de copa alta, trenzas con tullmas,
-// manta de aguayo y pollera, sobre una plataforma frente al Tunari y el Cristo de la Concordia.
+// Paseito en 3D (Three.js): cholita cochabambina chibi low poly con los colores de la bandera de Cochabamba
+// (celeste y blanco): sombrero blanco de copa alta, trenzas con tullmas, blusa bordada y pollera con alforzas
+// sobre la enagua de encaje, en una plataforma frente al Tunari y el Cristo de la Concordia.
 // Misma API que el avatar 2D (avatar.js) para poder intercambiarlos:
 //
 //   const avatar = new Avatar3D(contenedor, { calidadAdaptativa: true });  // lanza un error si no hay WebGL
@@ -17,22 +18,29 @@ import { FORMAS, formaEn, formaPorVolumen, palabraEn, planDePalabra, prepararPla
 
 const C = {
   piel: 0xc68a5c, pielOscura: 0xa96f46, cabello: 0x1e1412, sombrero: 0xf7f3ea, cinta: 0x151515,
-  blusa: 0xfbf7ef, pollera: 0xc2185b, oro: 0xe7b73a, labio: 0xb4505a, labioSup: 0xa3434d, boca: 0x3a0d12,
-  lengua: 0xc65a63, manta: 0xb03a63,
+  blusa: 0xfbf7ef, pollera: 0x4fb0e6, oro: 0xe7b73a, labio: 0xb4505a, labioSup: 0xa3434d, boca: 0x3a0d12,
+  lengua: 0xc65a63, celesteOscuro: 0x2b86c9, blanco: 0xf8fbff,
 };
 const COLOR_ESTADO = { normal: 0xe7b73a, escuchando: 0xff5470, pensando: 0x8f7bff };
 const CLAVES_BOCA = Object.keys(FORMAS.reposo);
 
+// Proporciones chibi: cabeza grande sobre un cuerpo corto. La pollera se acorta BAJA y el torso baja lo mismo,
+// así todo lo que está en coordenadas del torso (poses, trenzas, cabeza) no cambia.
+const CABEZA = 1.75;
+const BAJA = 0.25;
+
 // Pose de cada brazo en coordenadas del torso: adónde va la mano, hacia dónde apunta el codo, la forma
 // de los dedos y el giro de la mano sobre el antebrazo. s = +1 brazo izquierdo de Paseito (derecha de la pantalla).
+// Los brazos chibi alcanzan ~0.46 desde el hombro (±0.245, 1.255) y la cabeza ocupa de y≈1.44 a 2.02.
 const POSES = {
-  normal: (s) => ({ mano: [s * 0.05, 0.83, 0.3], codo: [s, -0.4, -0.45], dedos: "relajada", giro: -s * 1.2 }),
-  saludar: (s) => (s > 0 ? { mano: [0.42, 1.62, 0.16], codo: [1, -0.8, -0.1], dedos: "abierta", giro: Math.PI, ola: 9 } : POSES.normal(s)),
-  despedir: (s) => (s > 0 ? { mano: [0.44, 1.6, 0.2], codo: [1, -0.8, -0.1], dedos: "abierta", giro: Math.PI, ola: 6 } : POSES.normal(s)),
-  presentar: (s) => (s > 0 ? { mano: [0.48, 1.03, 0.28], codo: [0.5, -1, -0.4], dedos: "abierta", giro: -1.2 } : POSES.normal(s)),
-  pensar: (s) => (s < 0 ? { mano: [-0.04, 1.47, 0.2], codo: [-0.4, -1, 0.15], dedos: "barbilla", giro: Math.PI } : POSES.normal(s)),
-  trenza: (s) => (s > 0 ? { mano: [0.19, 1.12, 0.3], codo: [1, -0.7, -0.2], dedos: "pinza", giro: 1.6 } : POSES.normal(s)),
-  sombrero: (s) => (s < 0 ? { mano: [-0.2, 1.69, 0.17], codo: [-1, -0.25, 0.1], dedos: "pinza", giro: Math.PI } : POSES.normal(s)),
+  normal: (s) => ({ mano: [s * 0.1, 1.0, 0.25], codo: [s, -0.6, -0.15], dedos: "relajada", giro: -s * 1.6 }),
+  saludar: (s) => (s > 0 ? { mano: [0.4, 1.58, 0.16], codo: [1, -0.8, -0.1], dedos: "abierta", giro: Math.PI, ola: 9 } : POSES.normal(s)),
+  despedir: (s) => (s > 0 ? { mano: [0.42, 1.56, 0.2], codo: [1, -0.8, -0.1], dedos: "abierta", giro: Math.PI, ola: 6 } : POSES.normal(s)),
+  presentar: (s) => (s > 0 ? { mano: [0.46, 1.08, 0.27], codo: [0.6, -1, -0.3], dedos: "abierta", giro: -1.2 } : POSES.normal(s)),
+  // el codo va adelante: si cuelga, se mete en el torso y el antebrazo parece salir del pecho
+  pensar: (s) => (s < 0 ? { mano: [-0.04, 1.49, 0.24], codo: [-0.45, -0.7, 0.6], dedos: "barbilla", giro: Math.PI } : POSES.normal(s)),
+  trenza: (s) => (s > 0 ? { mano: [0.27, 1.15, 0.27], codo: [1, -0.7, -0.2], dedos: "pinza", giro: 1.6 } : POSES.normal(s)),
+  arete: (s) => (s < 0 ? { mano: [-0.3, 1.55, 0.12], codo: [-1, -0.25, 0.1], dedos: "pinza", giro: Math.PI } : POSES.normal(s)),
 };
 // Se precalculan para no crear objetos en cada cuadro.
 const POSES_LADO = Object.fromEntries(Object.entries(POSES).map(([nombre, fn]) => [nombre, [-1, 1].map((s) => {
@@ -90,44 +98,52 @@ const texturaRadial = () => lienzo(128, 128, (g, w) => {
   g.fillRect(0, 0, w, w);
 });
 
-// Sin flipY, la fila superior del lienzo queda en el borde inferior de la manta.
-const texturaAguayo = () => lienzo(1024, 256, (g, w, h) => {
-  g.fillStyle = "#b03a63";
+// Blusa blanca con una guarda de flores celestes bordada al pecho.
+// Sin flipY, la fila superior del lienzo queda en la cintura y la inferior en el cuello.
+const texturaBlusa = () => lienzo(1024, 512, (g, w, h) => {
+  const y = 240;
+  g.fillStyle = "#fbf7ef";
   g.fillRect(0, 0, w, h);
-  g.globalAlpha = 0.1;
-  for (let x = 0; x < w; x += 8) { g.fillStyle = "#000"; g.fillRect(x, 0, 2, h); }
-  g.globalAlpha = 1;
-  const franjas = [["#3d0c20", 10], ["#f2b705", 9], ["#d62f5b", 13], ["#1f9d55", 7], ["#2b59c3", 22], ["#1f9d55", 7], ["#d62f5b", 13], ["#f2b705", 9]];
-  let y = 0;
-  let centroAzul = 0;
-  for (const [color, alto] of franjas) {
-    g.fillStyle = color;
-    g.fillRect(0, y, w, alto);
-    if (color === "#2b59c3") centroAzul = y + alto / 2;
-    y += alto;
+  g.fillStyle = "#4fb0e6";
+  g.fillRect(0, y - 26, w, 3);
+  g.fillRect(0, y + 23, w, 3);
+  for (let x = 32; x < w; x += 64) {
+    g.fillStyle = "#4fb0e6";
+    for (let k = 0; k < 5; k++) {
+      const a = (k / 5) * Math.PI * 2 - Math.PI / 2;
+      g.beginPath(); g.arc(x + Math.cos(a) * 8, y + Math.sin(a) * 8, 6, 0, Math.PI * 2); g.fill();
+    }
+    g.fillStyle = "#f2c94c";
+    g.beginPath(); g.arc(x, y, 4, 0, Math.PI * 2); g.fill();
+    g.fillStyle = "#2b86c9";
+    for (const d of [-1, 1]) {
+      g.beginPath(); g.ellipse(x + d * 23, y, 7, 3, d * 0.5, 0, Math.PI * 2); g.fill();
+    }
   }
-  g.fillStyle = "#fff4d6";
-  for (let x = 12; x < w; x += 32) {
-    g.beginPath();
-    g.moveTo(x, centroAzul - 8); g.lineTo(x + 8, centroAzul); g.lineTo(x, centroAzul + 8); g.lineTo(x - 8, centroAzul);
-    g.fill();
-  }
+});
+
+// Encaje de la enagua: blanco sobre fondo transparente (alphaTest lo recorta).
+const texturaEncaje = () => lienzo(512, 32, (g, w, h) => {
+  g.fillStyle = "#f8fbff";
+  g.fillRect(0, 0, w, h * 0.45);
+  for (let x = 8; x < w; x += 16) { g.beginPath(); g.arc(x, h * 0.45, 8, 0, Math.PI); g.fill(); }
+  for (let x = 8; x < w; x += 16) g.clearRect(x - 1.5, h * 0.18, 3, 3);
 });
 
 const texturaPlataforma = () => lienzo(512, 512, (g, w) => {
   const c = w / 2;
-  g.fillStyle = "#2a0f1b";
+  g.fillStyle = "#12304f";
   g.fillRect(0, 0, w, w);
   g.strokeStyle = "#e7b73a";
   g.lineWidth = 3;
   for (const r of [238, 200, 120]) { g.beginPath(); g.arc(c, c, r, 0, Math.PI * 2); g.stroke(); }
-  const colores = ["#f2b705", "#d62f5b", "#1f9d55", "#2b59c3"];
+  const colores = ["#4fb0e6", "#f8fbff"];
   for (let i = 0; i < 36; i++) {
     const a = (i / 36) * Math.PI * 2;
     g.save();
     g.translate(c + Math.cos(a) * 219, c + Math.sin(a) * 219);
     g.rotate(a);
-    g.fillStyle = colores[i % 4];
+    g.fillStyle = colores[i % 2];
     g.beginPath(); g.moveTo(0, -11); g.lineTo(9, 0); g.lineTo(0, 11); g.lineTo(-9, 0); g.fill();
     g.restore();
   }
@@ -371,7 +387,7 @@ export class Avatar3D {
 
     this.escena = new THREE.Scene();
     this.camara = new THREE.PerspectiveCamera(28, 1, 0.1, 200);
-    this.objetivo = new THREE.Vector3(0, 1.25, 0);
+    this.objetivo = new THREE.Vector3(0, 1.27, 0);
     this.margenes = { arriba: 0, abajo: 0, izquierda: 0, derecha: 0 };
 
     this.rampa = new THREE.DataTexture(new Uint8Array([105, 170, 225, 255]), 4, 1, THREE.RedFormat);
@@ -453,7 +469,7 @@ export class Avatar3D {
     const s = local.x >= 0 ? 1 : -1;
     const hombro = tmp.b.set(s * 0.245, 1.255, 0.01);
     const direccion = tmp.c.subVectors(local, hombro).normalize();
-    const mano = this.señal.mano.copy(hombro).addScaledVector(direccion, 0.47);
+    const mano = this.señal.mano.copy(hombro).addScaledVector(direccion, 0.42);
     mano.set(limitar(mano.x, -0.62, 0.62), limitar(mano.y, 1.0, 1.72), Math.max(mano.z, 0.14));
     this.señal.s = s;
     this.gesto("señalar", duracion);
@@ -558,8 +574,9 @@ export class Avatar3D {
 
   // ---------- Construcción ----------
 
+  /** Material toon facetado (low poly); los ojos piden flatShading: false para verse lisos. */
   _toon(color, extra = {}) {
-    return new THREE.MeshToonMaterial({ color, gradientMap: this.rampa, ...extra });
+    return new THREE.MeshToonMaterial({ color, gradientMap: this.rampa, flatShading: true, ...extra });
   }
 
   /** Centra la geometría (para que el contorno escalado quede parejo) y la deja en su posición original. */
@@ -799,10 +816,10 @@ export class Avatar3D {
     this.paseo.scale.setScalar(0.75);
     e.add(this.paseo);
 
-    // plataforma con anillo de aguayo y halo que cambia de color según el estado
+    // plataforma celeste y blanca con halo que cambia de color según el estado
     const base = new THREE.Mesh(
       new THREE.CylinderGeometry(1.15, 1.25, 0.14, 72),
-      new THREE.MeshStandardMaterial({ color: 0x2a0f1b, metalness: 0.45, roughness: 0.35 }),
+      new THREE.MeshStandardMaterial({ color: 0x12304f, metalness: 0.45, roughness: 0.35 }),
     );
     base.position.y = -0.07;
     base.receiveShadow = true;
@@ -846,17 +863,24 @@ export class Avatar3D {
     const P = (this.personaje = new THREE.Group());
     this.escena.add(P);
 
-    // pollera con tablones
-    const geoPollera = new THREE.CylinderGeometry(0.21, 0.44, 0.8, 112, 8, true);
+    // pollera de cintura alta con tablones en zigzag: con 2 lados por tablón, un vértice sale y el siguiente entra.
+    // Llega a y=1.0 del torso (donde su radio es ~0.21) y deja ver poca blusa: el cuerpo chibi se ve corto.
+    const LADOS_POLLERA = 32;
+    const abajo = 0.05, arriba = 1.0 - BAJA, alto = arriba - abajo;
+    const radioPollera = (y) => 0.44 + (0.21 - 0.44) * (y - abajo) / alto;
+    const plisar = (geo, centroY) => {
+      const p = geo.attributes.position;
+      for (let i = 0; i < p.count; i++) {
+        const x = p.getX(i), y = p.getY(i), z = p.getZ(i);
+        const k = 1 + Math.cos(Math.atan2(z, x) * LADOS_POLLERA / 2) * 0.035 * (0.3 + (arriba - (y + centroY)) / alto);
+        p.setXYZ(i, x * k, y, z * k);
+      }
+      geo.computeVertexNormals();
+      return geo;
+    };
+    const geoPollera = plisar(new THREE.CylinderGeometry(0.21, 0.44, alto, LADOS_POLLERA, 4, true), abajo + alto / 2);
+    geoPollera.translate(0, abajo + alto / 2, 0);
     const p = geoPollera.attributes.position;
-    for (let i = 0; i < p.count; i++) {
-      const x = p.getX(i), y = p.getY(i), z = p.getZ(i);
-      const t = (0.4 - y) / 0.8;
-      const k = 1 + Math.sin(Math.atan2(z, x) * 28) * 0.03 * (0.3 + t);
-      p.setXYZ(i, x * k, y, z * k);
-    }
-    geoPollera.computeVertexNormals();
-    geoPollera.translate(0, 0.45, 0);
     const pollera = this._pieza(geoPollera, this._toon(C.pollera, { side: THREE.DoubleSide }), 0.02);
     P.add(pollera);
     // La pollera se mece con resortes: se guardan los vértices en reposo para deformarlos en cada cuadro.
@@ -864,41 +888,42 @@ export class Avatar3D {
     const base = Float32Array.from(p.array);
     const angulos = new Float32Array(p.count);
     for (let i = 0; i < p.count; i++) angulos[i] = Math.atan2(base[i * 3 + 2], base[i * 3]) * 3;
-    this.pollera = { malla: pollera, base, angulos, alto: 0.8, arriba: 0.85, franjas: [] };
-    for (const [y, color] of [[0.16, 0x1f9d55], [0.22, 0xf2b705]]) {
-      const radio = 0.44 - (y - 0.05) * 0.29;
-      const franja = new THREE.Mesh(new THREE.CylinderGeometry(radio + 0.012, radio + 0.014, 0.03, 112, 1, true), this._toon(color, { side: THREE.DoubleSide }));
+    this.pollera = { malla: pollera, base, angulos, alto, arriba, franjas: [] };
+    // alforzas: las tres franjas blancas cosidas que lleva la pollera cochabambina
+    for (const [y, color] of [[0.11, C.blanco], [0.155, C.blanco], [0.2, C.blanco]]) {
+      const geo = new THREE.CylinderGeometry(radioPollera(y + 0.01) * 1.025, radioPollera(y - 0.01) * 1.025, 0.02, LADOS_POLLERA, 1, true);
+      const franja = new THREE.Mesh(plisar(geo, y), this._toon(color, { side: THREE.DoubleSide }));
       franja.position.y = y;
       P.add(franja);
       this.pollera.franjas.push(franja);
     }
+    const encaje = texturaEncaje();
+    encaje.wrapS = THREE.RepeatWrapping;
+    encaje.repeat.x = 3;
+    const enagua = new THREE.Mesh(
+      plisar(new THREE.CylinderGeometry(radioPollera(abajo) * 1.005, radioPollera(abajo) * 1.03, 0.045, LADOS_POLLERA, 1, true), abajo - 0.02),
+      new THREE.MeshToonMaterial({ map: encaje, gradientMap: this.rampa, side: THREE.DoubleSide, alphaTest: 0.5 }),
+    );
+    enagua.position.y = abajo - 0.02;
+    P.add(enagua);
+    this.pollera.franjas.push(enagua);
 
-    // parte de arriba (respira)
+    // parte de arriba (respira); baja BAJA para apoyarse en la pollera corta
     const T = (this.torso = new THREE.Group());
+    T.position.y = -BAJA;
     P.add(T);
-    const perfilTorso = [[0.2, 0.8], [0.215, 0.92], [0.205, 1.06], [0.18, 1.2], [0.13, 1.31], [0.07, 1.37]];
-    T.add(this._pieza(new THREE.LatheGeometry(perfilTorso.map(([r, y]) => new THREE.Vector2(r, y)), 48), this._toon(C.blusa, { side: THREE.DoubleSide }), 0.02));
-
-    // perfil de abajo hacia arriba: si no, las caras miran adentro y el contorno negro tapa la manta
-    const perfilManta = [[0.295, 1.07], [0.293, 1.14], [0.282, 1.22], [0.245, 1.3], [0.16, 1.355], [0.075, 1.385]];
-    const aguayo = texturaAguayo();
-    aguayo.flipY = false;
-    this.manta = this._pieza(
-      new THREE.LatheGeometry(perfilManta.map(([r, y]) => new THREE.Vector2(r, y)), 72),
-      new THREE.MeshToonMaterial({ map: aguayo, gradientMap: this.rampa, side: THREE.DoubleSide }),
+    // hombros anchos para que las mangas nazcan del cuerpo (los hombros están en x = ±0.245, y = 1.255)
+    const perfilTorso = [[0.2, 0.8], [0.215, 0.92], [0.212, 1.06], [0.205, 1.18], [0.18, 1.28], [0.11, 1.355], [0.06, 1.39]];
+    const bordado = texturaBlusa();
+    bordado.flipY = false;
+    this.blusa = this._pieza(
+      new THREE.LatheGeometry(perfilTorso.map(([r, y]) => new THREE.Vector2(r, y)), 12),
+      this._toon(0xffffff, { map: bordado, side: THREE.DoubleSide }),
       0.02,
     );
-    T.add(this.manta);
+    T.add(this.blusa);
 
-    const tupu = new THREE.Group();
-    tupu.add(new THREE.Mesh(new THREE.SphereGeometry(0.022, 16, 12), this._toon(C.oro)));
-    const aguja = new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.004, 0.08, 6), this._toon(0xb8901f));
-    aguja.position.y = -0.045;
-    tupu.add(aguja);
-    tupu.position.set(0, 1.2, 0.29);
-    T.add(tupu);
-
-    T.add(this._pieza(new THREE.CylinderGeometry(0.05, 0.056, 0.14, 24).translate(0, 1.41, 0), this._toon(C.pielOscura), 0.03));
+    T.add(this._pieza(new THREE.CylinderGeometry(0.05, 0.056, 0.14, 8).translate(0, 1.41, 0), this._toon(C.pielOscura), 0.03));
 
     this.brazos = [this._brazo(1), this._brazo(-1)];
     for (const b of this.brazos) T.add(b.hombro);
@@ -909,25 +934,30 @@ export class Avatar3D {
     T.add(this.cabeza);
   }
 
-  /** Brazo: la manta cubre hasta el codo, luego la manga de la blusa con volado y la mano. */
+  /** Brazo: manga abullonada de la blusa con cinta celeste, antebrazo con volado y la mano. */
   _brazo(s) {
-    const largoBrazo = 0.28;
-    const largoAntebrazo = 0.255;
+    const largoBrazo = 0.24;
+    const largoAntebrazo = 0.22;
+    const LADOS = 8;
     const hombro = new THREE.Group();
     hombro.position.set(s * 0.245, 1.255, 0.01);
-    hombro.add(this._pieza(new THREE.CapsuleGeometry(0.054, 0.21, 6, 16).translate(0, -0.13, 0), this._toon(C.manta), 0.03));
-    for (const [y, color] of [[-0.2, 0xf2b705], [-0.22, 0x1f9d55], [-0.238, 0x2b59c3]]) {
-      const franja = new THREE.Mesh(new THREE.CylinderGeometry(0.0565, 0.0565, 0.016, 24, 1, true), this._toon(color, { side: THREE.DoubleSide }));
+    hombro.add(this._pieza(new THREE.CapsuleGeometry(0.058, 0.17, 2, LADOS).translate(0, -0.11, 0), this._toon(C.blusa), 0.03));
+    const abullonado = this._pieza(new THREE.SphereGeometry(0.085, 8, 6), this._toon(C.blusa), 0.03);
+    abullonado.scale.set(1.05, 1, 0.95);
+    abullonado.position.set(-s * 0.015, -0.005, 0);
+    hombro.add(abullonado);
+    for (const [y, color] of [[-0.18, C.pollera], [-0.198, C.celesteOscuro]]) {
+      const franja = new THREE.Mesh(new THREE.CylinderGeometry(0.061, 0.061, 0.016, LADOS, 1, true), this._toon(color, { side: THREE.DoubleSide }));
       franja.position.y = y;
       hombro.add(franja);
     }
 
     const codo = new THREE.Group();
     codo.position.y = -largoBrazo;
-    codo.add(this._pieza(new THREE.CapsuleGeometry(0.04, 0.15, 6, 14).translate(0, -0.1, 0), this._toon(C.blusa), 0.03));
-    const volado = new THREE.Mesh(new THREE.TorusGeometry(0.04, 0.014, 8, 24), this._toon(C.blusa));
+    codo.add(this._pieza(new THREE.CapsuleGeometry(0.044, 0.12, 2, LADOS).translate(0, -0.085, 0), this._toon(C.blusa), 0.03));
+    const volado = new THREE.Mesh(new THREE.TorusGeometry(0.044, 0.016, 4, LADOS), this._toon(C.blusa));
     volado.rotation.x = Math.PI / 2;
-    volado.position.y = -0.2;
+    volado.position.y = -0.17;
     codo.add(volado);
 
     // mano: muñeca (gira sobre el antebrazo) > palma (se agita al saludar) > dedos con dos falanges y pulgar.
@@ -936,12 +966,13 @@ export class Avatar3D {
     const muneca = new THREE.Group();
     muneca.position.y = -largoAntebrazo + 0.012;
     const palma = new THREE.Group();
+    palma.scale.setScalar(1.3);
     muneca.add(palma);
-    const dorso = this._pieza(new THREE.SphereGeometry(0.036, 18, 14), piel, 0.05);
+    const dorso = this._pieza(new THREE.SphereGeometry(0.036, 8, 6), piel, 0.05);
     dorso.scale.set(0.98, 1.05, 0.56);
     dorso.position.y = -0.026;
     palma.add(dorso);
-    const geoFalange = (radio, largo) => new THREE.CapsuleGeometry(radio, largo, 4, 8).translate(0, -largo / 2, 0);
+    const geoFalange = (radio, largo) => new THREE.CapsuleGeometry(radio, largo, 1, 5).translate(0, -largo / 2, 0);
     const dedos = [
       [0.021, 0.022, 0.018, 0.0078], [0.007, 0.025, 0.02, 0.008], [-0.007, 0.023, 0.018, 0.0076], [-0.02, 0.018, 0.015, 0.007],
     ].map(([x, largo1, largo2, radio]) => {
@@ -1016,12 +1047,13 @@ export class Avatar3D {
 
   _trenza(s) {
     const grupo = new THREE.Group();
+    // nace detrás de la oreja de la cabeza chibi y cae por delante del hombro
     const curva = new THREE.CatmullRomCurve3([
-      [0.12, 1.55, -0.06], [0.17, 1.45, 0.0], [0.22, 1.33, 0.14], [0.235, 1.2, 0.215], [0.225, 1.07, 0.245], [0.21, 0.95, 0.245],
+      [0.2, 1.62, -0.1], [0.26, 1.48, -0.02], [0.28, 1.36, 0.1], [0.28, 1.24, 0.19], [0.265, 1.12, 0.225], [0.25, 1.01, 0.23],
     ].map(([x, y, z]) => new THREE.Vector3(s * x, y, z)));
-    const geo = new THREE.SphereGeometry(1, 12, 8);
+    const geo = new THREE.IcosahedronGeometry(1, 0);
     const arriba = new THREE.Vector3(0, 1, 0);
-    const n = 20;
+    const n = 12;
     const nudos = new THREE.InstancedMesh(geo, this._toon(C.cabello), n + 1);
     nudos.castShadow = true;
     nudos.frustumCulled = false;
@@ -1032,9 +1064,9 @@ export class Avatar3D {
       const punto = curva.getPoint(t);
       const tangente = curva.getTangent(t);
       const lado = new THREE.Vector3().crossVectors(tangente, new THREE.Vector3(0, 0, 1)).normalize();
-      const radio = 0.03 * (1 - 0.35 * t);
+      const radio = 0.042 * (1 - 0.3 * t);
       base.push({
-        pos: punto.addScaledVector(lado, (i % 2 ? 1 : -1) * 0.008).sub(raiz),
+        pos: punto.addScaledVector(lado, (i % 2 ? 1 : -1) * 0.01).sub(raiz),
         giro: new THREE.Quaternion().setFromUnitVectors(arriba, tangente),
         escala: new THREE.Vector3(radio, radio * 1.7, radio * 0.85),
         peso: t ** 1.3,
@@ -1043,11 +1075,11 @@ export class Avatar3D {
     grupo.add(nudos);
     const fin = curva.getPoint(1);
     const punta = new THREE.Group();
-    const cordon = new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.004, 0.05, 6), this._toon(0xd62f5b));
+    const cordon = new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.004, 0.05, 6), this._toon(C.celesteOscuro));
     cordon.position.set(0, -0.035, 0);
     punta.add(cordon);
-    for (const [dx, dy, color] of [[0, -0.07, 0xd62f5b], [-0.018, -0.1, 0xf2b705], [0.018, -0.1, 0x1f9d55]]) {
-      const pompon = this._pieza(new THREE.SphereGeometry(0.022, 14, 10), this._toon(color), 0.06);
+    for (const [dx, dy, color] of [[0, -0.075, C.celesteOscuro], [-0.024, -0.11, C.blanco], [0.024, -0.11, C.pollera]]) {
+      const pompon = this._pieza(new THREE.IcosahedronGeometry(0.028, 0), this._toon(color), 0.06);
       pompon.position.set(dx, dy, 0.01);
       punta.add(pompon);
     }
@@ -1079,6 +1111,7 @@ export class Avatar3D {
   _cabeza() {
     const pivote = new THREE.Group();
     pivote.position.set(0, 1.45, 0);
+    pivote.scale.setScalar(CABEZA);
     const centro = new THREE.Vector3(0, 0.16, 0);
     const piel = this._toon(C.piel);
     const oscuro = this._toon(0x2a1a14);
@@ -1096,9 +1129,9 @@ export class Avatar3D {
     };
     const cabello = this._toon(C.cabello, { side: THREE.DoubleSide });
     pivote.add(
-      sobreCabeza(this._pieza(new THREE.SphereGeometry(0.15, 48, 32), piel, 0.025)),
-      sobreCabeza(this._pieza(new THREE.SphereGeometry(0.158, 40, 24, Math.PI / 2 + 0.95, Math.PI * 2 - 1.9, 0, Math.PI * 0.64), cabello, 0.02)),
-      sobreCabeza(this._pieza(new THREE.SphereGeometry(0.1585, 40, 12, 0, Math.PI * 2, 0, Math.PI * 0.31), cabello, 0)),
+      sobreCabeza(this._pieza(new THREE.SphereGeometry(0.15, 18, 14), piel, 0.025)),
+      sobreCabeza(this._pieza(new THREE.SphereGeometry(0.158, 18, 10, Math.PI / 2 + 0.95, Math.PI * 2 - 1.9, 0, Math.PI * 0.64), cabello, 0.02)),
+      sobreCabeza(this._pieza(new THREE.SphereGeometry(0.1585, 18, 4, 0, Math.PI * 2, 0, Math.PI * 0.31), cabello, 0)),
     );
 
     // ojos: dentro de `envoltura` (achatada) el globo es una esfera, así el iris gira sobre ella al mirar y
@@ -1106,9 +1139,12 @@ export class Avatar3D {
     ref.iris = [];
     ref.parpadosSup = [];
     ref.parpadosInf = [];
-    const R = 0.026;
+    // ojos chibi: grandes, separados, más abajo en la cara y lisos (no facetados)
+    const R = 0.031;
+    const ALTO_OJO = 0.9;
+    const yOjo = -0.002;
     // anillos finos (no un abanico de triángulos grandes) para que el iris siga la curva del globo sin hundirse
-    const geoIris = new THREE.RingGeometry(0.00005, 0.0142, 32, 8);
+    const geoIris = new THREE.RingGeometry(0.00005, 0.018, 32, 8);
     const pi = geoIris.attributes.position;
     for (let i = 0; i < pi.count; i++) {
       const x = pi.getX(i), y = pi.getY(i) / 0.78;
@@ -1117,7 +1153,7 @@ export class Avatar3D {
     const matIris = new THREE.MeshBasicMaterial({ map: texturaIris() });
     const matBrillo = new THREE.MeshBasicMaterial({ color: 0xffffff });
     const matPestana = new THREE.MeshBasicMaterial({ color: 0x140c0a });
-    const matParpado = this._toon(C.piel);
+    const matParpado = this._toon(C.piel, { flatShading: false });
     const sobreGlobo = (malla, x, y, radio) => {
       const z = Math.sqrt(radio * radio - x * x - y * y);
       malla.position.set(x, y, z);
@@ -1126,17 +1162,17 @@ export class Avatar3D {
     };
     for (const s of [-1, 1]) {
       const ojo = new THREE.Group();
-      ojo.position.set(s * 0.052, centro.y + 0.012, superficie(0.052, 0.012) - 0.008);
+      ojo.position.set(s * 0.056, centro.y + yOjo, superficie(0.056, yOjo) - 0.009);
       const envoltura = new THREE.Group();
-      envoltura.scale.set(1, 0.78, 0.5);
-      const blanco = new THREE.Mesh(new THREE.SphereGeometry(R, 24, 16), this._toon(0xfffaf3));
+      envoltura.scale.set(1, ALTO_OJO, 0.5);
+      const blanco = new THREE.Mesh(new THREE.SphereGeometry(R, 24, 16), this._toon(0xfffaf3, { flatShading: false }));
       const iris = new THREE.Group();
       iris.add(new THREE.Mesh(geoIris, matIris));
-      iris.add(sobreGlobo(new THREE.Mesh(new THREE.CircleGeometry(0.0036, 12), matBrillo), 0.0048, 0.0085, R + 0.0006));
-      iris.add(sobreGlobo(new THREE.Mesh(new THREE.CircleGeometry(0.0017, 10), matBrillo), -0.0052, -0.0052, R + 0.0006));
+      iris.add(sobreGlobo(new THREE.Mesh(new THREE.CircleGeometry(0.0055, 12), matBrillo), 0.0062, 0.0105, R + 0.0006));
+      iris.add(sobreGlobo(new THREE.Mesh(new THREE.CircleGeometry(0.0026, 10), matBrillo), -0.0068, -0.0068, R + 0.0006));
       const sup = new THREE.Group();
       sup.add(new THREE.Mesh(new THREE.SphereGeometry(R * 1.06, 24, 10, 0, Math.PI * 2, 0, Math.PI / 2), matParpado));
-      const pestanas = new THREE.Mesh(new THREE.TorusGeometry(R * 1.06, 0.0034, 6, 24, Math.PI), matPestana);
+      const pestanas = new THREE.Mesh(new THREE.TorusGeometry(R * 1.06, 0.0042, 6, 24, Math.PI), matPestana);
       pestanas.rotation.x = Math.PI / 2;
       pestanas.scale.set(1, 1, 1.5);
       const rabillo = new THREE.Mesh(new THREE.ConeGeometry(0.0034, 0.011, 6), matPestana);
@@ -1158,7 +1194,7 @@ export class Avatar3D {
 
     // cejas: gruesas hacia la nariz, finas hacia afuera y arqueadas sobre la curva de la frente
     ref.cejas = [-1, 1].map((s) => {
-      const geo = new THREE.CapsuleGeometry(0.0046, 0.034, 4, 10).rotateZ(Math.PI / 2);
+      const geo = new THREE.CapsuleGeometry(0.0046, 0.034, 2, 6).rotateZ(Math.PI / 2);
       const pc = geo.attributes.position;
       for (let i = 0; i < pc.count; i++) {
         const x = pc.getX(i), y = pc.getY(i), z = pc.getZ(i);
@@ -1171,21 +1207,21 @@ export class Avatar3D {
       geo.computeVertexNormals();
       const ceja = new THREE.Mesh(geo, oscuro);
       ceja.rotation.z = s * 0.06;
-      ceja.position.set(s * 0.055, centro.y + 0.058, superficie(0.055, 0.058) + 0.001);
+      ceja.position.set(s * 0.058, centro.y + 0.054, superficie(0.058, 0.054) + 0.002);
       ceja.userData = { y: ceja.position.y, giro: ceja.rotation.z, s };
       pivote.add(ceja);
       return ceja;
     });
 
-    const nariz = new THREE.Mesh(new THREE.SphereGeometry(0.016, 16, 12), this._toon(C.pielOscura));
-    nariz.scale.set(0.9, 1.2, 1);
-    nariz.position.set(0, centro.y - 0.028, superficie(0, -0.028) + 0.002);
+    // nariz chibi: un botoncito
+    const nariz = new THREE.Mesh(new THREE.IcosahedronGeometry(0.009, 0), this._toon(C.pielOscura));
+    nariz.position.set(0, centro.y - 0.034, superficie(0, -0.034) + 0.002);
     pivote.add(nariz);
 
     ref.mejillas = [-1, 1].map((s) => {
-      const normal = new THREE.Vector3(s * 0.085, -0.04 / 1.25, superficie(0.085, -0.04)).normalize();
-      const mejilla = new THREE.Mesh(new THREE.CircleGeometry(0.026, 24), new THREE.MeshBasicMaterial({ color: 0xe0676a, transparent: true, opacity: 0.35, depthWrite: false }));
-      mejilla.position.set(s * 0.085, centro.y - 0.04, superficie(0.085, -0.04) + 0.003);
+      const normal = new THREE.Vector3(s * 0.088, -0.045 / 1.25, superficie(0.088, -0.045)).normalize();
+      const mejilla = new THREE.Mesh(new THREE.CircleGeometry(0.03, 6), new THREE.MeshBasicMaterial({ color: 0xe0676a, transparent: true, opacity: 0.35, depthWrite: false }));
+      mejilla.position.set(s * 0.088, centro.y - 0.045, superficie(0.088, -0.045) + 0.005);
       mejilla.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal);
       mejilla.userData.y = mejilla.position.y;
       pivote.add(mejilla);
@@ -1202,24 +1238,25 @@ export class Avatar3D {
       labioInf: this._toon(C.labio, lados),
     });
     const boca = ref.boca.grupo;
-    boca.position.set(0, centro.y - 0.075, superficie(0, -0.075));
+    boca.position.set(0, centro.y - 0.072, superficie(0, -0.072) + 0.002);
     boca.rotation.x = 0.42;
+    boca.scale.setScalar(0.8);
     ref.boca.actualizar(FORMAS.reposo, this.sonrisa);
     pivote.add(boca);
 
     // orejas y aretes dorados
     ref.aretes = [];
     for (const s of [-1, 1]) {
-      const oreja = new THREE.Mesh(new THREE.SphereGeometry(0.03, 16, 12), piel);
+      const oreja = new THREE.Mesh(new THREE.SphereGeometry(0.03, 8, 6), piel);
       oreja.scale.set(0.45, 1, 0.75);
       oreja.position.set(s * 0.149, centro.y, -0.01);
       const arete = new THREE.Group();
       arete.position.set(s * 0.147, centro.y - 0.082, 0.02);
       const aro = new THREE.Mesh(new THREE.TorusGeometry(0.007, 0.0025, 6, 16), this._toon(C.oro));
-      const gota = new THREE.Mesh(new THREE.SphereGeometry(0.013, 14, 10), this._toon(C.oro));
+      const gota = new THREE.Mesh(new THREE.OctahedronGeometry(0.013, 0), this._toon(C.oro));
       gota.scale.set(1, 1.5, 0.5);
       gota.position.y = -0.03;
-      const piedra = new THREE.Mesh(new THREE.SphereGeometry(0.005, 8, 6), new THREE.MeshBasicMaterial({ color: 0xd62f5b }));
+      const piedra = new THREE.Mesh(new THREE.SphereGeometry(0.005, 8, 6), new THREE.MeshBasicMaterial({ color: C.pollera }));
       piedra.position.set(0, -0.032, 0.007);
       arete.add(aro, gota, piedra);
       pivote.add(oreja, arete);
@@ -1231,10 +1268,11 @@ export class Avatar3D {
     sombrero.position.set(0, 0.305, -0.005);
     sombrero.rotation.set(-0.1, 0, 0.06);
     const blanco = this._toon(C.sombrero);
-    sombrero.add(this._pieza(new THREE.CylinderGeometry(0.27, 0.27, 0.014, 72), blanco, 0.02));
-    sombrero.add(this._pieza(new THREE.CylinderGeometry(0.129, 0.131, 0.045, 64).translate(0, 0.03, 0), this._toon(C.cinta), 0.01));
-    sombrero.add(this._pieza(new THREE.CylinderGeometry(0.113, 0.127, 0.23, 64).translate(0, 0.122, 0), blanco, 0.02));
-    const copa = this._pieza(new THREE.SphereGeometry(0.113, 48, 8, 0, Math.PI * 2, 0, Math.PI / 2), blanco, 0.02);
+    const LADOS_SOMBRERO = 12;
+    sombrero.add(this._pieza(new THREE.CylinderGeometry(0.27, 0.27, 0.014, LADOS_SOMBRERO), blanco, 0.02));
+    sombrero.add(this._pieza(new THREE.CylinderGeometry(0.129, 0.131, 0.045, LADOS_SOMBRERO).translate(0, 0.03, 0), this._toon(C.cinta), 0.01));
+    sombrero.add(this._pieza(new THREE.CylinderGeometry(0.113, 0.127, 0.23, LADOS_SOMBRERO).translate(0, 0.122, 0), blanco, 0.02));
+    const copa = this._pieza(new THREE.SphereGeometry(0.113, LADOS_SOMBRERO, 3, 0, Math.PI * 2, 0, Math.PI / 2), blanco, 0.02);
     copa.scale.set(1, 0.25, 1);
     copa.position.y = 0.237;
     sombrero.add(copa);
@@ -1255,8 +1293,8 @@ export class Avatar3D {
     const { arriba, abajo, izquierda, derecha } = this.margenes;
     const altoLibre = Math.max(0.3, (h - arriba - abajo) / h);
     const anchoLibre = Math.max(0.3, (w - izquierda - derecha) / w);
-    // de la mitad de la pollera (y≈0.45) a la copa del sombrero (y≈2.07), con el brazo en alto para saludar
-    this.distancia = Math.max(0.86 / (tanV * altoLibre), 0.52 / (tanV * cam.aspect * anchoLibre));
+    // de la mitad de la pollera (y≈0.3) a la copa del sombrero (y≈2.2); de ancho, el ala del sombrero y la mano al saludar
+    this.distancia = Math.max(0.97 / (tanV * altoLibre), 0.56 / (tanV * cam.aspect * anchoLibre));
     // medio ancho visible (sin los paneles) a esa profundidad: el Cristo y el Paseo quedan a la vista, no detrás de la interfaz
     const libre = (objeto) => tanV * cam.aspect * anchoLibre * (this.distancia - objeto.position.z);
     this.cerro.position.x = Math.min(12, libre(this.cerro) * 0.78);
@@ -1279,7 +1317,7 @@ export class Avatar3D {
 
   /** Movimientos de reposo variados para que no se vea en bucle; nunca repite el anterior. */
   _accionReposo(ahora) {
-    const acciones = ["mirar", "mirar", "peso", "ladear", "sonreir", "parpadeo", "suspiro", "trenza", "sombrero"]
+    const acciones = ["mirar", "mirar", "peso", "ladear", "sonreir", "parpadeo", "suspiro", "trenza", "arete"]
       .filter((a) => a !== this.ultimaAccion);
     const accion = acciones[Math.floor(Math.random() * acciones.length)];
     this.ultimaAccion = accion;
@@ -1297,7 +1335,7 @@ export class Avatar3D {
       case "parpadeo": this.parpadeo = ahora; this.proximoParpadeo = ahora + 230; break;
       case "suspiro": this.suspiroDesde = ahora; break;
       case "trenza": this.gesto("trenza", 2200); break;
-      case "sombrero": this.gesto("sombrero", 1700); break;
+      case "arete": this.gesto("arete", 1700); break;
     }
   }
 
@@ -1381,8 +1419,8 @@ export class Avatar3D {
     cab.set(base.x + asiente, base.y, base.z);
 
     // ojos: iris hacia la mirada (arriba al pensar), parpadeo, ojos felices al sonreír, abiertos al sorprenderse
-    const irisY = estado === "pensando" ? 0.2 : this.mirada.x * 0.23;
-    const irisX = estado === "pensando" ? -0.32 : -this.mirada.y * 0.16;
+    const irisY = estado === "pensando" ? 0.16 : this.mirada.x * 0.23;
+    const irisX = estado === "pensando" ? -0.24 : -this.mirada.y * 0.16;
     for (const iris of r.iris) {
       iris.rotation.y += (irisY - iris.rotation.y) * suave(14);
       iris.rotation.x += (irisX - iris.rotation.x) * suave(14);
@@ -1419,8 +1457,8 @@ export class Avatar3D {
     const suspiro = ds >= 0 && ds < 1 ? Math.sin(Math.PI * ds) : 0;
     const respira = Math.sin(t * 1.7);
     this.cadera += (this.pesoObjetivo - this.cadera) * suave(1.6);
-    this.torso.position.set(this.cadera, respira * 0.004 + suspiro * 0.007, 0);
-    this.manta.scale.set(1 + respira * 0.006 + suspiro * 0.012, 1, 1 + respira * 0.006 + suspiro * 0.012);
+    this.torso.position.set(this.cadera, -BAJA + respira * 0.004 + suspiro * 0.007, 0);
+    this.blusa.scale.set(1 + respira * 0.006 + suspiro * 0.012, 1, 1 + respira * 0.006 + suspiro * 0.012);
     this.personaje.rotation.y += (cab.y * 0.25 - this.personaje.rotation.y) * suave(2);
     const inclinarTorso = estado === "escuchando" ? 0.06 : estado === "pensando" ? -0.015 : 0;
     this.torso.rotation.x += (inclinarTorso - this.torso.rotation.x) * suave(3);

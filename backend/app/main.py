@@ -10,8 +10,8 @@ from sqlmodel import Session
 from . import agente, puntos
 from .config import CORS_ORIGINS, FRONTEND_DIR, GEMINI_MODEL
 from .db import crear_tablas, engine
-from .rutas import admin, analitica, catalogo, chat, voz
-from .seed import sembrar
+from .rutas import admin, analitica, catalogo, chat, cupones, voz
+from .seed import sembrar, sembrar_productos
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
@@ -22,6 +22,8 @@ async def lifespan(_: FastAPI):
     with Session(engine) as db:
         if sembrar(db):
             logging.getLogger("jarvis").info("Base de datos sembrada con los datos del Paseo")
+        if nuevos := sembrar_productos(db):
+            logging.getLogger("jarvis").info("%s productos nuevos desde productos.json", nuevos)
     puntos.iniciar()
     yield
 
@@ -46,6 +48,7 @@ app.include_router(catalogo.router)
 app.include_router(admin.router)
 app.include_router(analitica.router)
 app.include_router(voz.router)
+app.include_router(cupones.router)
 
 
 @app.get("/salud", tags=["sistema"])

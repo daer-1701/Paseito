@@ -1,0 +1,1084 @@
+[
+  {
+    "tienda": "Chipotle Mexican Food",
+    "nombre": "Tostadas Chipotle",
+    "descripcion": "Dos tortillas de maíz crocantes con carne a elección (lomo de res, filete de pollo o lomo de cerdo), cubiertas con verduras salteadas, crema agria y ensalada de palta, sobre una cama de lechuga.",
+    "precio": 50,
+    "stock": -1,
+    "etiquetas": "tostadas,comida mexicana,tortilla de maiz,res,pollo,cerdo,palta,crema agria,almuerzo,cena",
+    "fuente": "Menú impreso de Chipotle Mexican Food, octubre 2026"
+  },
+  {
+    "tienda": "Chipotle Mexican Food",
+    "nombre": "Chimichanga",
+    "descripcion": "Tortilla de trigo crocante rellena de carne de res, cubierta con queso gratinado, tocino, crema de frijoles, cebolla brunoise blanca y tomate, decorada con guacamole, pico de gallo y choclitos de maíz, sobre cama de lechuga. Acompañada de una porción de arroz y una porción de nachos de maíz.",
+    "precio": 50,
+    "stock": -1,
+    "etiquetas": "chimichanga,comida mexicana,tortilla de trigo,res,queso,tocino,frijoles,guacamole,nachos,arroz,almuerzo,cena",
+    "fuente": "Menú impreso de Chipotle Mexican Food, octubre 2026"
+  },
+
+  {
+    "tienda": "Patanegra",
+    "nombre": "Tabla de Pinchos",
+    "descripcion": "Pinchos de queso curado y chorizo, calamares crujientes, lomo de cerdo curado, y jamón serrano con tomate y rúcula.",
+    "precio": 69,
+    "stock": -1,
+    "etiquetas": "pinchos,tapas,piqueo,para compartir,comida española,chorizo,jamon serrano,calamares,queso",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Calamares",
+    "descripcion": "Aros de calamar con crujiente rebozado, con papas caseras, limón y alioli.",
+    "precio": 155,
+    "stock": -1,
+    "etiquetas": "calamares,mariscos,frituras,piqueo,para compartir,comida española,papas,alioli",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Tabla de tapas",
+    "descripcion": "Croquetas de jamón serrano, empanadillas de carne, papas alioli gratinadas y queso frito con chutney de mango.",
+    "precio": 110,
+    "stock": -1,
+    "etiquetas": "tapas,piqueo,para compartir,comida española,croquetas,empanadillas,queso frito,papas",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Fritura mixta",
+    "descripcion": "Mix de pescados y mariscos: calamares, camarones crujientes y lomo de paiche frito, acompañados de papas fritas y alioli.",
+    "precio": 175,
+    "stock": -1,
+    "etiquetas": "fritura,mariscos,pescado,camarones,calamares,paiche,piqueo,para compartir,comida española",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Patatas de la Abuela",
+    "descripcion": "Papas caseras fritas con aliño mediterráneo, chorizo español, queso gratinado y locoto.",
+    "precio": 59,
+    "stock": -1,
+    "etiquetas": "papas,papas fritas,chorizo,queso,picante,piqueo,para compartir,comida española",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Huevos rotos con jamón serrano",
+    "descripcion": "Huevos fritos en aceite de oliva sobre papas fritas, con jamón serrano cortado a mano.",
+    "precio": 65,
+    "stock": -1,
+    "etiquetas": "huevos rotos,huevos,papas fritas,jamon serrano,piqueo,comida española",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Huevos rotos con chorizo",
+    "descripcion": "Huevos fritos en aceite de oliva sobre papas fritas, con chorizo español.",
+    "precio": 60,
+    "stock": -1,
+    "etiquetas": "huevos rotos,huevos,papas fritas,chorizo,piqueo,comida española",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Empanadillas",
+    "descripcion": "Cuatro empanadillas de carne de res, cebolla caramelizada y jugo de carne, con salsa alioli y ají picante.",
+    "precio": 55,
+    "stock": -1,
+    "etiquetas": "empanadillas,empanadas,carne,res,picante,piqueo,comida española",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Tabla Patanegra",
+    "descripcion": "Tabla de embutidos: jamón serrano cortado a mano, chorizo español, lomo de cerdo curado y queso maduro, con pan de masa madre, aliños, nueces y ciruelas. Viene en dos tamaños: Bs 85 y Bs 135.",
+    "precio": 85,
+    "stock": -1,
+    "etiquetas": "tabla,embutidos,jamon serrano,chorizo,queso,para compartir,piqueo,comida española",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Tabla Mixta",
+    "descripcion": "Tabla de embutidos: jamón serrano cortado a mano y queso maduro, con tostas de pan de masa madre, aliños, nueces y ciruelas. Viene en dos tamaños: Bs 80 y Bs 130.",
+    "precio": 80,
+    "stock": -1,
+    "etiquetas": "tabla,embutidos,jamon serrano,queso,para compartir,piqueo,comida española",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Tabla de Jamón Serrano",
+    "descripcion": "Jamón serrano cortado a mano con pan tostado, nueces, aceitunas, tomates cherry, aceite de oliva virgen extra y ciruelas. Viene en dos tamaños: Bs 90 y Bs 139.",
+    "precio": 90,
+    "stock": -1,
+    "etiquetas": "tabla,embutidos,jamon serrano,para compartir,piqueo,comida española",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Tostas de pan",
+    "descripcion": "Pan de masa madre artesano con aceite de oliva virgen extra, tomate aliñado y tapenade de aceituna.",
+    "precio": 30,
+    "stock": -1,
+    "etiquetas": "tostas,pan,tapas,vegetariano,piqueo,comida española",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Croquetas de jamón serrano",
+    "descripcion": "Cuatro croquetas de jamón serrano.",
+    "precio": 40,
+    "stock": -1,
+    "etiquetas": "croquetas,jamon serrano,tapas,piqueo,comida española",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Queso frito",
+    "descripcion": "Queso curado frito, con crujiente empanado y chutney de mango.",
+    "precio": 70,
+    "stock": -1,
+    "etiquetas": "queso,queso frito,tapas,vegetariano,piqueo,comida española",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Tortilla española",
+    "descripcion": "Tapa tradicional de papa, huevo, cebolla y aceite de oliva, con tostas de pan de masa madre.",
+    "precio": 40,
+    "stock": -1,
+    "etiquetas": "tortilla española,tortilla,huevo,papa,tapas,vegetariano,comida española",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Tortilla española con chorizo",
+    "descripcion": "Tortilla tradicional de papa, huevo, cebolla y aceite de oliva con chorizo español, y tostas de pan de masa madre.",
+    "precio": 50,
+    "stock": -1,
+    "etiquetas": "tortilla española,tortilla,huevo,papa,chorizo,tapas,comida española",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Gambas al ajillo",
+    "descripcion": "Entre 14 y 16 gambas confitadas en aceite de oliva, guindilla, ajo y perejil, con tostas de pan de masa madre.",
+    "precio": 130,
+    "stock": -1,
+    "etiquetas": "gambas,camarones,mariscos,ajo,comida española",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Bienmesabe",
+    "descripcion": "Lomo de paiche en dados con adobo tradicional, acompañado de papas fritas mediterráneas y ensalada.",
+    "precio": 85,
+    "stock": -1,
+    "etiquetas": "pescado,paiche,papas fritas,ensalada,almuerzo,cena,comida española",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Pulpo Patanegra",
+    "descripcion": "Pulpo laminado sobre puré rústico de papa, alioli gratinado, pimentón ahumado y aceite de oliva.",
+    "precio": 149,
+    "stock": -1,
+    "etiquetas": "pulpo,mariscos,pure,almuerzo,cena,comida española",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Paella de mariscos",
+    "descripcion": "El plato español más reconocido, hecho de forma tradicional en paellera, con mariscos, gambas peladas y alioli casero. Precio por porción personal; tarda unos 30 minutos.",
+    "precio": 125,
+    "stock": -1,
+    "etiquetas": "paella,arroz,mariscos,gambas,camarones,almuerzo,cena,comida española",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Paella Montañesa",
+    "descripcion": "Carne de res a la parrilla sobre una paella de verduras, champiñones y jugo de carne. Precio por porción personal; tarda unos 30 minutos.",
+    "precio": 85,
+    "stock": -1,
+    "etiquetas": "paella,arroz,carne,res,parrilla,champiñones,almuerzo,cena,comida española",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Paella Montañesa de pollo",
+    "descripcion": "Pollo sobre una paella de verduras, champiñones y jugo de carne. Precio por porción personal; tarda unos 30 minutos.",
+    "precio": 75,
+    "stock": -1,
+    "etiquetas": "paella,arroz,pollo,champiñones,almuerzo,cena,comida española",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Arroz negro",
+    "descripcion": "Paella de temporada, de sabor intenso, con mariscos y tinta de calamar. Precio por porción personal; tarda unos 30 minutos.",
+    "precio": 135,
+    "stock": -1,
+    "etiquetas": "paella,arroz negro,arroz,mariscos,calamar,de temporada,almuerzo,cena,comida española",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Tabla de carnes para 4 personas",
+    "descripcion": "Pinchos morunos de pollo, entraña de res y chistorra, con papas fritas, ensalada de la casa y pimientos asados a la bilbaína.",
+    "precio": 259,
+    "stock": -1,
+    "etiquetas": "tabla de carnes,carne,parrilla,res,pollo,chistorra,para compartir,grupo,familia,cena",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Tabla de carnes para 2 personas",
+    "descripcion": "Entraña de res y chistorra con papas fritas, ensalada de la casa y pimientos asados a la bilbaína.",
+    "precio": 159,
+    "stock": -1,
+    "etiquetas": "tabla de carnes,carne,parrilla,res,chistorra,para compartir,pareja,cena",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Entraña de res",
+    "descripcion": "Entraña de res con papas fritas mediterráneas, ensalada de la casa y pimientos asados a la bilbaína.",
+    "precio": 89,
+    "stock": -1,
+    "etiquetas": "entraña,carne,res,parrilla,papas fritas,almuerzo,cena",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Ojo de bife",
+    "descripcion": "Corte de ojo de bife con papas fritas caseras, pimientos asados a la bilbaína y ensalada de la casa.",
+    "precio": 97,
+    "stock": -1,
+    "etiquetas": "ojo de bife,bife,carne,res,parrilla,papas fritas,almuerzo,cena",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Pinchos morunos",
+    "descripcion": "Entrepierna de pollo deshuesada en adobo tradicional, con papas fritas caseras y ensalada de la casa.",
+    "precio": 60,
+    "stock": -1,
+    "etiquetas": "pinchos,brochetas,pollo,papas fritas,almuerzo,cena,comida española",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Estofado de toro",
+    "descripcion": "Carne de res estofada con vino tinto y verduritas, con papitas fritas y reducción de jugo de carne.",
+    "precio": 85,
+    "stock": -1,
+    "etiquetas": "estofado,guiso,carne,res,almuerzo,cena,comida española",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Ensalada serrana",
+    "descripcion": "Mix de lechugas, jamón serrano, queso curado, aceitunas, tomates cherry, brotes y aliño de la casa.",
+    "precio": 60,
+    "stock": -1,
+    "etiquetas": "ensalada,jamon serrano,queso,liviano,almuerzo",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Tarta de Santiago",
+    "descripcion": "Tarta tradicional española de almendra. Bs 30 sola o Bs 35 con helado de vainilla.",
+    "precio": 30,
+    "stock": -1,
+    "etiquetas": "postre,tarta,almendra,helado,dulce",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Locura de chocolate",
+    "descripcion": "Fondant de chocolate puro y cacao caliente, con helado de vainilla y almendras caramelizadas.",
+    "precio": 30,
+    "stock": -1,
+    "etiquetas": "postre,chocolate,fondant,helado,dulce",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Limonada de coco",
+    "descripcion": "Jugo natural de limón con coco.",
+    "precio": 25,
+    "stock": -1,
+    "etiquetas": "jugo natural,limonada,coco,bebida sin alcohol",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Jugo Mediterráneo",
+    "descripcion": "Jugo natural de la casa.",
+    "precio": 20,
+    "stock": -1,
+    "etiquetas": "jugo natural,bebida sin alcohol",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Limonada",
+    "descripcion": "Jugo natural de limón.",
+    "precio": 15,
+    "stock": -1,
+    "etiquetas": "jugo natural,limonada,bebida sin alcohol",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Té helado",
+    "descripcion": "Té helado.",
+    "precio": 15,
+    "stock": -1,
+    "etiquetas": "te helado,bebida fria,bebida sin alcohol",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Jugo natural de frutilla, piña o sandía",
+    "descripcion": "Jugo natural a elección: frutilla, piña o sandía.",
+    "precio": 18,
+    "stock": -1,
+    "etiquetas": "jugo natural,frutilla,piña,sandia,bebida sin alcohol",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Mojito virgen",
+    "descripcion": "Mojito sin alcohol.",
+    "precio": 18,
+    "stock": -1,
+    "etiquetas": "mojito,sin alcohol,bebida sin alcohol",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Piña colada virgen",
+    "descripcion": "Piña colada sin alcohol.",
+    "precio": 25,
+    "stock": -1,
+    "etiquetas": "piña colada,piña,coco,sin alcohol,bebida sin alcohol",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Gaseosas y agua",
+    "descripcion": "Pepsi (normal o Black), 7up, Guaraná Antártica, Coca-Cola (normal o sin azúcar), Fanta (naranja o papaya), Sprite y agua Vital con o sin gas.",
+    "precio": 15,
+    "stock": -1,
+    "etiquetas": "gaseosa,refresco,soda,agua,coca cola,pepsi,sprite,fanta,bebida sin alcohol",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Café expreso",
+    "descripcion": "Café solo. Bs 10 simple o Bs 15 doble.",
+    "precio": 10,
+    "stock": -1,
+    "etiquetas": "cafe,expreso,espresso,bebida caliente",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Café americano",
+    "descripcion": "Café americano. Bs 10 simple o Bs 15 doble.",
+    "precio": 10,
+    "stock": -1,
+    "etiquetas": "cafe,americano,bebida caliente",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Café cortado",
+    "descripcion": "Expreso cortado con un poco de leche.",
+    "precio": 12,
+    "stock": -1,
+    "etiquetas": "cafe,cortado,bebida caliente",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Café con leche",
+    "descripcion": "Café con leche.",
+    "precio": 14,
+    "stock": -1,
+    "etiquetas": "cafe,cafe con leche,bebida caliente",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Café bombón",
+    "descripcion": "Expreso con leche condensada.",
+    "precio": 14,
+    "stock": -1,
+    "etiquetas": "cafe,bombon,dulce,bebida caliente",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Ice Coffee",
+    "descripcion": "Café helado.",
+    "precio": 17,
+    "stock": -1,
+    "etiquetas": "cafe,cafe helado,ice coffee,bebida fria",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+  {
+    "tienda": "Patanegra",
+    "nombre": "Mates",
+    "descripcion": "Mate de hierbas.",
+    "precio": 8,
+    "stock": -1,
+    "etiquetas": "mate,infusion,te,bebida caliente",
+    "fuente": "Carta de Patanegra, junio 2026"
+  },
+
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Brunch Tradicional",
+    "descripcion": "Huevos revueltos o fritos, croquetas de papa (hash browns), tocinos crujientes, panqueques con frutilla y maple syrup, jugo de naranja y café americano, té o mate (por Bs 6 más lo cambias por capuccino). Todos los días de 11:00 a 15:00.",
+    "precio": 45,
+    "stock": -1,
+    "etiquetas": "brunch,desayuno,huevos,tocino,panqueques,hash browns,jugo de naranja,cafe,mañana",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Brunch Criollo",
+    "descripcion": "Papas doradas en gajos, pan con ajo, silpancho en tiras, huevos fritos, chorrellana y llajua, con un chopp Paceña de 330 ml. Todos los días de 11:00 a 15:00.",
+    "precio": 45,
+    "stock": -1,
+    "etiquetas": "brunch,criollo,comida boliviana,silpancho,huevos,papas,llajua,cerveza,mañana",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Huevos revueltos",
+    "descripcion": "Huevos revueltos cremosos con un toque de crocantes de tocino.",
+    "precio": 20,
+    "stock": -1,
+    "etiquetas": "huevos,desayuno,brunch,tocino,mañana",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Omelette clásico",
+    "descripcion": "Omelette con mix de jamón y queso.",
+    "precio": 20,
+    "stock": -1,
+    "etiquetas": "omelette,huevos,jamon,queso,desayuno,brunch,mañana",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Ristretto",
+    "descripcion": "Expreso corto e intenso.",
+    "precio": 14,
+    "stock": -1,
+    "etiquetas": "cafe,ristretto,expreso,bebida caliente",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Espresso",
+    "descripcion": "Café expreso.",
+    "precio": 14,
+    "stock": -1,
+    "etiquetas": "cafe,espresso,expreso,bebida caliente",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Espresso cortado",
+    "descripcion": "Expreso con un poco de leche.",
+    "precio": 15,
+    "stock": -1,
+    "etiquetas": "cafe,cortado,espresso,bebida caliente",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Espresso con crema",
+    "descripcion": "Expreso con crema.",
+    "precio": 16,
+    "stock": -1,
+    "etiquetas": "cafe,espresso,crema,bebida caliente",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Doble espresso",
+    "descripcion": "Doble expreso.",
+    "precio": 17,
+    "stock": -1,
+    "etiquetas": "cafe,espresso,doble,bebida caliente",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Macchiato",
+    "descripcion": "Expreso manchado con espuma de leche.",
+    "precio": 15,
+    "stock": -1,
+    "etiquetas": "cafe,macchiato,bebida caliente",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Americano",
+    "descripcion": "Café americano.",
+    "precio": 15,
+    "stock": -1,
+    "etiquetas": "cafe,americano,bebida caliente",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Doble americano",
+    "descripcion": "Café americano doble.",
+    "precio": 19,
+    "stock": -1,
+    "etiquetas": "cafe,americano,doble,bebida caliente",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Bombón Cayenna",
+    "descripcion": "Café bombón de la casa, con leche condensada.",
+    "precio": 19,
+    "stock": -1,
+    "etiquetas": "cafe,bombon,dulce,bebida caliente",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Cappuccino clásico",
+    "descripcion": "Cappuccino clásico.",
+    "precio": 21,
+    "stock": -1,
+    "etiquetas": "cafe,cappuccino,capuchino,bebida caliente",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Cappuccino con crema",
+    "descripcion": "Cappuccino con crema.",
+    "precio": 22,
+    "stock": -1,
+    "etiquetas": "cafe,cappuccino,capuchino,crema,bebida caliente",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Cappuccino frozen",
+    "descripcion": "Cappuccino frío tipo frappé.",
+    "precio": 25,
+    "stock": -1,
+    "etiquetas": "cafe,cappuccino,frozen,frape,bebida fria",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Café latte",
+    "descripcion": "Latte. Bs 24 normal, Bs 25 con crema o Bs 27 frozen.",
+    "precio": 24,
+    "stock": -1,
+    "etiquetas": "cafe,latte,frozen,bebida caliente",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Café moka",
+    "descripcion": "Latte con chocolate. Bs 24 normal, Bs 25 con crema o Bs 27 frozen.",
+    "precio": 24,
+    "stock": -1,
+    "etiquetas": "cafe,moka,mocha,chocolate,latte,frozen,bebida caliente",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Café vainilla",
+    "descripcion": "Latte de vainilla. Bs 24 normal, Bs 25 con crema o Bs 27 frozen.",
+    "precio": 24,
+    "stock": -1,
+    "etiquetas": "cafe,vainilla,latte,frozen,bebida caliente",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Café caramelo",
+    "descripcion": "Latte de caramelo. Bs 24 normal, Bs 25 con crema o Bs 27 frozen.",
+    "precio": 24,
+    "stock": -1,
+    "etiquetas": "cafe,caramelo,latte,frozen,bebida caliente",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Té",
+    "descripcion": "Té clásico, con canela, verde o negro importado (Bs 15 el importado).",
+    "precio": 11,
+    "stock": -1,
+    "etiquetas": "te,te verde,canela,infusion,bebida caliente",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Té con leche",
+    "descripcion": "Té con leche.",
+    "precio": 12,
+    "stock": -1,
+    "etiquetas": "te,te con leche,bebida caliente",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Mates a elección",
+    "descripcion": "Mate de hierbas a elección.",
+    "precio": 11,
+    "stock": -1,
+    "etiquetas": "mate,infusion,bebida caliente",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Submarino",
+    "descripcion": "Leche caliente con chocolate.",
+    "precio": 25,
+    "stock": -1,
+    "etiquetas": "submarino,chocolate caliente,leche,niños,bebida caliente",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Cupcake de chocolate",
+    "descripcion": "Cupcake de chocolate.",
+    "precio": 9,
+    "stock": -1,
+    "etiquetas": "reposteria,cupcake,chocolate,postre,dulce,merienda",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Cupcake de zanahoria",
+    "descripcion": "Cupcake de zanahoria.",
+    "precio": 9,
+    "stock": -1,
+    "etiquetas": "reposteria,cupcake,zanahoria,postre,dulce,merienda",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Chocolate chip cookie",
+    "descripcion": "Galleta con chispas de chocolate y mantequilla de maní.",
+    "precio": 9,
+    "stock": -1,
+    "etiquetas": "reposteria,galleta,cookie,chocolate,mani,dulce,merienda",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "M&M's cookie",
+    "descripcion": "Galleta con M&M's.",
+    "precio": 9,
+    "stock": -1,
+    "etiquetas": "reposteria,galleta,cookie,chocolate,dulce,merienda,niños",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Galleta de avena y pistacho",
+    "descripcion": "Galleta de avena con pistacho y frutos secos.",
+    "precio": 10,
+    "stock": -1,
+    "etiquetas": "reposteria,galleta,avena,pistacho,dulce,merienda",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Alfajor de maizena clásico",
+    "descripcion": "Alfajor de maicena clásico.",
+    "precio": 9,
+    "stock": -1,
+    "etiquetas": "reposteria,alfajor,maicena,dulce,merienda",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Alfajor de chocolate",
+    "descripcion": "Alfajor bañado en chocolate.",
+    "precio": 10,
+    "stock": -1,
+    "etiquetas": "reposteria,alfajor,chocolate,dulce,merienda",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Pukacapa tradicional",
+    "descripcion": "Rellena de queso, cebolla y hierbas.",
+    "precio": 9,
+    "stock": -1,
+    "etiquetas": "reposteria,pukacapa,queso,salado,comida boliviana,merienda",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Pukacapa gourmet",
+    "descripcion": "Rellena de queso, tomate seco y albahaca.",
+    "precio": 9,
+    "stock": -1,
+    "etiquetas": "reposteria,pukacapa,queso,salado,vegetariano,comida boliviana,merienda",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Cuñapé",
+    "descripcion": "Pancito de queso y almidón de yuca.",
+    "precio": 9,
+    "stock": -1,
+    "etiquetas": "reposteria,cuñape,queso,salado,comida boliviana,merienda",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Torta Sacher",
+    "descripcion": "Porción de torta Sacher de chocolate.",
+    "precio": 30,
+    "stock": -1,
+    "etiquetas": "reposteria,torta,chocolate,postre,dulce",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Cheesecake tradicional",
+    "descripcion": "Porción de cheesecake.",
+    "precio": 35,
+    "stock": -1,
+    "etiquetas": "reposteria,cheesecake,torta,postre,dulce",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Empanadillas de pollo y ají amarillo",
+    "descripcion": "Seis empanadillas pequeñas de pollo con ají amarillo. Picantes.",
+    "precio": 36,
+    "stock": -1,
+    "etiquetas": "entrada,empanadillas,empanadas,pollo,aji,picante,piqueo",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Tabla de Mezze Mediterránea",
+    "descripcion": "Hummus, mojo de berenjenas, aceitunas verdes y negras, tomates secos, croquetas de carne y panes pita tostados.",
+    "precio": 72,
+    "stock": -1,
+    "etiquetas": "entrada,tabla,mezze,hummus,mediterraneo,para compartir,piqueo",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Mix de mariscos",
+    "descripcion": "Calamares fritos y camarones empanizados en panko y coco.",
+    "precio": 125,
+    "stock": -1,
+    "etiquetas": "entrada,mariscos,calamares,camarones,frituras,para compartir,piqueo",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Picada de lomito",
+    "descripcion": "Lomito cortado en cubos, con papas nativas, pan de ajo, ensalada y salsas.",
+    "precio": 78,
+    "stock": -1,
+    "etiquetas": "entrada,picada,lomito,carne,res,papas,para compartir,piqueo",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Croquetas de jamón serrano",
+    "descripcion": "Seis croquetas españolas tradicionales de jamón serrano y cerdo ahumado.",
+    "precio": 49,
+    "stock": -1,
+    "etiquetas": "entrada,croquetas,jamon serrano,cerdo,piqueo",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Ensalada de Ceviche de Salmón",
+    "descripcion": "Lechugas verdes bañadas en ceviche de salmón, con tomates, palta y crocantes de camote.",
+    "precio": 62,
+    "stock": -1,
+    "etiquetas": "ensalada,ceviche,salmon,pescado,palta,liviano,almuerzo",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Ensalada Teriyaki",
+    "descripcion": "Lechuga escarola, pimientos, champiñones y arvejas chinas salteadas, palmitos, pollo al grill especiado y crocantes con ajonjolí y salsa teriyaki de la casa.",
+    "precio": 54,
+    "stock": -1,
+    "etiquetas": "ensalada,teriyaki,pollo,liviano,almuerzo",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Pita Sillpancho",
+    "descripcion": "Pan pita con sillpancho, queso mizque, cebolla, tomate, locoto, huevo frito y crocante de papas. Con ensalada o papas chips moradas caseras, y llajua.",
+    "precio": 44,
+    "stock": -1,
+    "etiquetas": "sandwich,pita,sillpancho,comida boliviana,huevo,almuerzo",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Pita Pavo",
+    "descripcion": "Pan pita con jamón de pavo ahumado, queso cheddar, palta, tomate y jalapeños. Con ensalada o papas chips moradas caseras.",
+    "precio": 40,
+    "stock": -1,
+    "etiquetas": "sandwich,pita,pavo,queso,palta,almuerzo",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Pita Vegetariano",
+    "descripcion": "Pan pita con queso crema, champiñones salteados, tomate seco, queso gouda, albahaca y lechugas. Con ensalada o papas chips moradas caseras.",
+    "precio": 40,
+    "stock": -1,
+    "etiquetas": "sandwich,pita,vegetariano,champiñones,queso,almuerzo",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Steak Chimichurri",
+    "descripcion": "Lomito de res al grill bañado en chimichurri, con ensalada y llajua. Picante. Eliges acompañamiento (puré de papa morada, quinua u orzo) y viene con pan de ajo.",
+    "precio": 85,
+    "stock": -1,
+    "etiquetas": "carne,res,lomito,steak,chimichurri,picante,almuerzo,cena",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Steak Satay",
+    "descripcion": "Lomito de res en salsa picante de locoto y maní. Eliges acompañamiento (puré de papa morada, quinua u orzo) y viene con pan de ajo.",
+    "precio": 85,
+    "stock": -1,
+    "etiquetas": "carne,res,lomito,steak,satay,mani,picante,almuerzo,cena",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Duo de Sabores",
+    "descripcion": "Filete de res coronado con camarones en salsa de vino y hinojo. Eliges acompañamiento (puré de papa morada, quinua u orzo) y viene con pan de ajo.",
+    "precio": 120,
+    "stock": -1,
+    "etiquetas": "carne,res,camarones,mariscos,mar y tierra,almuerzo,cena",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Steak en costra de roquefort",
+    "descripcion": "Steak a la plancha con costra de queso roquefort, hierbas y almendras. Eliges acompañamiento (puré de papa morada, quinua u orzo) y viene con pan de ajo.",
+    "precio": 89,
+    "stock": -1,
+    "etiquetas": "carne,res,steak,roquefort,queso,almuerzo,cena",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Beefbacon sandwich",
+    "descripcion": "Baguette con filete de res, tocino, queso gouda, tomate y lechuga.",
+    "precio": 49,
+    "stock": -1,
+    "etiquetas": "sandwich,baguette,carne,res,tocino,queso,almuerzo",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Pique Cayenna",
+    "descripcion": "El pique macho cochabambino con el toque de la casa, para 2 personas. Viene con pan de ajo.",
+    "precio": 130,
+    "stock": -1,
+    "etiquetas": "pique macho,pique,comida boliviana,cochabambino,carne,para compartir,pareja,almuerzo,cena",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Pollo en salsa Satay",
+    "descripcion": "Filete de pollo a la plancha bañado en salsa de maní, locoto y crocantes de maní. Picante. Eliges acompañamiento (puré de papa morada, quinua u orzo) y viene con pan de ajo.",
+    "precio": 75,
+    "stock": -1,
+    "etiquetas": "pollo,satay,mani,picante,almuerzo,cena",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Pollo en salsa BBQ",
+    "descripcion": "Filete de pollo al grill glaseado con salsa agridulce de BBQ. Eliges acompañamiento (puré de papa morada, quinua u orzo) y viene con pan de ajo.",
+    "precio": 75,
+    "stock": -1,
+    "etiquetas": "pollo,bbq,barbacoa,almuerzo,cena",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Falso Risotto de Camarones",
+    "descripcion": "Pasta orzo cremosa al estilo de la casa, con camarones, un toque de vino blanco y queso parmesano. Viene con pan de ajo.",
+    "precio": 114,
+    "stock": -1,
+    "etiquetas": "risotto,pasta,orzo,camarones,mariscos,almuerzo,cena",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Falso Risotto de Champiñones",
+    "descripcion": "Pasta orzo cremosa al estilo de la casa, con champiñones, un toque de vino blanco y queso parmesano. Viene con pan de ajo.",
+    "precio": 74,
+    "stock": -1,
+    "etiquetas": "risotto,pasta,orzo,champiñones,vegetariano,almuerzo,cena",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Spaghetti al Oliva",
+    "descripcion": "Spaghetti salteado en aceite de oliva con aceitunas negras y verdes, tomates secos y frescos, albahaca y queso parmesano. Viene con pan de ajo.",
+    "precio": 74,
+    "stock": -1,
+    "etiquetas": "pasta,spaghetti,fideos,vegetariano,almuerzo,cena",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Soda italiana",
+    "descripcion": "Soda italiana saborizada.",
+    "precio": 33,
+    "stock": -1,
+    "etiquetas": "soda italiana,bebida fria,bebida sin alcohol",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Caribe Frappé",
+    "descripcion": "Jugo con agua de piña y coco.",
+    "precio": 23,
+    "stock": -1,
+    "etiquetas": "jugo,piña,coco,frape,bebida sin alcohol",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Cítrico",
+    "descripcion": "Jugo con agua de maracuyá, limón y naranja.",
+    "precio": 23,
+    "stock": -1,
+    "etiquetas": "jugo,maracuya,limon,naranja,bebida sin alcohol",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Refrescante",
+    "descripcion": "Jugo con agua de manzana verde, limón y hojas de menta.",
+    "precio": 23,
+    "stock": -1,
+    "etiquetas": "jugo,manzana,limon,menta,bebida sin alcohol",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Mojito Santo",
+    "descripcion": "Jugo de limón con Sprite y hierba buena, sin alcohol.",
+    "precio": 23,
+    "stock": -1,
+    "etiquetas": "jugo,mojito,limon,hierba buena,sin alcohol,bebida sin alcohol",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Maracuyá Santo",
+    "descripcion": "Jugo de maracuyá con Sprite y hierba buena, sin alcohol.",
+    "precio": 23,
+    "stock": -1,
+    "etiquetas": "jugo,maracuya,hierba buena,sin alcohol,bebida sin alcohol",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Exótico",
+    "descripcion": "Jugo de naranja, zanahoria y betarraga.",
+    "precio": 23,
+    "stock": -1,
+    "etiquetas": "jugo,naranja,zanahoria,betarraga,bebida sin alcohol",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Trío Naranja",
+    "descripcion": "Jugo de mango, naranja y papaya.",
+    "precio": 23,
+    "stock": -1,
+    "etiquetas": "jugo,mango,naranja,papaya,bebida sin alcohol",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Jugos clásicos",
+    "descripcion": "Limonada, piña, piña con hierba buena o té helado.",
+    "precio": 23,
+    "stock": -1,
+    "etiquetas": "jugo,limonada,piña,te helado,bebida sin alcohol",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Manjar de Frutilla",
+    "descripcion": "Jugo con leche de frutilla, leche natural y dulce de leche.",
+    "precio": 25,
+    "stock": -1,
+    "etiquetas": "jugo con leche,licuado,batido,frutilla,dulce de leche,bebida sin alcohol",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Duplo",
+    "descripcion": "Jugo con leche de plátano y frutilla.",
+    "precio": 25,
+    "stock": -1,
+    "etiquetas": "jugo con leche,licuado,batido,platano,frutilla,bebida sin alcohol",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Chuqui",
+    "descripcion": "Jugo de tumbo con leche.",
+    "precio": 25,
+    "stock": -1,
+    "etiquetas": "jugo con leche,licuado,batido,tumbo,bebida sin alcohol",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Pasión de Frutos Rojos",
+    "descripcion": "Jugo con leche de frutos rojos.",
+    "precio": 25,
+    "stock": -1,
+    "etiquetas": "jugo con leche,licuado,batido,frutos rojos,bebida sin alcohol",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  },
+  {
+    "tienda": "Cayenna Bistro Café",
+    "nombre": "Gaseosas y agua",
+    "descripcion": "Pepsi, Pepsi Black, Seven Up, Guaraná Antártica, Coca-Cola (normal o sin azúcar), Fanta, Sprite (normal o sin azúcar) y agua mineral con o sin gas.",
+    "precio": 15,
+    "stock": -1,
+    "etiquetas": "gaseosa,refresco,soda,agua,coca cola,pepsi,sprite,fanta,bebida sin alcohol",
+    "fuente": "Carta de Cayenna Bistro Café (Mall, noviembre)"
+  }
+]

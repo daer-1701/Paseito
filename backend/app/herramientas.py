@@ -9,9 +9,10 @@ from typing import Optional
 from sqlmodel import Session, select
 
 from . import puntos
-from .config import ZONA_HORARIA
+from .config import FRONTEND_DIR, ZONA_HORARIA
 from .models import Evento, Faq, Producto, Promocion, Tienda
 
+CARPETA_FOTOS = "img/locales"
 LIMITE_LUGARES = 6
 LIMITE_PRODUCTOS = 8
 LIMITE_PROMOCIONES = 6
@@ -120,7 +121,16 @@ def lugar_dict(t: Tienda) -> dict:
         "whatsapp": t.whatsapp,
         "instagram": t.instagram,
         "logo_url": t.logo_url,
+        "foto": foto_local(t),
     }
+
+
+def foto_local(t: Tienda) -> Optional[str]:
+    """Ruta, relativa al frontend, de la foto del local: frontend/img/locales/<nombre-en-minusculas>.jpg."""
+    if not FRONTEND_DIR:
+        return None
+    ruta = f"{CARPETA_FOTOS}/{re.sub(r'[^a-z0-9]+', '-', normalizar(t.nombre)).strip('-')}.jpg"
+    return ruta if (FRONTEND_DIR / ruta).is_file() else None
 
 
 def _texto_horario(t: Tienda) -> str:
@@ -138,8 +148,9 @@ def producto_dict(p: Producto, t: Optional[Tienda]) -> dict:
         "nombre": p.nombre,
         "descripcion": p.descripcion,
         "precio_bs": p.precio,
-        "disponible": p.stock > 0,
-        "stock": p.stock,
+        # stock -1: plato preparado al momento, sin control de stock
+        "disponible": p.stock != 0,
+        "stock": p.stock if p.stock >= 0 else None,
         "tienda": None if t is None else {
             "id": t.id, "nombre": t.nombre, "piso": t.piso, "local": t.local, "sector": t.sector,
         },
@@ -223,7 +234,7 @@ def buscar_productos(db: Session, palabras_clave: Optional[list] = None,
         if puntaje > 0:
             puntuados.append((puntaje, p, t))
 
-    puntuados.sort(key=lambda x: (-x[0], not x[1].stock > 0, x[1].precio))
+    puntuados.sort(key=lambda x: (-x[0], x[1].stock == 0, x[1].precio))
     return {
         "resultados": [producto_dict(p, t) for _, p, t in puntuados[:LIMITE_PRODUCTOS]],
         "total_encontrados": len(puntuados),
@@ -392,7 +403,8 @@ DECLARACIONES = [
         "type": "function",
         "name": "buscar_productos",
         "description": (
-            "Busca productos disponibles en las tiendas del Paseo con su precio en bolivianos, "
+            "Busca productos disponibles en las tiendas del Paseo, incluidos los platos, postres "
+            "y bebidas de la carta de los restaurantes, con su precio en bolivianos, "
             "disponibilidad y la tienda donde se venden."
         ),
         "parameters": {

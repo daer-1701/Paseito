@@ -42,9 +42,13 @@
   #reloj { text-align: right; line-height: 1.1; }
   #reloj b { font-size: 1.25rem; font-variant-numeric: tabular-nums; }
   #reloj small { display: block; color: var(--tenue); font-size: .75rem; text-transform: capitalize; }
-  #nueva { border: 1px solid var(--borde); background: rgba(255, 255, 255, .08); border-radius: 12px; padding: 8px 12px; font-size: .85rem; }
-  #nueva:hover { background: rgba(255, 255, 255, .16); }
+  #nueva, #ayuda-boton { border: 1px solid var(--borde); background: rgba(255, 255, 255, .08); border-radius: 12px; padding: 8px 12px; font-size: .85rem; }
+  #nueva:hover, #ayuda-boton:hover { background: rgba(255, 255, 255, .16); }
+  #conexion { display: flex; align-items: center; gap: 6px; font-size: .75rem; color: var(--tenue); }
   .punto { width: 9px; height: 9px; border-radius: 50%; background: var(--verde); box-shadow: 0 0 10px var(--verde); }
+  #conexion.caido { color: #ff9b9b; }
+  #conexion.caido .punto { background: #e74c3c; box-shadow: 0 0 10px #e74c3c; }
+  :focus-visible { outline: 3px solid var(--oro-claro); outline-offset: 2px; }
 
   /* ---------- paneles laterales ---------- */
   .panel { position: fixed; top: var(--arriba); bottom: var(--margen); width: var(--panel); border-radius: 22px; padding: 16px;
@@ -69,12 +73,16 @@
   .nombres li.activa { background: var(--oro); color: var(--vino-oscuro); }
 
   #tarjetas { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 4px 4px 4px 0; perspective: 900px; }
-  #tarjetas:empty::before { content: "Pregúntame algo y aquí verás las tiendas, comidas y eventos que encuentre."; color: var(--tenue); font-size: .88rem; line-height: 1.5; }
+  #tarjetas:empty::before { content: "Pregúntame algo y aquí verás las tiendas, comidas y eventos que encuentre. Toca un local para ver su foto y precios.";
+                            color: var(--tenue); font-size: .88rem; line-height: 1.5; }
   .tarjeta { position: relative; display: grid; grid-template-columns: 46px 1fr; gap: 12px; padding: 12px; border-radius: 16px;
              background: linear-gradient(135deg, rgba(255, 255, 255, .13), rgba(255, 255, 255, .04)); border: 1px solid var(--borde);
-             transform-style: preserve-3d; transition: transform .15s ease-out, box-shadow .2s; cursor: pointer;
+             transform-style: preserve-3d; transition: transform .15s ease-out, box-shadow .2s;
              animation: entra .55s cubic-bezier(.2, .9, .3, 1.2) both; animation-delay: calc(var(--n) * 70ms); }
-  .tarjeta:hover { box-shadow: 0 14px 30px rgba(0, 0, 0, .35), 0 0 0 1px var(--oro) inset; }
+  .tarjeta.abre { cursor: pointer; }
+  .tarjeta.abre:hover, .tarjeta.abre:focus-visible { box-shadow: 0 14px 30px rgba(0, 0, 0, .35), 0 0 0 1px var(--oro) inset; }
+  #pista-tarjetas { color: var(--tenue); font-weight: 400; letter-spacing: .4px; }
+  #pista-tarjetas[hidden] { display: none; }
   @keyframes entra { from { opacity: 0; transform: rotateY(-55deg) translateX(40px); } }
   .icono { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; font-size: 1.45rem;
            background: linear-gradient(135deg, var(--vino), var(--vino-oscuro)); border: 1px solid rgba(231, 183, 58, .5);
@@ -88,6 +96,66 @@
   .chip.abierto { background: var(--verde); }
   .chip.cerrado { background: #c0392b; }
   .chip.puntos { background: linear-gradient(135deg, #f7d774, #e0a526); color: var(--vino-oscuro); }
+  .icono img { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
+  .tarjeta.abre .info b::after { content: " ›"; color: var(--oro); }
+
+  /* ---------- ficha del local: foto y carta con precios ---------- */
+  #ficha, #ayuda, #lector { position: fixed; inset: 0; z-index: 7; display: grid; place-items: center; padding: var(--margen);
+                            background: rgba(20, 5, 15, .55); animation: aparece .25s ease-out; }
+  #ficha[hidden], #ayuda[hidden], #lector[hidden] { display: none; }
+  #lector article { position: relative; width: min(620px, 100%); max-height: 100%; overflow-y: auto; padding: 22px; border-radius: 24px;
+                    display: flex; flex-direction: column; gap: 14px; background: rgba(24, 10, 20, .9); }
+  #lector h3 { margin: 0 44px 0 0; font-size: 1.4rem; }
+  #lector .camara { position: relative; aspect-ratio: 4 / 3; border-radius: 18px; overflow: hidden; background: #000; }
+  #lector.sin-camara .camara { display: none; }
+  #lector video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+  #lector .marco { position: absolute; inset: 14% 24%; border: 3px solid var(--oro); border-radius: 18px;
+                   box-shadow: 0 0 0 999px rgba(0, 0, 0, .35); overflow: hidden; }
+  #lector .marco::after { content: ""; position: absolute; left: 0; right: 0; height: 3px; background: var(--oro-claro);
+                          box-shadow: 0 0 12px var(--oro-claro); animation: escaneo 2s infinite ease-in-out; }
+  @keyframes escaneo { 0%, 100% { top: 6%; } 50% { top: 92%; } }
+  #lector-estado { margin: 0; color: var(--oro-claro); font-weight: 700; text-align: center; }
+  #lector form { display: flex; flex-wrap: wrap; gap: 8px; }
+  #lector form label { flex-basis: 100%; color: var(--tenue); font-size: .85rem; }
+  #lector-codigo { flex: 1; min-width: 0; padding: 11px 14px; border-radius: 12px; border: 1px solid var(--borde); background: rgba(255, 255, 255, .08);
+                   color: var(--crema); font: inherit; letter-spacing: 2px; text-transform: uppercase; }
+  #lector form button { padding: 11px 16px; border-radius: 12px; border: none; font-weight: 700; color: var(--vino-oscuro);
+                        background: linear-gradient(135deg, var(--oro-claro), var(--oro)); }
+  #lector form button:disabled { opacity: .45; cursor: default; }
+  #lector .cerrar { position: absolute; top: 14px; right: 14px; width: 42px; height: 42px; border-radius: 50%; border: none; font-size: 1.1rem; background: rgba(0, 0, 0, .45); }
+  #ayuda article { position: relative; width: min(560px, 100%); max-height: 100%; overflow-y: auto; padding: 24px; border-radius: 24px;
+                   background: rgba(24, 10, 20, .9); }
+  #ayuda h3 { margin: 0 44px 14px 0; font-size: 1.4rem; }
+  #ayuda ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+  #ayuda li { display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: start; line-height: 1.45; }
+  #ayuda li > span { font-size: 1.4rem; text-align: center; }
+  #ayuda kbd { padding: 1px 6px; border-radius: 6px; border: 1px solid var(--borde); background: rgba(255, 255, 255, .1); font: inherit; font-size: .85em; }
+  #ayuda .ejemplos { margin-top: 16px; color: var(--tenue); font-size: .9rem; }
+  #ayuda .ejemplos button { margin: 6px 6px 0 0; border: 1px solid var(--borde); background: rgba(255, 255, 255, .07); border-radius: 999px; padding: 7px 11px; }
+  #ayuda .cerrar { position: absolute; top: 14px; right: 14px; width: 42px; height: 42px; border-radius: 50%; border: none; font-size: 1.1rem; background: rgba(0, 0, 0, .45); }
+  #ficha article { position: relative; width: min(940px, 100%); height: min(760px, 100%); display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+                   border-radius: 24px; overflow: hidden; background: rgba(24, 10, 20, .88); }
+  #ficha .portada { position: relative; display: grid; place-items: center; font-size: 5rem;
+                    background: linear-gradient(160deg, var(--vino), var(--vino-oscuro)); }
+  #ficha .portada img.foto { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  #ficha .portada img.logo { max-width: 70%; max-height: 40%; object-fit: contain; border-radius: 16px; background: #fff; padding: 12px; }
+  #ficha .cuerpo { display: flex; flex-direction: column; gap: 10px; min-height: 0; padding: 22px 22px 18px; }
+  #ficha h3 { margin: 0; padding-right: 44px; font-size: 1.6rem; }
+  #ficha .sub { color: var(--tenue); font-size: .9rem; }
+  #ficha h4 { margin: 6px 0 0; font-size: .74rem; letter-spacing: 1.6px; color: var(--oro); }
+  #ficha .carta { flex: 1; min-height: 0; overflow-y: auto; list-style: none; margin: 0; padding: 0 6px 0 0; display: grid; align-content: start; gap: 2px; }
+  #ficha .carta li { display: grid; grid-template-columns: 1fr auto; column-gap: 12px; padding: 9px 10px; border-radius: 12px; }
+  #ficha .carta li:nth-child(odd) { background: rgba(255, 255, 255, .05); }
+  #ficha .carta b { font-size: .98rem; }
+  #ficha .carta .precio { font-weight: 800; color: var(--oro-claro); white-space: nowrap; }
+  #ficha .carta small { grid-column: 1 / -1; color: var(--tenue); font-size: .8rem; line-height: 1.35; margin-top: 2px; }
+  #ficha .carta li.agotado { opacity: .5; }
+  #ficha .vacio { color: var(--tenue); line-height: 1.5; }
+  #ficha .acciones { display: flex; gap: 10px; }
+  #ficha .acciones button { flex: 1; padding: 12px; border-radius: 14px; border: 1px solid var(--borde); background: rgba(255, 255, 255, .08); font-weight: 700; }
+  #ficha .acciones .llegar { border: none; color: var(--vino-oscuro); background: linear-gradient(135deg, var(--oro-claro), var(--oro)); }
+  #ficha .cerrar { position: absolute; top: 14px; right: 14px; z-index: 1; width: 42px; height: 42px; border-radius: 50%; border: none;
+                   font-size: 1.1rem; background: rgba(0, 0, 0, .45); }
 
   /* ---------- conversación ---------- */
   .chat { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 4px; }
@@ -132,6 +200,7 @@
   #texto::placeholder { color: var(--tenue); }
   #enviar { flex: none; width: 48px; height: 48px; border-radius: 50%; border: none; background: var(--vino); font-size: 1.2rem; }
   #enviar:hover { background: #962a4e; }
+  #enviar:disabled { opacity: .4; cursor: default; background: var(--vino); }
   #estado { flex: none; font-size: .8rem; color: var(--oro-claro); white-space: nowrap; }
   #estado:empty { display: none; }
 
@@ -151,6 +220,7 @@
   #aviso { position: fixed; top: calc(var(--arriba) + 6px); left: 50%; transform: translate(-50%, -20px); padding: 10px 18px; border-radius: 14px;
            z-index: 6; opacity: 0; transition: all .3s; pointer-events: none; }
   #aviso.visible { opacity: 1; transform: translate(-50%, 0); }
+  #aviso.error { border-color: var(--rojo); background: rgba(90, 10, 25, .85); }
 
   /* pantallas bajas: la torre de pisos cede su lugar a las tarjetas */
   @media (max-height: 660px) {
@@ -165,7 +235,7 @@
   /* vertical o angosta: resultados arriba, conversación y micrófono abajo */
   @media (max-width: 900px) {
     :root { --panel: 0px; }
-    #reloj small, .marca small { display: none; }
+    #reloj small, .marca small, #conexion small { display: none; }
     #resultados { left: var(--margen); right: var(--margen); bottom: auto; width: auto; height: 116px; padding: 10px; }
     #resultados h2, .torre { display: none; }
     #tarjetas { flex-direction: row; overflow-x: auto; overflow-y: hidden; }
@@ -176,6 +246,7 @@
     #sugerencias button { flex: none; }
     #controles { left: var(--margen); right: var(--margen); max-width: none; }
     body.modo-2d #avatar2d { left: 0; right: 0; top: 140px; bottom: calc(clamp(170px, 25vh, 300px) + 110px); }
+    #ficha article { grid-template-columns: 1fr; grid-template-rows: 30vh minmax(0, 1fr); }
   }
 </style>
 </head>
@@ -189,9 +260,10 @@
     <div><b>Paseito</b><small>Asistente del Paseo Aranjuez · Cochabamba</small></div>
   </div>
   <div class="derecha">
-    <button id="nueva" title="Empezar de nuevo">↺ Nueva conversación</button>
+    <button id="ayuda-boton" title="Cómo usar Paseito" aria-haspopup="dialog">❔ Ayuda</button>
+    <button id="nueva" title="Borra esta conversación y empieza de cero">↺ Nueva conversación</button>
     <div id="reloj"><b>--:--</b><small></small></div>
-    <div class="punto" title="En línea"></div>
+    <div id="conexion" role="status" title="Conexión con el asistente"><span class="punto"></span><small>En línea</small></div>
   </div>
 </header>
 
@@ -214,15 +286,15 @@
     <div class="escenario"><div class="pisos" id="capas"></div></div>
     <ul class="nombres" id="nombres-pisos"></ul>
   </div>
-  <h2>LO QUE ENCONTRÉ</h2>
+  <h2>LO QUE ENCONTRÉ <span id="pista-tarjetas" hidden>· toca un local para ver más</span></h2>
   <div id="tarjetas"></div>
 </aside>
 
 <div id="controles" class="vidrio">
   <button id="microfono" title="Hablar (barra espaciadora)"><span class="onda"></span><span class="onda"></span><span class="onda"></span>🎤</button>
-  <input id="texto" placeholder="Escribe o toca el micrófono…" autocomplete="off">
-  <span id="estado"></span>
-  <button id="enviar" title="Enviar">➤</button>
+  <input id="texto" placeholder="Escribe o toca el micrófono…" autocomplete="off" maxlength="1000" aria-label="Escribe tu pregunta">
+  <span id="estado" role="status"></span>
+  <button id="enviar" title="Enviar (Enter)" aria-label="Enviar" disabled>➤</button>
 </div>
 
 <div id="inicio">
@@ -230,7 +302,53 @@
   <p>Tu asistente del Paseo Aranjuez. Pregúntame lo que necesites.</p>
   <div class="boton">Toca para empezar 👆</div>
 </div>
-<div id="aviso" class="vidrio"></div>
+<div id="aviso" class="vidrio" role="alert"></div>
+<div id="lector" hidden>
+  <article class="vidrio" role="dialog" aria-modal="true" aria-labelledby="lector-titulo">
+    <button class="cerrar" title="Cancelar (Esc)" aria-label="Cancelar">✕</button>
+    <h3 id="lector-titulo">🎟️ Mis cupones</h3>
+    <div class="camara"><video id="lector-video" playsinline muted></video><div class="marco"></div></div>
+    <p id="lector-estado" role="status"></p>
+    <form id="lector-manual" autocomplete="off">
+      <label for="lector-codigo">¿Sin cámara? Escribe el código que aparece bajo el QR del cupón:</label>
+      <input id="lector-codigo" maxlength="11" placeholder="ABCDE-12345" spellcheck="false">
+      <button type="submit" disabled>Verificar</button>
+    </form>
+  </article>
+</div>
+<div id="ayuda" hidden>
+  <article class="vidrio" role="dialog" aria-modal="true" aria-labelledby="ayuda-titulo">
+    <button class="cerrar" title="Cerrar (Esc)" aria-label="Cerrar">✕</button>
+    <h3 id="ayuda-titulo">Cómo usar Paseito</h3>
+    <ul>
+      <li><span>🎤</span><div><b>Habla:</b> toca el micrófono (o <kbd>Espacio</kbd>) y haz tu pregunta. Paseito te escucha hasta que dejas de hablar.</div></li>
+      <li><span>⌨️</span><div><b>Escribe:</b> escribe tu pregunta y toca ➤ (o <kbd>Enter</kbd>).</div></li>
+      <li><span>👆</span><div><b>Toca un local</b> en "Lo que encontré" para ver su foto, su menú o productos con precios, y cómo llegar.</div></li>
+      <li><span>✋</span><div><b>Interrumpe</b> cuando quieras: toca el micrófono, a Paseito o <kbd>Esc</kbd>.</div></li>
+      <li><span>📷</span><div><b>Mira tus cupones:</b> toca "Lee mi QR" y muestra a la cámara tu QR de cliente de la app de Paseo Points (ves todos tus cupones) o el QR de un cupón.</div></li>
+      <li><span>↺</span><div><b>Nueva conversación</b> borra lo hablado. Si nadie usa el kiosco por 90 segundos, Paseito se despide y empieza de nuevo.</div></li>
+    </ul>
+    <div class="ejemplos">Prueba con:<br>
+      <button data-p="¿Dónde puedo comer paella?">¿Dónde puedo comer paella?</button>
+      <button data-p="Tengo 50 bolivianos para un regalo">Tengo 50 Bs para un regalo</button>
+      <button data-p="¿Qué está abierto ahora?">¿Qué está abierto ahora?</button>
+    </div>
+  </article>
+</div>
+<div id="ficha" hidden>
+  <article class="vidrio" role="dialog" aria-modal="true" aria-labelledby="ficha-nombre">
+    <button class="cerrar" title="Cerrar (Esc)" aria-label="Cerrar">✕</button>
+    <div class="portada"></div>
+    <div class="cuerpo">
+      <h3 id="ficha-nombre"></h3>
+      <div class="sub"></div>
+      <div class="chips"></div>
+      <h4></h4>
+      <ul class="carta"></ul>
+      <div class="acciones"><button class="llegar">🧭 ¿Cómo llego?</button><button class="volver">Cerrar</button></div>
+    </div>
+  </article>
+</div>
 
 <script type="module">
 const SALUDO = "¡Hola! Soy Paseito, y conozco el Paseo Aranjuez de punta a punta. ¿Qué andas buscando hoy?";
@@ -243,8 +361,8 @@ const ESPERAS = [
 const INICIAL = "¡Hola! Pregúntame lo que quieras del Paseo: tiendas, comida, eventos o servicios.";
 const SUGERENCIAS = [
   ["🍽️", "¿Dónde puedo comer?"], ["☕", "Quiero tomar un café"], ["🎁", "Busco un regalo"],
-  ["🅿️", "¿Dónde estaciono?"], ["📅", "¿Qué eventos hay hoy?"], ["⭐", "¿Cuántos puntos tengo?"],
-  ["🕒", "¿Qué está abierto ahora?"],
+  ["📷", "Lee mi QR", "lector"], ["🅿️", "¿Dónde estaciono?"], ["📅", "¿Qué eventos hay hoy?"],
+  ["⭐", "¿Cuántos puntos tengo?"], ["🕒", "¿Qué está abierto ahora?"],
 ];
 const PISOS = [
   ["5", "Quinto y más"], ["4", "Cuarto piso"], ["3", "Tercer piso"], ["2", "Segundo piso"],
@@ -300,12 +418,30 @@ function estado(texto, modo = "normal") {
 }
 
 let temporizadorAviso;
-function aviso(texto) {
+function aviso(texto, error = false) {
   $("aviso").textContent = texto;
   $("aviso").classList.add("visible");
+  $("aviso").classList.toggle("error", error);
   clearTimeout(temporizadorAviso);
-  temporizadorAviso = setTimeout(() => $("aviso").classList.remove("visible"), 3500);
+  // los errores traen qué hacer; necesitan más tiempo de lectura
+  temporizadorAviso = setTimeout(() => $("aviso").classList.remove("visible"), error ? 7000 : 3500);
 }
+
+// ---------- Conexión con el asistente ----------
+function marcarConexion(ok) {
+  $("conexion").classList.toggle("caido", !ok);
+  $("conexion").querySelector("small").textContent = ok ? "En línea" : "Sin conexión";
+}
+async function revisarConexion() {
+  try {
+    const r = await fetch(`${API}/salud`, { cache: "no-store" });
+    marcarConexion(r.ok);
+  } catch {
+    marcarConexion(false);
+  }
+}
+revisarConexion();
+setInterval(revisarConexion, 30_000);
 
 function oyente(texto) {
   $("oyente").textContent = texto || "";
@@ -322,12 +458,22 @@ function relojBolivia() {
 relojBolivia();
 setInterval(relojBolivia, 15_000);
 
-$("sugerencias").innerHTML = SUGERENCIAS.map(([icono, texto]) => `<button data-p="${texto}">${icono} ${texto}</button>`).join("");
-$("sugerencias").onclick = (e) => { const b = e.target.closest("button"); if (b) preguntar(b.dataset.p); };
+$("sugerencias").innerHTML = SUGERENCIAS
+  .map(([icono, texto, accion]) => `<button data-p="${texto}"${accion ? ` data-accion="${accion}"` : ""}>${icono} ${texto}</button>`).join("");
+$("sugerencias").onclick = (e) => {
+  const b = e.target.closest("button");
+  if (b?.dataset.accion === "lector") abrirLector();
+  else if (b) preguntar(b.dataset.p);
+};
 
 // ---------- Torre de pisos ----------
 $("capas").innerHTML = PISOS.map(([clave], i) => `<div class="capa" data-piso="${clave}" style="--i:${PISOS.length - 1 - i}"></div>`).join("");
 $("nombres-pisos").innerHTML = PISOS.map(([clave, nombre]) => `<li data-piso="${clave}">${nombre}<span></span></li>`).join("");
+
+// Mismos nombres que la torre de pisos, en singular para un local.
+function nombrePiso(clave) {
+  return { 5: "Quinto piso", S: "Semisótano" }[clave] ?? PISOS.find(([c]) => c === clave)?.[1] ?? "";
+}
 
 function clavePiso(texto = "") {
   const t = String(texto ?? "").toLowerCase().trim();
@@ -361,11 +507,14 @@ const ICONOS = [
   [/perfum|cosmét|cuidado|maquill/, "💄"], [/artesan|madera|boliv/, "🧶"], [/lencer|interior/, "🩱"],
   [/mochila|accesorio/, "👜"], [/ropa|jeans|moda/, "👗"], [/oficina|cowork/, "🏢"], [/arte|galer/, "🖼️"],
 ];
-const ICONOS_TIPO = { recompensa: "🎁", mision: "🎯", nivel: "🏅", puntos: "⭐" };
+const ICONOS_TIPO = { recompensa: "🎁", mision: "🎯", nivel: "🏅", puntos: "⭐", cupon: "🎟️" };
+const ESTADOS_CUPON = { vigente: ["abierto", "Vigente"], canjeado: ["", "Ya usado"], vencido: ["cerrado", "Vencido"], cancelado: ["cerrado", "Cancelado"] };
+const fechaLarga = (s) => new Date(s.replace(" ", "T")).toLocaleDateString("es-BO", { day: "numeric", month: "long" });
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 const miles = (n) => Number(n).toLocaleString("es-BO");
 
 function icono(t) {
+  if (t.foto) return `<img src="${esc(t.foto)}" alt="" loading="lazy">`;
   if (ICONOS_TIPO[t.tipo]) return ICONOS_TIPO[t.tipo];
   if (t.tipo === "evento") return "🎤";
   if (t.tipo === "promocion") return "🏷️";
@@ -379,7 +528,7 @@ function tarjetaHtml(t, n) {
   const u = t.ubicacion || t.tienda || {};
   const piso = clavePiso(u.piso);
   const chips = [];
-  if (piso) chips.push(`<span class="chip piso">${piso === "PB" ? "Planta baja" : piso === "S" ? "Semisótano" : "Piso " + piso}</span>`);
+  if (piso) chips.push(`<span class="chip piso">${nombrePiso(piso)}</span>`);
   if (u.local) chips.push(`<span class="chip">Local ${esc(u.local)}</span>`);
   if (t.abierto_ahora != null) chips.push(`<span class="chip ${t.abierto_ahora ? "abierto" : "cerrado"}">${t.abierto_ahora ? "Abierto" : "Cerrado"}</span>`);
   let titulo = t.nombre, detalle = t.categoria || u.sector || "";
@@ -400,9 +549,22 @@ function tarjetaHtml(t, n) {
     detalle = "Paseo Points";
     chips.push(`<span class="chip puntos">${miles(t.saldo)} pts</span>`);
   }
+  if (t.tipo === "cupon") {
+    titulo = t.titulo;
+    detalle = t.nombre || "Paseo Points";
+    const [clase, texto] = ESTADOS_CUPON[t.estado] || ["", t.estado];
+    chips.unshift(`<span class="chip ${clase}">${texto}</span>`);
+    if (t.canjeado_el) chips.push(`<span class="chip">Usado el ${esc(fechaLarga(t.canjeado_el))}</span>`);
+  }
   if (t.puntos && t.tipo === "evento") chips.push(`<span class="chip puntos">+${miles(t.puntos)} pts</span>`);
   const extra = t.horario ? `<small>🕒 ${esc(t.horario)}</small>` : "";
-  return `<div class="tarjeta" style="--n:${n}" data-piso="${piso || ""}" data-nombre="${esc(t.nombre || titulo)}" data-tipo="${esc(t.tipo)}">
+  // Locales de Paseito (id numérico con ubicacion) y lo que pertenece a uno (productos, promociones, cupones)
+  // abren la ficha de ese local; las recompensas de Paseo Points traen ubicacion pero no son un local de aquí.
+  const lugar = t.ubicacion && Number.isInteger(t.id) ? t.id : t.tienda?.id;
+  const abre = lugar != null
+    ? ` role="button" tabindex="0" title="Ver foto, precios y cómo llegar" data-lugar="${esc(lugar)}"`
+    : "";
+  return `<div class="tarjeta${abre ? " abre" : ""}"${abre} style="--n:${n}" data-piso="${piso || ""}" data-nombre="${esc(t.nombre || titulo)}" data-tipo="${esc(t.tipo)}">
     <div class="icono">${icono(t)}</div>
     <div class="info"><b>${esc(titulo)}</b><small>${esc(detalle)}</small>${extra}<div class="chips">${chips.join("")}</div></div>
   </div>`;
@@ -418,6 +580,7 @@ function mostrarTarjetas(tarjetas) {
     if (p) cuentasPisos[p] = (cuentasPisos[p] || 0) + 1;
   }
   marcarPisos(cuentasPisos);
+  $("pista-tarjetas").hidden = !$("tarjetas").querySelector(".abre");
 }
 
 $("tarjetas").addEventListener("pointermove", (e) => {
@@ -434,9 +597,286 @@ $("tarjetas").addEventListener("pointerout", (e) => {
   if (tarjeta && !tarjeta.contains(e.relatedTarget)) { tarjeta.style.transform = ""; marcarPisos(cuentasPisos); }
 });
 $("tarjetas").addEventListener("click", (e) => {
-  const tarjeta = e.target.closest(".tarjeta");
-  if (tarjeta?.dataset.tipo === "lugar") preguntar(`¿Cómo llego a ${tarjeta.dataset.nombre}?`);
+  const tarjeta = e.target.closest(".tarjeta.abre");
+  if (tarjeta) abrirFicha(tarjeta.dataset.lugar);
 });
+$("tarjetas").addEventListener("keydown", (e) => {
+  const tarjeta = e.target.closest(".tarjeta.abre");
+  if (tarjeta && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); abrirFicha(tarjeta.dataset.lugar); }
+});
+
+// ---------- Diálogos (ficha y ayuda): el foco entra al abrir y vuelve a donde estaba al cerrar ----------
+let focoPrevio = null;
+const DIALOGOS = ["ficha", "ayuda", "lector"];
+const dialogoAbierto = () => DIALOGOS.some((id) => !$(id).hidden);
+function abrirDialogo(id) {
+  if (!dialogoAbierto()) focoPrevio = document.activeElement;
+  if (id !== "lector") detenerCamara();
+  for (const otro of DIALOGOS) $(otro).hidden = otro !== id;
+  $(id).querySelector(".cerrar").focus({ preventScroll: true });
+}
+function cerrarDialogo(id) {
+  if ($(id).hidden) return;
+  $(id).hidden = true;
+  if (focoPrevio?.isConnected && focoPrevio !== $("texto")) focoPrevio.focus({ preventScroll: true });
+  focoPrevio = null;
+}
+
+// ---------- Ficha del local: foto, datos y carta con precios ----------
+let fichaPedida = 0;
+let fichaNombre = "";
+const ficha = (selector) => $("ficha").querySelector(selector);
+
+async function abrirFicha(id) {
+  const mia = ++fichaPedida;
+  ultimaActividad = Date.now();
+  ficha(".portada").innerHTML = "";
+  ficha("h3").textContent = "Cargando…";
+  for (const s of [".sub", ".chips", "h4"]) ficha(s).innerHTML = "";
+  ficha(".carta").innerHTML = `<li class="vacio"><span class="pensando"><span></span><span></span><span></span></span></li>`;
+  abrirDialogo("ficha");
+  try {
+    const r = await fetch(`${API}/lugares/${encodeURIComponent(id)}`);
+    if (!r.ok) throw new Error(r.status);
+    const lugar = await r.json();
+    if (mia === fichaPedida) pintarFicha(lugar);
+  } catch (error) {
+    console.warn("Ficha del local falló", error);
+    if (mia === fichaPedida) {
+      cerrarFicha();
+      aviso("No pude abrir la ficha del local. Revisa la conexión y vuelve a tocarlo.", true);
+      revisarConexion();
+    }
+  }
+}
+
+function pintarFicha(l) {
+  fichaNombre = l.nombre;
+  const u = l.ubicacion || {};
+  const piso = clavePiso(u.piso);
+  ficha(".portada").innerHTML = l.foto
+    ? `<img class="foto" src="${esc(l.foto)}" alt="Fachada de ${esc(l.nombre)}">`
+    : l.logo_url ? `<img class="logo" src="${esc(l.logo_url)}" alt="Logo de ${esc(l.nombre)}">` : icono(l);
+  const logo = ficha(".portada img.logo");
+  if (logo) logo.onerror = () => { ficha(".portada").innerHTML = icono(l); };
+  ficha("h3").textContent = l.nombre;
+  ficha(".sub").textContent = [l.categoria, u.sector, u.referencia].filter(Boolean).join(" · ");
+  const chips = [];
+  if (piso) chips.push(`<span class="chip piso">${nombrePiso(piso)}</span>`);
+  if (u.local) chips.push(`<span class="chip">Local ${esc(u.local)}</span>`);
+  if (l.abierto_ahora != null) chips.push(`<span class="chip ${l.abierto_ahora ? "abierto" : "cerrado"}">${l.abierto_ahora ? "Abierto" : "Cerrado"}</span>`);
+  if (l.horario) chips.push(`<span class="chip">🕒 ${esc(l.horario)}${l.horario_confirmado === false ? " (aprox.)" : ""}</span>`);
+  for (const p of l.promociones || []) chips.push(`<span class="chip puntos">🏷️ ${esc(p.titulo)}</span>`);
+  ficha(".chips").innerHTML = chips.join("");
+
+  const productos = l.productos || [];
+  ficha("h4").textContent = l.tipo === "restaurante" ? "MENÚ" : "PRODUCTOS Y PRECIOS";
+  ficha(".carta").innerHTML = productos.length
+    ? productos.map((p) => `<li class="${p.disponible ? "" : "agotado"}">
+        <b>${esc(p.nombre)}</b><span class="precio">Bs ${miles(p.precio_bs)}</span>
+        ${p.descripcion || !p.disponible ? `<small>${esc(p.descripcion)}${p.disponible ? "" : " · Agotado"}</small>` : ""}
+      </li>`).join("")
+    : `<li class="vacio">Todavía no tengo su ${l.tipo === "restaurante" ? "menú" : "catálogo"} con precios.${l.telefono ? ` Puedes consultarles al ${esc(l.telefono)}.` : ""}</li>`;
+  ficha(".carta").scrollTop = 0;
+}
+
+function cerrarFicha() {
+  fichaPedida++;
+  cerrarDialogo("ficha");
+}
+
+$("ficha").addEventListener("click", (e) => {
+  if (e.target === $("ficha") || e.target.closest(".cerrar, .volver")) cerrarFicha();
+  else if (e.target.closest(".llegar")) { const nombre = fichaNombre; cerrarFicha(); preguntar(`¿Cómo llego a ${nombre}?`); }
+  ultimaActividad = Date.now();
+});
+ficha(".carta").addEventListener("scroll", () => { ultimaActividad = Date.now(); }, { passive: true });
+
+// ---------- Ayuda ----------
+$("ayuda-boton").onclick = () => { ultimaActividad = Date.now(); abrirDialogo("ayuda"); };
+$("ayuda").addEventListener("click", (e) => {
+  const ejemplo = e.target.closest("[data-p]");
+  if (e.target === $("ayuda") || e.target.closest(".cerrar")) cerrarDialogo("ayuda");
+  else if (ejemplo) { cerrarDialogo("ayuda"); preguntar(ejemplo.dataset.p); }
+});
+
+// ---------- Cupones: lector del QR que muestra la app de Paseo Points ----------
+// Chrome en Windows no trae BarcodeDetector; jsQR lee el QR de los cuadros del video.
+const LECTOR_MAX_MS = 45_000;
+const LECTOR_CADA_MS = 150;
+const LECTOR_ANCHO = 640;
+let camara = null;
+let jsQRListo = null;
+
+function cargarJsQR() {
+  jsQRListo ??= new Promise((ok, falla) => {
+    const s = document.createElement("script");
+    s.src = "vendor/jsqr/jsQR.js";
+    s.onload = ok;
+    s.onerror = () => { jsQRListo = null; falla(new Error("jsQR")); };
+    document.head.append(s);
+  });
+  return jsQRListo;
+}
+
+function detenerCamara() {
+  camara?.getTracks().forEach((t) => t.stop());
+  camara = null;
+  $("lector-video").srcObject = null;
+}
+
+function cerrarLector() {
+  detenerCamara();
+  cerrarDialogo("lector");
+}
+
+async function abrirLector() {
+  if (enBienvenida) salirBienvenida(false);
+  callar();
+  ultimaActividad = Date.now();
+  $("lector").classList.remove("sin-camara");
+  $("lector-codigo").value = "";
+  $("lector-manual").querySelector("button").disabled = true;
+  $("lector-estado").textContent = "Abriendo la cámara… si el navegador pregunta, toca Permitir.";
+  abrirDialogo("lector");
+  try {
+    await cargarJsQR();
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
+    if ($("lector").hidden) { stream.getTracks().forEach((t) => t.stop()); return; }
+    camara = stream;
+    $("lector-video").srcObject = stream;
+    await $("lector-video").play();
+    $("lector-estado").textContent = "Muestra tu QR de cliente (o el de un cupón) dentro del recuadro";
+    buscarQR(stream);
+  } catch (e) {
+    console.warn("Lector QR sin cámara", e);
+    $("lector").classList.add("sin-camara");
+    $("lector-estado").textContent = e.name === "NotAllowedError"
+      ? "No tengo permiso para usar la cámara. Escribe el código del cupón."
+      : "No pude abrir la cámara. Escribe el código del cupón.";
+    $("lector-codigo").focus();
+  }
+}
+
+function buscarQR(stream) {
+  const video = $("lector-video");
+  const lienzo = document.createElement("canvas");
+  const ctx = lienzo.getContext("2d", { willReadFrequently: true });
+  const inicio = performance.now();
+  let ultimo = 0;
+  const paso = (ahora) => {
+    if (camara !== stream) return;
+    if (ahora - inicio > LECTOR_MAX_MS) {
+      cerrarLector();
+      aviso("No alcancé a ver un QR. Toca \"Lee mi QR\" para intentar otra vez.", true);
+      return;
+    }
+    if (ahora - ultimo > LECTOR_CADA_MS && video.videoWidth) {
+      ultimo = ahora;
+      const escala = Math.min(1, LECTOR_ANCHO / video.videoWidth);
+      lienzo.width = Math.round(video.videoWidth * escala);
+      lienzo.height = Math.round(video.videoHeight * escala);
+      ctx.drawImage(video, 0, 0, lienzo.width, lienzo.height);
+      const qr = window.jsQR(ctx.getImageData(0, 0, lienzo.width, lienzo.height).data, lienzo.width, lienzo.height);
+      if (qr?.data) {
+        cerrarLector();
+        verificarCupon(qr.data);
+        return;
+      }
+    }
+    requestAnimationFrame(paso);
+  };
+  requestAnimationFrame(paso);
+}
+
+$("lector").addEventListener("click", (e) => {
+  if (e.target === $("lector") || e.target.closest(".cerrar")) cerrarLector();
+  ultimaActividad = Date.now();
+});
+$("lector-codigo").addEventListener("input", (e) => {
+  e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, "");
+  $("lector-manual").querySelector("button").disabled = !/^[A-Z0-9]{5}-[A-Z0-9]{5}$/.test(e.target.value);
+});
+$("lector-manual").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const codigo = $("lector-codigo").value;
+  cerrarLector();
+  verificarCupon(codigo);
+});
+
+const bolivianos = (texto) => texto.replace(/Bs (\d+(?:[.,]\d+)?)/g, "$1 bolivianos");
+// "Descuento de Bs 20" va en minúscula dentro de la frase; "Classic Roll gratis" es un nombre y se queda igual.
+const beneficioHablado = (titulo) => (/^Descuento\b/.test(titulo) ? titulo.charAt(0).toLowerCase() + titulo.slice(1) : titulo);
+
+/** Lo que dice Paseito del cupón leído: estado, dónde se usa y si tiene más cupones vigentes. */
+function resumenCupon({ cliente, cupon: c, otros_cupones: otros = [] }) {
+  const beneficio = beneficioHablado(c.titulo);
+  const donde = c.nombre ? ` en ${c.nombre}` : "";
+  const piso = clavePiso((c.tienda || c.ubicacion || {}).piso);
+  const frases = [cliente ? `¡Listo, ${cliente}!` : "¡Listo!"];
+  if (c.estado === "vigente") {
+    frases.push(`Tu cupón de ${beneficio}${donde} está vigente.`);
+    const enPiso = piso === "PB" ? "en planta baja" : piso ? `en el ${nombrePiso(piso).toLowerCase()}` : "";
+    frases.push(`Para usarlo, muestra este mismo QR al pagar${enPiso ? `; el local está ${enPiso}` : ""}.`);
+  } else if (c.estado === "canjeado") {
+    frases.push(`Ese cupón de ${beneficio}${donde} ya fue usado${c.canjeado_el ? ` el ${fechaLarga(c.canjeado_el)}` : ""}.`);
+  } else if (c.estado === "vencido") {
+    frases.push(`Uy, ese cupón de ${beneficio}${donde} ya venció.`);
+  } else {
+    frases.push(`Ese cupón${donde} fue cancelado.`);
+  }
+  if (otros.length) frases.push(otros.length === 1 ? "Además tienes otro cupón vigente." : `Además tienes ${otros.length} cupones vigentes más.`);
+  return bolivianos(frases.join(" "));
+}
+
+/** Con el QR de cliente: cuántos cupones vigentes tiene, cuáles y su saldo de puntos. */
+function resumenCliente({ cliente, saldo_puntos: saldo, vigentes }) {
+  const frases = [cliente ? `¡Hola, ${cliente}!` : "¡Hola!"];
+  const cupon = (c) => `${beneficioHablado(c.titulo)}${c.nombre ? ` en ${c.nombre}` : ""}`;
+  if (!vigentes.length) {
+    frases.push("Ahora no tienes cupones vigentes.");
+    if (saldo > 0) frases.push(`Tienes ${miles(saldo)} puntos para canjear por recompensas en la app de Paseo Points.`);
+  } else {
+    if (vigentes.length === 1) frases.push(`Tienes un cupón vigente: ${cupon(vigentes[0])}.`);
+    else {
+      const nombres = vigentes.slice(0, 3).map(cupon);
+      const lista = nombres.length > 1 ? `${nombres.slice(0, -1).join(", ")} y ${nombres.at(-1)}` : nombres[0];
+      frases.push(`Tienes ${vigentes.length} cupones vigentes${vigentes.length > 3 ? "; los más nuevos son" : ":"} ${lista}.`);
+    }
+    frases.push("Para usarlos, abre el cupón en la app y muestra su QR al pagar.");
+    if (saldo > 0) frases.push(`Y te quedan ${miles(saldo)} puntos.`);
+  }
+  return bolivianos(frases.join(" "));
+}
+
+async function verificarCupon(codigo) {
+  ultimaActividad = Date.now();
+  callar();
+  oyente("🎟️ Mis cupones");
+  pensando();
+  estado("Revisando tu cupón…", "pensando");
+  try {
+    const r = await fetch(`${API}/cupones/verificar`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ codigo }),
+    });
+    const datos = await r.json();
+    if (!r.ok) throw new Error(datos.detail || r.status);
+    estado("", "normal");
+    if (datos.error) {
+      await hablar(datos.error);
+      return;
+    }
+    mostrarTarjetas(datos.resultados);
+    await hablar(datos.modo === "cliente" ? resumenCliente(datos) : resumenCupon(datos), { presentar: true });
+  } catch (error) {
+    console.warn("Verificación de cupón falló", error);
+    estado("", "normal");
+    pintarSubtitulo(["Uy, no pude revisar tu cupón ahora."]);
+    progresoFrase(0, 1);
+    aviso("No pude conectar con Paseo Points. Toca \"Lee mi QR\" para intentar otra vez.", true);
+    revisarConexion();
+  }
+}
 
 // ---------- Subtítulos sincronizados ----------
 function dividirFrases(texto) {
@@ -540,7 +980,7 @@ async function hablar(texto, { presentar = false, audios } = {}) {
       let url = null;
       try { url = await audios[i]; } catch { /* esa frase va con la voz del navegador */ }
       if (miTurno !== turno) return;
-      estado("");
+      estado("🔊 Toca 🎤 para interrumpir");
       if (i === 0 && presentar) señalarTarjetas();
       const alProgresar = (f) => progresoFrase(i, f);
       if (url) await avatar.hablarAudio(url, { alProgresar, texto: frases[i] });
@@ -548,7 +988,7 @@ async function hablar(texto, { presentar = false, audios } = {}) {
     }
     if (miTurno === turno) avatar.sonreir?.(1, 2500);
   } finally {
-    if (miTurno === turno) { hablando = false; ultimaActividad = Date.now(); }
+    if (miTurno === turno) { hablando = false; ultimaActividad = Date.now(); estado(""); }
     for (const a of audios) a.then((url) => [...vocesListas.values()].includes(url) || URL.revokeObjectURL(url), () => {});
   }
 }
@@ -569,9 +1009,18 @@ function callar() {
 }
 
 // ---------- Conversación ----------
+// "Lee mi QR", "verificar mis cupones"…: abre el lector en vez de preguntarle a Gemini.
+const PIDE_LECTOR = /\b(mis?|verificar|validar|revisar|leer|escanear)\b.*\b(cup[oó]n(es)?|qr)\b|\bqr\b/i;
+
 async function preguntar(texto) {
   texto = (texto || "").trim();
   if (!texto) return;
+  if (PIDE_LECTOR.test(texto)) {
+    oyente(texto);
+    abrirLector();
+    hablar("¡Claro! Muéstrame tu QR de cliente de la app frente a la cámara.");
+    return;
+  }
   if (enBienvenida) salirBienvenida(false);
   ultimaActividad = Date.now();
   callar();
@@ -607,18 +1056,28 @@ async function preguntar(texto) {
     estado("", "normal");
     pintarSubtitulo(["Uy, se me cortó la conexión. ¿Me lo repites?"]);
     progresoFrase(0, 1);
-    aviso("No pude conectar con el asistente");
+    // La pregunta queda escrita para reintentar con un toque, sin volver a dictarla.
+    $("texto").value = texto;
+    actualizarEnviar();
+    aviso("No pude conectar con el asistente. Tu pregunta quedó escrita: toca ➤ para reintentar.", true);
+    revisarConexion();
   }
 }
 
-$("enviar").onclick = () => { preguntar($("texto").value); $("texto").value = ""; };
+const actualizarEnviar = () => { $("enviar").disabled = !$("texto").value.trim(); };
+$("texto").oninput = actualizarEnviar;
+$("enviar").onclick = () => { preguntar($("texto").value); $("texto").value = ""; actualizarEnviar(); };
 $("texto").onkeydown = (e) => { if (e.key === "Enter") $("enviar").click(); };
 
 async function reiniciar() {
   callar();
   if (sessionId) fetch(`${API}/chat/${sessionId}`, { method: "DELETE" }).catch(() => {});
   sessionId = null;
+  cerrarFicha();
+  cerrarDialogo("ayuda");
+  cerrarLector();
   $("tarjetas").innerHTML = "";
+  $("pista-tarjetas").hidden = true;
   cuentasPisos = {};
   marcarPisos({});
   oyente("");
@@ -672,10 +1131,10 @@ for (const id of ["escena3d", "avatar2d"]) {
 // Primero el reconocimiento del navegador (Chrome/Edge, con texto en vivo). Si no existe o no tiene servicio
 // (p. ej. navegadores embebidos sin acceso a los servidores de Google), se graba aquí y Gemini transcribe en /voz/escuchar.
 const Reconocimiento = window.SpeechRecognition || window.webkitSpeechRecognition;
-const SIN_SERVICIO = ["network", "service-not-allowed", "language-not-supported"];
 const ERRORES_MICROFONO = {
   "not-allowed": "Permite el micrófono: toca el candado junto a la dirección",
   "audio-capture": "No encuentro un micrófono conectado",
+  "no-speech": "No te escuché. Acércate al micrófono y toca 🎤 otra vez, o escribe tu pregunta",
   NotAllowedError: "Permite el micrófono: toca el candado junto a la dirección",
   NotFoundError: "No encuentro un micrófono conectado",
   NotReadableError: "Otro programa está usando el micrófono",
@@ -685,7 +1144,8 @@ const SILENCIO_FIN_MS = 1300;
 const ESPERA_SIN_VOZ_MS = 7000;
 const MAX_GRABACION_MS = 15000;
 
-let modoMicrofono = Reconocimiento ? "navegador" : "servidor";
+// ?mic=servidor fuerza la grabación + Gemini aunque el navegador tenga reconocimiento propio.
+let modoMicrofono = Reconocimiento && new URLSearchParams(location.search).get("mic") !== "servidor" ? "navegador" : "servidor";
 let escuchando = false;
 let preparando = false;
 let detenerGrabacion = null;
@@ -707,28 +1167,36 @@ function marcarEscucha(activo) {
 }
 
 let rec = null;
+// Texto parcial que aún no se envió: si el reconocimiento se corta sin resultado final, se pregunta igual.
+let parcial = "";
 if (Reconocimiento) {
   rec = new Reconocimiento();
   rec.lang = "es-BO";
   rec.interimResults = true;
-  rec.onstart = () => marcarEscucha(true);
-  rec.onend = () => { if (modoMicrofono === "navegador") marcarEscucha(false); };
+  rec.onstart = () => { parcial = ""; marcarEscucha(true); };
+  rec.onend = () => {
+    if (modoMicrofono !== "navegador") return;
+    marcarEscucha(false);
+    if (parcial.trim()) preguntar(parcial);
+    parcial = "";
+  };
   rec.onerror = (e) => {
-    if (SIN_SERVICIO.includes(e.error)) {
-      console.info("Reconocimiento del navegador sin servicio (%s); uso Gemini en el servidor", e.error);
-      modoMicrofono = "servidor";
-      marcarEscucha(false);
-      escucharConServidor();
-    } else if (ERRORES_MICROFONO[e.error]) {
-      aviso(ERRORES_MICROFONO[e.error]);
-    }
+    console.warn("Reconocimiento del navegador: %s", e.error);
+    if (e.error === "aborted") return;
+    if (ERRORES_MICROFONO[e.error]) return aviso(ERRORES_MICROFONO[e.error], true);
+    // network, service-not-allowed, language-not-supported u otro: transcribe Gemini en el servidor
+    modoMicrofono = "servidor";
+    parcial = "";
+    marcarEscucha(false);
+    escucharConServidor();
   };
   rec.onresult = (e) => {
     ultimaActividad = Date.now();
     const r = e.results[e.results.length - 1];
     oyente(r[0].transcript);
     asentirDeVezEnCuando();
-    if (r.isFinal) preguntar(r[0].transcript);
+    if (r.isFinal) { parcial = ""; preguntar(r[0].transcript); }
+    else parcial = r[0].transcript;
   };
 }
 
@@ -763,7 +1231,7 @@ async function transcribir(trozos, tipo, ctx) {
   } catch (error) {
     console.warn("Transcripción falló", error);
     estado("");
-    aviso("No pude entender el audio, intenta de nuevo");
+    aviso("No pude entender el audio. Toca 🎤 para intentar de nuevo o escribe tu pregunta.", true);
   } finally {
     ctx.close();
   }
@@ -776,7 +1244,7 @@ async function escucharConServidor() {
   try {
     stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
   } catch (e) {
-    aviso(ERRORES_MICROFONO[e.name] || "No pude abrir el micrófono");
+    aviso(ERRORES_MICROFONO[e.name] || "No pude abrir el micrófono. Puedes escribir tu pregunta abajo.", true);
     return;
   } finally {
     preparando = false;
@@ -810,7 +1278,7 @@ async function escucharConServidor() {
     marcarEscucha(false);
     if (!hablo) {
       ctx.close();
-      aviso("No te escuché. Revisa que el micrófono de Windows correcto esté activo");
+      aviso(ERRORES_MICROFONO["no-speech"], true);
       return;
     }
     transcribir(trozos, grabadora.mimeType, ctx);
@@ -853,7 +1321,18 @@ if (!navigator.mediaDevices?.getUserMedia && !Reconocimiento) {
 }
 $("microfono").onclick = alternar;
 addEventListener("keydown", (e) => {
-  if (e.code === "Space" && document.activeElement !== $("texto")) { e.preventDefault(); alternar(); }
+  if (e.key === "Escape") {
+    // Esc deshace lo último en curso: cierra el diálogo, deja de escuchar o hace callar a Paseito.
+    if (!$("ficha").hidden) cerrarFicha();
+    else if (!$("ayuda").hidden) cerrarDialogo("ayuda");
+    else if (!$("lector").hidden) cerrarLector();
+    else if (escuchando) alternar();
+    else if (hablando) { callar(); estado(""); }
+    return;
+  }
+  // Espacio abre el micrófono salvo que esté escribiendo, en un botón o tarjeta, o con un diálogo abierto.
+  const enControl = document.activeElement?.closest?.("input, button, [tabindex]");
+  if (e.code === "Space" && !enControl && !dialogoAbierto()) { e.preventDefault(); alternar(); }
 });
 </script>
 </body>

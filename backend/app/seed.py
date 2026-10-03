@@ -4,18 +4,24 @@
   y guardado en app/datos/lugares.json (editable a mano para completar locales y horarios).
 - Eventos: cronograma oficial de la Hackathon By Paseo 2026.
 - Preguntas frecuentes: sitio oficial, Pulso Empresarial, Los Tiempos, Google Maps/Waze.
-Productos y promociones quedan vacíos hasta relevarlos con cada tienda.
+- Productos: app/datos/productos.json, relevados de menús y catálogos de cada tienda. Se agregan en cada
+  arranque los que falten, así que basta con sumarlos al archivo. stock -1 = plato preparado, sin control de stock.
+Las promociones quedan vacías hasta relevarlas con cada tienda.
 """
 
 import json
+import logging
 from datetime import date
 from pathlib import Path
 
 from sqlmodel import Session, select
 
-from .models import Evento, Faq, Tienda
+from .models import Evento, Faq, Producto, Tienda
 
 LUGARES_JSON = Path(__file__).resolve().parent / "datos" / "lugares.json"
+PRODUCTOS_JSON = Path(__file__).resolve().parent / "datos" / "productos.json"
+log = logging.getLogger("jarvis")
+CAMPOS_PRODUCTO = {"nombre", "descripcion", "precio", "stock", "etiquetas"}
 
 EVENTOS = [
     dict(nombre="Hackathon By Paseo 2026: inauguración y presentación de retos",
@@ -96,3 +102,24 @@ def sembrar(db: Session) -> bool:
     db.add_all([Faq(pregunta=p, respuesta=r, etiquetas=e) for p, r, e in FAQS])
     db.commit()
     return True
+
+
+def sembrar_productos(db: Session) -> int:
+    """Agrega los productos de productos.json que aún no están (por tienda y nombre). Devuelve cuántos sumó."""
+    if not PRODUCTOS_JSON.exists():
+        return 0
+    tiendas = {t.nombre.lower(): t.id for t in db.exec(select(Tienda)).all()}
+    existentes = {(p.tienda_id, p.nombre.lower()) for p in db.exec(select(Producto)).all()}
+    nuevos = []
+    for item in json.loads(PRODUCTOS_JSON.read_text(encoding="utf-8")):
+        tienda_id = tiendas.get(item["tienda"].lower())
+        if tienda_id is None:
+            log.warning("productos.json: no existe la tienda %r", item["tienda"])
+            continue
+        if (tienda_id, item["nombre"].lower()) in existentes:
+            continue
+        nuevos.append(Producto(tienda_id=tienda_id, **{k: v for k, v in item.items() if k in CAMPOS_PRODUCTO}))
+        existentes.add((tienda_id, item["nombre"].lower()))
+    db.add_all(nuevos)
+    db.commit()
+    return len(nuevos)
