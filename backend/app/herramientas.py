@@ -1,12 +1,14 @@
 """Herramientas que el agente puede invocar. Toda cifra o dato que Paseito menciona sale de aquí."""
 
 import difflib
+import re
 import unicodedata
 from datetime import date, datetime, timedelta
 from typing import Optional
 
 from sqlmodel import Session, select
 
+from . import puntos
 from .config import ZONA_HORARIA
 from .models import Evento, Faq, Producto, Promocion, Tienda
 
@@ -312,8 +314,11 @@ HERRAMIENTAS = {
     "ver_eventos": ver_eventos,
     "ubicar_lugar": ubicar_lugar,
     "info_general": info_general,
+    "programa_puntos": puntos.programa_puntos,
+    "mis_puntos": puntos.mis_puntos,
 }
 
+# Las filas de Paseo Points traen su propio "tipo" (recompensa, mision, nivel...), que prevalece.
 TIPO_TARJETA = {
     "buscar_lugares": "lugar",
     "ubicar_lugar": "lugar",
@@ -321,7 +326,23 @@ TIPO_TARJETA = {
     "ver_promociones": "promocion",
     "ver_eventos": "evento",
     "info_general": "info",
+    "programa_puntos": "puntos",
+    "mis_puntos": "puntos",
 }
+
+# Datos personales que no se guardan en la analítica ni se devuelven al frontend.
+ARGUMENTOS_PRIVADOS = {"mis_puntos": {"celular", "correo"}}
+
+
+def ocultar_dato(texto: str) -> str:
+    """Enmascara celulares y correos: '71234567' -> '•••••567'."""
+    texto = re.sub(r"[\w.+-]+@[\w-]+\.[\w.]+", "•••@•••", texto or "")
+    return re.sub(r"\d[\d\s-]{5,}\d", lambda m: "•" * (len(m.group()) - 3) + m.group()[-3:], texto)
+
+
+def argumentos_para_registro(nombre: str, argumentos: dict) -> dict:
+    privados = ARGUMENTOS_PRIVADOS.get(nombre, set())
+    return {k: (ocultar_dato(str(v)) if k in privados and v else v) for k, v in argumentos.items()}
 
 
 def ejecutar(nombre: str, argumentos: dict, db: Session) -> dict:
@@ -437,3 +458,39 @@ DECLARACIONES = [
         },
     },
 ]
+
+DECLARACIONES_PUNTOS = [
+    {
+        "type": "function",
+        "name": "programa_puntos",
+        "description": (
+            "Paseo Points, el programa de fidelización del Paseo: cómo se ganan puntos, niveles (Bronce, Plata, Oro...), "
+            "recompensas canjeables con su costo, promociones de puntos extra, misiones y eventos que dan puntos."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "tema": {"type": "string", "enum": puntos.TEMAS,
+                         "description": "Qué parte del programa consultar; 'todo' si es una pregunta general."},
+            },
+        },
+    },
+    {
+        "type": "function",
+        "name": "mis_puntos",
+        "description": (
+            "Saldo de Paseo Points de la persona que conversa: puntos, nivel, recompensas que ya puede canjear, "
+            "cuánto le falta para la siguiente y misiones en curso. Úsala solo con el celular o correo que la "
+            "persona dio como suyo en esta conversación; si no lo dio, pídeselo antes."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "celular": {"type": "string", "description": "Celular registrado, solo dígitos."},
+                "correo": {"type": "string", "description": "Correo registrado (alternativa al celular)."},
+            },
+        },
+    },
+]
+if puntos.configurado():
+    DECLARACIONES += DECLARACIONES_PUNTOS

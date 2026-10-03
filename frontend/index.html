@@ -87,6 +87,7 @@
   .chip.piso { background: var(--oro); color: var(--vino-oscuro); }
   .chip.abierto { background: var(--verde); }
   .chip.cerrado { background: #c0392b; }
+  .chip.puntos { background: linear-gradient(135deg, #f7d774, #e0a526); color: var(--vino-oscuro); }
 
   /* ---------- conversación ---------- */
   .chat { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 4px; }
@@ -200,7 +201,7 @@
     <div id="oyente"></div>
     <div id="subtitulo">
       <div class="quien">✦ PASEITO</div>
-      <div id="texto-respuesta">¡Hola! Pregúntame por tiendas, comida, eventos o servicios del Paseo.</div>
+      <div id="texto-respuesta">¡Hola! Pregúntame lo que quieras del Paseo: tiendas, comida, eventos o servicios.</div>
     </div>
   </div>
   <h2>PUEDES PREGUNTARME</h2>
@@ -232,11 +233,18 @@
 <div id="aviso" class="vidrio"></div>
 
 <script type="module">
-const SALUDO = "¡Hola! Soy Paseito, tu asistente del Paseo Aranjuez. ¿En qué te puedo ayudar hoy?";
-const DESPEDIDA = "¡Gracias por tu visita! Vuelve pronto al Paseo Aranjuez.";
+const SALUDO = "¡Hola! Soy Paseito, y conozco el Paseo Aranjuez de punta a punta. ¿Qué andas buscando hoy?";
+const DESPEDIDA = "Bueno, me quedo por aquí. ¡Gracias por visitarnos, vuelve prontito!";
+// Lo que dice mientras Gemini piensa (3-5 s): [ms desde la pregunta, frases posibles].
+const ESPERAS = [
+  [400, ["Mmm, a ver.", "A ver, déjame ver.", "Un segundito.", "Ya, déjame revisar.", "A ver, a ver.", "Dame un ratito."]],
+  [4200, ["Ya casi.", "Ya casi lo tengo.", "Un ratito más."]],
+];
+const INICIAL = "¡Hola! Pregúntame lo que quieras del Paseo: tiendas, comida, eventos o servicios.";
 const SUGERENCIAS = [
   ["🍽️", "¿Dónde puedo comer?"], ["☕", "Quiero tomar un café"], ["🎁", "Busco un regalo"],
-  ["🅿️", "¿Dónde estaciono?"], ["📅", "¿Qué eventos hay hoy?"], ["🕒", "¿Qué está abierto ahora?"],
+  ["🅿️", "¿Dónde estaciono?"], ["📅", "¿Qué eventos hay hoy?"], ["⭐", "¿Cuántos puntos tengo?"],
+  ["🕒", "¿Qué está abierto ahora?"],
 ];
 const PISOS = [
   ["5", "Quinto y más"], ["4", "Cuarto piso"], ["3", "Tercer piso"], ["2", "Segundo piso"],
@@ -322,8 +330,9 @@ $("capas").innerHTML = PISOS.map(([clave], i) => `<div class="capa" data-piso="$
 $("nombres-pisos").innerHTML = PISOS.map(([clave, nombre]) => `<li data-piso="${clave}">${nombre}<span></span></li>`).join("");
 
 function clavePiso(texto = "") {
-  const t = texto.toLowerCase();
-  if (t.includes("planta baja")) return "PB";
+  const t = String(texto ?? "").toLowerCase().trim();
+  if (/^[1-5]$/.test(t)) return t;
+  if (t === "pb" || t.includes("planta baja")) return "PB";
   if (t.includes("primer")) return "1";
   if (t.includes("segundo")) return "2";
   if (t.includes("tercer")) return "3";
@@ -334,7 +343,7 @@ function clavePiso(texto = "") {
 }
 
 function marcarPisos(cuentas, activo = null) {
-  for (const el of document.querySelectorAll("[data-piso]")) {
+  for (const el of document.querySelectorAll("#capas [data-piso], #nombres-pisos [data-piso]")) {
     const n = cuentas[el.dataset.piso] || 0;
     el.classList.toggle("con", n > 0);
     el.classList.toggle("activa", el.dataset.piso === activo);
@@ -352,7 +361,12 @@ const ICONOS = [
   [/perfum|cosmét|cuidado|maquill/, "💄"], [/artesan|madera|boliv/, "🧶"], [/lencer|interior/, "🩱"],
   [/mochila|accesorio/, "👜"], [/ropa|jeans|moda/, "👗"], [/oficina|cowork/, "🏢"], [/arte|galer/, "🖼️"],
 ];
+const ICONOS_TIPO = { recompensa: "🎁", mision: "🎯", nivel: "🏅", puntos: "⭐" };
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+const miles = (n) => Number(n).toLocaleString("es-BO");
+
 function icono(t) {
+  if (ICONOS_TIPO[t.tipo]) return ICONOS_TIPO[t.tipo];
   if (t.tipo === "evento") return "🎤";
   if (t.tipo === "promocion") return "🏷️";
   if (t.tipo === "producto") return "🛍️";
@@ -366,18 +380,31 @@ function tarjetaHtml(t, n) {
   const piso = clavePiso(u.piso);
   const chips = [];
   if (piso) chips.push(`<span class="chip piso">${piso === "PB" ? "Planta baja" : piso === "S" ? "Semisótano" : "Piso " + piso}</span>`);
-  if (u.local) chips.push(`<span class="chip">Local ${u.local}</span>`);
+  if (u.local) chips.push(`<span class="chip">Local ${esc(u.local)}</span>`);
   if (t.abierto_ahora != null) chips.push(`<span class="chip ${t.abierto_ahora ? "abierto" : "cerrado"}">${t.abierto_ahora ? "Abierto" : "Cerrado"}</span>`);
   let titulo = t.nombre, detalle = t.categoria || u.sector || "";
   if (t.tipo === "producto") detalle = `Bs ${t.precio_bs} · ${t.tienda?.nombre || ""}`;
   if (t.tipo === "promocion") { titulo = t.titulo; detalle = t.tienda?.nombre || t.descripcion || ""; }
   if (t.tipo === "evento") detalle = `${t.fecha} · ${t.hora_inicio || ""} · ${t.lugar || ""}`;
   if (t.tipo === "info") { titulo = t.pregunta; detalle = t.respuesta || ""; }
-  const extra = t.horario ? `<small>🕒 ${t.horario}</small>` : "";
-  const nombre = (t.nombre || titulo || "").replace(/"/g, "&quot;");
-  return `<div class="tarjeta" style="--n:${n}" data-piso="${piso || ""}" data-nombre="${nombre}" data-tipo="${t.tipo}">
+  if (t.tipo === "recompensa") {
+    titulo = t.titulo;
+    detalle = t.nombre || "";
+    chips.unshift(`<span class="chip puntos">${miles(t.costo_puntos)} pts</span>`);
+    if (t.nivel_minimo) chips.push(`<span class="chip">Nivel ${esc(t.nivel_minimo)}</span>`);
+  }
+  if (t.tipo === "mision") { detalle = t.descripcion || ""; chips.push(`<span class="chip puntos">+${miles(t.puntos)} pts</span>`); }
+  if (t.tipo === "nivel") detalle = `Desde ${miles(t.estatus_minimo)} de estatus · puntos x${t.multiplicador}`;
+  if (t.tipo === "puntos") {
+    titulo = `${t.nombre} · Nivel ${t.nivel || ""}`;
+    detalle = "Paseo Points";
+    chips.push(`<span class="chip puntos">${miles(t.saldo)} pts</span>`);
+  }
+  if (t.puntos && t.tipo === "evento") chips.push(`<span class="chip puntos">+${miles(t.puntos)} pts</span>`);
+  const extra = t.horario ? `<small>🕒 ${esc(t.horario)}</small>` : "";
+  return `<div class="tarjeta" style="--n:${n}" data-piso="${piso || ""}" data-nombre="${esc(t.nombre || titulo)}" data-tipo="${esc(t.tipo)}">
     <div class="icono">${icono(t)}</div>
-    <div class="info"><b>${titulo || ""}</b><small>${detalle}</small>${extra}<div class="chips">${chips.join("")}</div></div>
+    <div class="info"><b>${esc(titulo)}</b><small>${esc(detalle)}</small>${extra}<div class="chips">${chips.join("")}</div></div>
   </div>`;
 }
 
@@ -415,7 +442,8 @@ $("tarjetas").addEventListener("click", (e) => {
 function dividirFrases(texto) {
   const unidas = [];
   for (const f of texto.split(/(?<=[.!?…])\s+/).map((s) => s.trim()).filter(Boolean)) {
-    if (unidas.length && unidas[unidas.length - 1].length < 40) unidas[unidas.length - 1] += " " + f;
+    // La primera frase va sola: la voz tarda lo mismo con 3 que con 30 palabras, y así empieza a hablar antes.
+    if (unidas.length > 1 && unidas[unidas.length - 1].length < 40) unidas[unidas.length - 1] += " " + f;
     else unidas.push(f);
   }
   return unidas;
@@ -441,10 +469,48 @@ function pensando() {
 }
 
 // ---------- Voz ----------
-async function pedirAudio(texto) {
+async function pedirAudioRed(texto) {
   const r = await fetch(`${API}/voz`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ texto }) });
   if (!r.ok) throw new Error(r.status);
   return URL.createObjectURL(await r.blob());
+}
+
+// frase -> Promise<url> ya pedida; vocesListas guarda las que ya llegaron.
+const vocesPedidas = new Map();
+const vocesListas = new Map();
+function precargarVoz(texto) {
+  for (const frase of dividirFrases(texto)) {
+    if (vocesPedidas.has(frase)) continue;
+    const pedido = pedirAudioRed(frase);
+    vocesPedidas.set(frase, pedido);
+    pedido.then((url) => vocesListas.set(frase, url), () => vocesPedidas.delete(frase));
+  }
+}
+const pedirAudio = (texto) => vocesPedidas.get(texto) ?? pedirAudioRed(texto);
+
+setTimeout(() => {
+  precargarVoz(SALUDO);
+  precargarVoz(DESPEDIDA);
+  for (const [, frases] of ESPERAS) frases.forEach(precargarVoz);
+}, 1500);
+
+const dormir = (ms) => new Promise((ok) => setTimeout(ok, Math.max(0, ms)));
+const ultimaEspera = new Map();
+
+/** Muletillas mientras llega la respuesta; solo usa audios ya descargados para no sumar demora. */
+async function acompañarEspera(respuesta, miTurno) {
+  let llego = false;
+  respuesta.then(() => {}, () => {}).finally(() => { llego = true; });
+  const inicio = performance.now();
+  for (const [desde, frases] of ESPERAS) {
+    await dormir(desde - (performance.now() - inicio));
+    if (llego || miTurno !== turno) return;
+    const opciones = frases.filter((f) => vocesListas.has(f) && f !== ultimaEspera.get(frases));
+    const frase = opciones[Math.floor(Math.random() * opciones.length)];
+    if (!frase) continue;
+    ultimaEspera.set(frases, frase);
+    await avatar.hablarAudio(vocesListas.get(frase), { texto: frase }).catch(() => {});
+  }
 }
 
 function vozNavegador(texto, alProgresar) {
@@ -463,11 +529,11 @@ function vozNavegador(texto, alProgresar) {
   });
 }
 
-async function hablar(texto, { presentar = false } = {}) {
+async function hablar(texto, { presentar = false, audios } = {}) {
   const miTurno = ++turno;
   const frases = dividirFrases(texto);
   pintarSubtitulo(frases);
-  const audios = frases.map((f) => pedirAudio(f));
+  audios ??= frases.map((f) => pedirAudio(f));
   hablando = true;
   try {
     for (let i = 0; i < frases.length; i++) {
@@ -483,6 +549,7 @@ async function hablar(texto, { presentar = false } = {}) {
     if (miTurno === turno) avatar.sonreir?.(1, 2500);
   } finally {
     if (miTurno === turno) { hablando = false; ultimaActividad = Date.now(); }
+    for (const a of audios) a.then((url) => [...vocesListas.values()].includes(url) || URL.revokeObjectURL(url), () => {});
   }
 }
 
@@ -508,26 +575,37 @@ async function preguntar(texto) {
   if (enBienvenida) salirBienvenida(false);
   ultimaActividad = Date.now();
   callar();
+  const miTurno = turno;
   oyente(texto);
   pensando();
   estado("Pensando…", "pensando");
   avatar.gesto("pensar");
-  try {
-    const r = await fetch(`${API}/chat`, {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mensaje: texto, session_id: sessionId }),
-    });
+  const respuesta = fetch(`${API}/chat`, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ mensaje: texto, session_id: sessionId }),
+  }).then(async (r) => {
     const datos = await r.json();
     if (!r.ok) throw new Error(datos.detail || r.status);
+    return datos;
+  });
+  const espera = acompañarEspera(respuesta, miTurno);
+  try {
+    const datos = await respuesta;
     sessionId = datos.session_id;
+    // la voz de la respuesta se pide ya, mientras termina la muletilla
+    const audios = dividirFrases(datos.respuesta).map(pedirAudio);
+    await espera;
+    if (miTurno !== turno) return;
     avatar.gesto("normal");
     estado("", "normal");
     if (datos.tarjetas.length) mostrarTarjetas(datos.tarjetas);
-    await hablar(datos.respuesta, { presentar: datos.tarjetas.length > 0 });
+    await hablar(datos.respuesta, { presentar: datos.tarjetas.length > 0, audios });
   } catch (error) {
+    await espera;
+    if (miTurno !== turno) return;
     avatar.gesto("normal");
     estado("", "normal");
-    pintarSubtitulo(["Disculpa, tuve un problema. ¿Puedes repetirlo?"]);
+    pintarSubtitulo(["Uy, se me cortó la conexión. ¿Me lo repites?"]);
     progresoFrase(0, 1);
     aviso("No pude conectar con el asistente");
   }
@@ -544,7 +622,7 @@ async function reiniciar() {
   cuentasPisos = {};
   marcarPisos({});
   oyente("");
-  pintarSubtitulo(["¡Hola! Pregúntame por tiendas, comida, eventos o servicios del Paseo."]);
+  pintarSubtitulo([INICIAL]);
   progresoFrase(0, 1);
   estado("", "normal");
 }
@@ -680,7 +758,7 @@ async function transcribir(trozos, tipo, ctx) {
     const r = await fetch(`${API}/voz/escuchar`, { method: "POST", headers: { "Content-Type": "audio/wav" }, body: wav });
     const datos = await r.json();
     if (!r.ok) throw new Error(datos.detail || r.status);
-    if (!datos.texto) { estado(""); aviso("No te entendí, ¿puedes repetirlo?"); return; }
+    if (!datos.texto) { estado(""); aviso("No te alcancé a entender, ¿me lo repites?"); return; }
     preguntar(datos.texto);
   } catch (error) {
     console.warn("Transcripción falló", error);
