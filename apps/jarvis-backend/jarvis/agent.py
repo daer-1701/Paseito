@@ -29,7 +29,8 @@ def intent(message: str) -> str:
         return "loyalty"
     if words & {"pedido", "orden", "retiro", "reserva", "reservar", "reservame", "pagar", "paga", "compra", "comprame", "canjear"}:
         return "order"
-    if words & {"guiame", "guia", "llegar", "llego", "ruta", "direccion", "direcciones"}:
+    if (words & {"guiame", "guia", "llegar", "llego", "ruta", "direccion", "direcciones", "ubicacion", "ubicado", "ubicada", "queda", "quedan"}
+            or 'donde' in words and words & {'esta', 'estan', 'encuentra', 'encuentran'}):
         return "navigation"
     if words & {"clima", "tiempo", "lluvia", "llueve", "temperatura"}:
         return "weather"
@@ -39,6 +40,8 @@ def intent(message: str) -> str:
         return "promotion_search"
     if words & {"evento", "eventos", "actividad", "actividades", "concierto", "feria", "agenda"}:
         return "event_search"
+    if words & {"describe", "descripcion", "describeme"}:
+        return "venue_info"
     if words & {"producto", "productos", "comprar", "precio", "cuesta", "cuestan", "stock", "disponibilidad", "servicio", "servicios"}:
         return "product_search"
     return "discovery"
@@ -205,7 +208,7 @@ def chat(db, message: str, session_id: str | None = None,
         if preferences.get('recipient') == 'infantil' and ('regalo' in tokens(query)):
             query += ' juguetes infantil'
         kinds = {"event_search": {"event"}, "promotion_search": {"promotion"},
-                 "navigation": {"venue", "faq"}, "product_search": {"product"}}.get(mode, {"venue", "faq", "product"})
+                 "navigation": {"venue", "faq"}, "venue_info": {"venue"}, "product_search": {"product"}}.get(mode, {"venue", "faq", "product"})
         event_day = None
         now = datetime.now(BOLIVIA)
         if mode == "event_search":
@@ -226,6 +229,10 @@ def chat(db, message: str, session_id: str | None = None,
         browse = mode in {"event_search", "promotion_search"} and not topic
         explicit_venues = matching_venues(db, query) if mode in {'product_search', 'promotion_search'} else []
         scoped_venues = {r['id'] for r in explicit_venues} or None
+        if records_override is None and mode in {'navigation', 'venue_info'}:
+            named = matching_venues(db, message)
+            if named:
+                records_override = named[:1]
         records = records_override if records_override is not None else search(db, " ".join(topic) if mode in {"event_search", "promotion_search"} else query, kinds=kinds,
             event_day=event_day, browse=browse, maximum_price=preferences.get('budget_bs'),
             venue_ids=scoped_venues, limit=5)

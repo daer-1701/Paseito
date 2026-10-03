@@ -3,18 +3,27 @@
 Esta rama reúne el último `main` de `daer-1701/Paseito` y el trabajo del
 monorepo Paseo Aranjuez Digital, conservando ambos historiales Git.
 
+## Aplicación principal: Jarvis con avatar actualizado
+
+Seguir la [guía única del equipo](docs/arranque-equipo.md): opciones con Docker
+sin GPU, Python en Windows y voz local NVIDIA. El kiosco principal ya usa la
+última versión del avatar incorporada desde Paseito y mantiene nuestro agente,
+catálogo y demo WhatsApp.
+
+Ver la [auditoría de cada requisito y porcentaje de avance](docs/auditoria-reto-jarvis.md).
+
 ## Aplicaciones disponibles
 
 | Aplicación | Carpetas | Arranque |
 |---|---|---|
-| Paseito con avatar cochabambino, Gemini y FastAPI | `backend/`, `frontend/` | [Guía de Paseito](docs/paseito-original.md) |
-| Jarvis con voz local GPU, catálogo conversacional y demo WhatsApp | `apps/jarvis-backend/`, `services/voice/` | [Arranque Windows y WSL2](docs/arranque-torre-windows.md) |
+| Paseito original (alternativo), Gemini y FastAPI | `backend/`, `frontend/` | [Guía de Paseito](docs/paseito-original.md) |
+| Jarvis principal con avatar actualizado, voz GPU, catálogo y demo WhatsApp | `apps/jarvis-backend/`, `services/voice/` | [Arranque Windows y WSL2](docs/arranque-torre-windows.md) |
 
 Son dos aplicaciones independientes dentro del mismo repositorio. Sus APIs,
 sesiones y bases SQLite todavía no están unificadas. El frontend de Paseito
 utiliza su backend FastAPI; el kiosco Jarvis utiliza su propia API. Ambos usan
 el puerto 8000 por defecto: ejecuta uno a la vez o inicia Paseito con
-`uvicorn app.main:app --port 8002` desde `backend/` y abre `http://localhost:8002`.
+`uvicorn app.main:app --port 8002` desde `backend/` y abre `http://localhost:8002/?api=http://localhost:8002`.
 
 Los archivos `.env`, bases de datos locales y descargas temporales se mantienen
 fuera de Git. Los ejemplos de configuración de ambos proyectos se conservan.

@@ -1,5 +1,8 @@
 # Tareas 6–10: implementación y entrega
 
+> Estado vigente: [auditoría del reto 2, requisitos y avance](auditoria-reto-jarvis.md). Este documento conserva información de entregas anteriores; sus conteos y pendientes pueden ser históricos.
+
+
 ## 6. Ubicación y continuidad
 
 Se conservan piso, local, torre, sector y referencia. `/destination/{id}` devuelve una ficha pública adaptable al teléfono, con fuente y aviso de recorrido interior pendiente. No incluye sesión, preferencias ni historial. Si la ficha se elimina, rechaza o vence, la página deja de estar disponible.

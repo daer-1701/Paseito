@@ -35,7 +35,7 @@ Clonar en el filesystem de Linux, por ejemplo `~/Developer`, para evitar el
 coste de acceso a archivos de `/mnt/c`. Sustituir la URL por la del monorepo:
 
 ```bash
-git clone --branch feat/jarvis-grounded-kiosk URL_DEL_MONOREPO paseo-aranjuez-digital
+git clone --branch feat/avatar-jarvis-auditoria-reto https://github.com/daer-1701/Paseito.git paseo-aranjuez-digital
 cd paseo-aranjuez-digital
 bash scripts/start-tower.sh
 ```
@@ -50,8 +50,11 @@ Abrir **http://localhost:8000 en Chrome o Edge de Windows**. Pulsar la bienvenid
 permitir micrófono y consultar por un café. El navegador usa la transcripción de
 la torre; no selecciona el reconocimiento remoto del navegador en este perfil.
 
-En el momento de preparar estos archivos no había un remoto Git configurado.
-Antes de clonar por URL hay que publicar esta rama en el repositorio del equipo.
+La rama ya está publicada en Paseito. Para equipos sin NVIDIA, seguir la
+[guía del equipo](arranque-equipo.md). Para mostrar catálogo, horarios de demo y
+WhatsApp local, establecer `JARVIS_DEMO_CATALOG=1` en `.env`; el script conserva
+la configuración existente. El perfil GPU predeterminado no activa datos demo.
+
 También se puede transportar un `git bundle` de la rama y clonarlo sin servidor
 Git; los modelos seguirán descargándose en el primer arranque.
 

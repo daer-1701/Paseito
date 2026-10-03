@@ -1,5 +1,8 @@
 # Pendientes de Jarvis: estado al 2026-10-03
 
+> Estado vigente: [auditoría del reto 2, requisitos y avance](auditoria-reto-jarvis.md). Este documento conserva información de entregas anteriores; sus conteos y pendientes pueden ser históricos.
+
+
 ## Actualización tras investigar fuentes públicas
 
 Se enriquecieron 74 negocios y se añadieron tres servicios de Rezzom y un evento real: Bingo Familiar del 4 de octubre, 15:00–18:00. La instancia tiene 88 fichas. Faltan un piso, 69 locales y 78 horarios completos; cuatro negocios conservan fecha de fuente pendiente. Rezzom tiene horario parcial y Pauker calendario semanal. Ver [investigación y recomendaciones](investigacion-datos-publicos.md). Los feeds oficiales publican otros eventos con horario incompleto; el endpoint de promociones está vacío, sin que eso demuestre ausencia de descuentos en cada negocio.
