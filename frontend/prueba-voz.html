@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paseito · Prueba de voz</title>
+<style>
+  :root { --oro: #c9a227; --fondo: #0f1115; --panel: #181b22; --texto: #e8e8e8; --tenue: #8a8f98; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, sans-serif; background: var(--fondo); color: var(--texto);
+         display: flex; justify-content: center; padding: 24px; }
+  main { width: 100%; max-width: 720px; display: grid; gap: 16px; }
+  h1 { margin: 0; font-size: 1.4rem; } h1 span { color: var(--oro); }
+  .panel { background: var(--panel); border-radius: 12px; padding: 16px; }
+  .fila { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  button, select, input { font: inherit; border-radius: 8px; border: 1px solid #2a2f3a; background: #10131a; color: var(--texto); padding: 8px 12px; }
+  button { cursor: pointer; } button:disabled { opacity: .5; cursor: default; }
+  #microfono { width: 96px; height: 96px; border-radius: 50%; font-size: 2.2rem; background: var(--oro); color: #111; border: none; }
+  #microfono.escuchando { background: #e5484d; animation: pulso 1s infinite; }
+  @keyframes pulso { 50% { transform: scale(1.08); } }
+  #texto { flex: 1; min-width: 200px; }
+  #conversacion { display: grid; gap: 10px; max-height: 50vh; overflow-y: auto; }
+  .msg { padding: 10px 12px; border-radius: 10px; line-height: 1.4; }
+  .yo { background: #1f2a3a; justify-self: end; max-width: 85%; }
+  .jarvis { background: #262014; border-left: 3px solid var(--oro); max-width: 95%; }
+  .meta { color: var(--tenue); font-size: .8rem; margin-top: 4px; }
+  #estado { color: var(--tenue); min-height: 1.2em; }
+</style>
+<script src="config.js"></script>
+</head>
+<body>
+<main>
+  <h1><span>Paseito</span> · prueba de voz</h1>
+
+  <div class="panel fila" style="justify-content: space-between">
+    <button id="microfono" title="Mantén presionado o haz clic para hablar">🎤</button>
+    <div style="flex: 1; display: grid; gap: 8px">
+      <div class="fila">
+        <label>Voz:</label>
+        <select id="modoVoz">
+          <option value="gemini" selected>Servidor · Sofía (Bolivia)</option>
+          <option value="navegador">Navegador (instantánea)</option>
+          <option value="ninguna">Sin voz</option>
+        </select>
+        <select id="vozNavegador" title="Voz del navegador"></select>
+      </div>
+      <div class="fila">
+        <input id="texto" placeholder="…o escribe tu pregunta y presiona Enter">
+        <button id="enviar">Enviar</button>
+        <button id="reiniciar" title="Olvidar la conversación">Nueva</button>
+      </div>
+      <div id="estado"></div>
+    </div>
+  </div>
+
+  <div class="panel" id="conversacion"></div>
+</main>
+
+<script>
+const API = window.PASEITO_API;
+const $ = (id) => document.getElementById(id);
+let sessionId = null;
+let audioActual = null;
+
+function estado(t) { $("estado").textContent = t; }
+
+function agregar(clase, texto, meta) {
+  const div = document.createElement("div");
+  div.className = "msg " + clase;
+  div.textContent = texto;
+  if (meta) {
+    const m = document.createElement("div");
+    m.className = "meta";
+    m.textContent = meta;
+    div.appendChild(m);
+  }
+  $("conversacion").appendChild(div);
+  div.scrollIntoView({ behavior: "smooth" });
+  return div;
+}
+
+// ---------- Voz del navegador ----------
+function cargarVoces() {
+  const voces = speechSynthesis.getVoices().filter(v => v.lang.toLowerCase().startsWith("es"));
+  const preferidas = ["es-419", "es-MX", "es-US", "es-BO", "es-AR", "es-CO"];
+  voces.sort((a, b) => {
+    const pa = preferidas.indexOf(a.lang), pb = preferidas.indexOf(b.lang);
+    return (pa < 0 ? 99 : pa) - (pb < 0 ? 99 : pb) || (b.name.includes("Google") - a.name.includes("Google"));
+  });
+  $("vozNavegador").innerHTML = voces.map(v => `<option value="${v.name}">${v.name} (${v.lang})</option>`).join("")
+    || "<option>Sin voces en español</option>";
+}
+speechSynthesis.onvoiceschanged = cargarVoces;
+cargarVoces();
+
+function hablarNavegador(texto) {
+  return new Promise((resolve) => {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(texto);
+    const voz = speechSynthesis.getVoices().find(v => v.name === $("vozNavegador").value);
+    if (voz) { u.voice = voz; u.lang = voz.lang; } else { u.lang = "es-419"; }
+    u.rate = 1.05;
+    u.onend = u.onerror = resolve;
+    speechSynthesis.speak(u);
+  });
+}
+
+// El TTS tarda más cuanto más largo es el texto: se pide cada frase en paralelo y se
+// reproducen en orden, así Paseito empieza a hablar cuando llega la primera.
+function dividirFrases(texto) {
+  const frases = texto.split(/(?<=[.!?…])\s+/).map(f => f.trim()).filter(Boolean);
+  const unidas = [];
+  for (const f of frases) {
+    if (unidas.length && unidas[unidas.length - 1].length < 40) unidas[unidas.length - 1] += " " + f;
+    else unidas.push(f);
+  }
+  return unidas;
+}
+
+async function pedirAudio(texto) {
+  const r = await fetch(`${API}/voz`, {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ texto }),
+  });
+  if (!r.ok) throw new Error((await r.json()).detail || r.status);
+  return { url: URL.createObjectURL(await r.blob()), modelo: r.headers.get("X-Modelo-Voz") };
+}
+
+function reproducir(url) {
+  return new Promise((resolve, reject) => {
+    audioActual = new Audio(url);
+    audioActual.onended = resolve;
+    audioActual.onerror = reject;
+    audioActual.onpause = resolve;
+    audioActual.play().catch(reject);
+  });
+}
+
+let turno = 0;
+
+async function hablarGemini(texto, meta) {
+  const miTurno = ++turno;
+  const t0 = performance.now();
+  const frases = dividirFrases(texto);
+  const audios = frases.map(f => pedirAudio(f));
+  for (let i = 0; i < frases.length; i++) {
+    let audio = null;
+    try { audio = await audios[i]; } catch (e) { /* esa frase va con la voz del navegador */ }
+    if (miTurno !== turno) return;
+    if (i === 0) meta.textContent += ` · voz Gemini en ${((performance.now() - t0) / 1000).toFixed(1)}s`
+      + ` (${frases.length} frases${audio ? ", " + audio.modelo : ""})`;
+    estado("");
+    if (audio) await reproducir(audio.url);
+    else await hablarNavegador(frases[i]);
+  }
+}
+
+async function hablar(texto, burbuja) {
+  const modo = $("modoVoz").value;
+  if (modo === "ninguna") return;
+  if (modo === "gemini") {
+    estado("Generando voz con Gemini…");
+    return hablarGemini(texto, burbuja.querySelector(".meta"));
+  }
+  estado("");
+  await hablarNavegador(texto);
+}
+
+function callar() {
+  turno++;
+  speechSynthesis.cancel();
+  if (audioActual) audioActual.pause();
+}
+
+// ---------- Chat ----------
+async function preguntar(texto) {
+  texto = texto.trim();
+  if (!texto) return;
+  callar();
+  agregar("yo", texto);
+  $("enviar").disabled = true;
+  estado("Paseito está pensando…");
+  const t0 = performance.now();
+  try {
+    const r = await fetch(`${API}/chat`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mensaje: texto, session_id: sessionId }),
+    });
+    const datos = await r.json();
+    if (!r.ok) throw new Error(datos.detail || r.status);
+    sessionId = datos.session_id;
+    const lugares = datos.tarjetas.map(t => t.nombre || t.titulo || t.pregunta).filter(Boolean).slice(0, 4);
+    const meta = `${((performance.now() - t0) / 1000).toFixed(1)}s · ${datos.modelo}`
+      + (lugares.length ? ` · ${lugares.join(", ")}` : "");
+    const burbuja = agregar("jarvis", datos.respuesta, meta);
+    await hablar(datos.respuesta, burbuja);
+  } catch (e) {
+    agregar("jarvis", "Error: " + e.message);
+    estado("");
+  } finally {
+    $("enviar").disabled = false;
+  }
+}
+
+$("enviar").onclick = () => { preguntar($("texto").value); $("texto").value = ""; };
+$("texto").onkeydown = (e) => { if (e.key === "Enter") $("enviar").click(); };
+$("reiniciar").onclick = async () => {
+  if (sessionId) await fetch(`${API}/chat/${sessionId}`, { method: "DELETE" });
+  sessionId = null;
+  $("conversacion").innerHTML = "";
+  estado("Conversación nueva");
+};
+
+// ---------- Micrófono ----------
+const Reconocimiento = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (!Reconocimiento) {
+  $("microfono").disabled = true;
+  estado("Este navegador no reconoce voz; usa Chrome o Edge (o escribe).");
+} else {
+  const rec = new Reconocimiento();
+  rec.lang = "es-BO";
+  rec.interimResults = true;
+  let escuchando = false;
+
+  rec.onstart = () => { escuchando = true; $("microfono").classList.add("escuchando"); estado("Escuchando…"); };
+  rec.onend = () => { escuchando = false; $("microfono").classList.remove("escuchando"); };
+  rec.onerror = (e) => estado("Micrófono: " + e.error);
+  rec.onresult = (e) => {
+    const r = e.results[e.results.length - 1];
+    estado("“" + r[0].transcript + "”");
+    if (r.isFinal) preguntar(r[0].transcript);
+  };
+
+  $("microfono").onclick = () => {
+    if (escuchando) return rec.stop();
+    callar();
+    rec.start();
+  };
+}
+</script>
+</body>
+</html>

@@ -1,3 +1,28 @@
+# Paseito · integración con Jarvis
+
+Esta rama reúne el último `main` de `daer-1701/Paseito` y el trabajo del
+monorepo Paseo Aranjuez Digital, conservando ambos historiales Git.
+
+## Aplicaciones disponibles
+
+| Aplicación | Carpetas | Arranque |
+|---|---|---|
+| Paseito con avatar cochabambino, Gemini y FastAPI | `backend/`, `frontend/` | [Guía de Paseito](docs/paseito-original.md) |
+| Jarvis con voz local GPU, catálogo conversacional y demo WhatsApp | `apps/jarvis-backend/`, `services/voice/` | [Arranque Windows y WSL2](docs/arranque-torre-windows.md) |
+
+Son dos aplicaciones independientes dentro del mismo repositorio. Sus APIs,
+sesiones y bases SQLite todavía no están unificadas. El frontend de Paseito
+utiliza su backend FastAPI; el kiosco Jarvis utiliza su propia API. Ambos usan
+el puerto 8000 por defecto: ejecuta uno a la vez o inicia Paseito con
+`uvicorn app.main:app --port 8002` desde `backend/` y abre `http://localhost:8002`.
+
+Los archivos `.env`, bases de datos locales y descargas temporales se mantienen
+fuera de Git. Los ejemplos de configuración de ambos proyectos se conservan.
+
+[Detalle de esta integración](docs/integracion-paseito.md).
+
+---
+
 # Paseo Aranjuez Digital
 
 Monorepo del equipo para la Hackatón by Paseo Aranjuez. Agrupa los tres retos
