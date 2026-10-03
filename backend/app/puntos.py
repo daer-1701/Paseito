@@ -4,6 +4,10 @@ Solo consulta: compras, canjes y movimientos los registra la plataforma de Paseo
 Prisma guarda las fechas en UTC; aquí se devuelven en hora de Bolivia.
 """
 
+import base64
+import hashlib
+import hmac
+import json
 import logging
 import re
 import threading
@@ -12,9 +16,11 @@ from datetime import timezone
 from typing import Callable
 from urllib.parse import unquote, urlparse
 
+import httpx
 import pymysql
 
-from .config import PUNTOS_DATABASE_URL, PUNTOS_DB_CA, PUNTOS_TIMEOUT_S, ZONA_HORARIA
+from .config import (PUNTOS_API_KEY, PUNTOS_API_URL, PUNTOS_DATABASE_URL, PUNTOS_DB_CA, PUNTOS_QR_SECRET,
+                     PUNTOS_TIMEOUT_S, ZONA_HORARIA)
 
 log = logging.getLogger("jarvis")
 
@@ -24,6 +30,18 @@ CONEXION_S = 3
 LIMITE_TARJETAS = 6
 NO_DISPONIBLE = "Paseo Points no responde en este momento."
 TEMAS = ["todo", "recompensas", "niveles", "promociones", "misiones", "eventos"]
+# Código de verificación de un canje (Redemption.verificationToken), p. ej. AB1C2-D3EF4.
+CODIGO_CUPON = re.compile(r"\b[A-Z0-9]{5}-[A-Z0-9]{5}\b", re.IGNORECASE)
+ESTADOS_CUPON = {"PENDING": "vigente", "REDEEMED": "canjeado", "EXPIRED": "vencido", "CANCELLED": "cancelado"}
+LIMITE_OTROS_CUPONES = 5
+# QR de cliente de la app: PP1.<datos>.<firma>, datos = base64url de {"u": id, "exp": ms} y
+# firma = HMAC-SHA256 de <datos> en base64url. Vale entre 5 y 10 minutos; la app lo renueva sola.
+QR_CLIENTE = re.compile(r"PP1\.([A-Za-z0-9_-]+)\.([A-Za-z0-9_-]+)")
+RUTA_VERIFICAR_QR = "/api/integrations/customer-qr/verify"
+QR_NO_VALIDO = "No pude validar ese QR. Abre tu QR de cliente en la app de Paseo Points y muéstramelo de nuevo."
+QR_VENCIDO = "Ese QR ya venció; la app lo renueva cada pocos minutos. Ábrelo de nuevo y muéstramelo."
+CUENTA_NO_ENCONTRADA = "No encuentro esa cuenta en Paseo Points."
+LIMITE_CUPONES_PASADOS = 3
 
 _cache: dict[str, tuple[float, dict]] = {}
 # Una sola conexión reutilizada: abrir una nueva hacia Aiven cuesta 1-4 s y a veces se pierde.
@@ -232,6 +250,11 @@ def programa_puntos(db, tema: str = "todo") -> dict:
     return respuesta
 
 
+def _nivel_actual(niveles: list[dict], estatus: int) -> dict | None:
+    return max((n for n in niveles if n["estatus_minimo"] <= estatus), key=lambda n: n["estatus_minimo"],
+               default=niveles[0] if niveles else None)
+
+
 def mis_puntos(db, celular: str = "", correo: str = "") -> dict:
     if not configurado():
         return {"error": "Paseo Points no está conectado.", "resultados": []}
@@ -279,8 +302,7 @@ def mis_puntos(db, celular: str = "", correo: str = "") -> dict:
 
     saldo, estatus = cliente["saldo"], cliente["estatus"]
     niveles = datos["niveles"]
-    actual = max((n for n in niveles if n["estatus_minimo"] <= estatus), key=lambda n: n["estatus_minimo"],
-                 default=niveles[0] if niveles else None)
+    actual = _nivel_actual(niveles, estatus)
     siguiente = min((n for n in niveles if n["estatus_minimo"] > estatus), key=lambda n: n["estatus_minimo"],
                     default=None)
     permitidas = [r for r in datos["recompensas"] if r["nivel_estatus"] <= estatus]
@@ -302,3 +324,164 @@ def mis_puntos(db, celular: str = "", correo: str = "") -> dict:
         "resultados": [{"id": "mis-puntos", "tipo": "puntos", "nombre": cliente["nombre"], "saldo": saldo,
                         "nivel": nivel}] + [_publico(r) for r in alcanzables[:LIMITE_TARJETAS - 1]],
     }
+
+
+# ---------- Cupones (canjes) leídos desde el QR que muestra la app ----------
+
+_CONSULTA_CUPON = """
+    SELECT r.id, r.status, r.pointsSpent, r.createdAt, r.redeemedAt, u.firstName,
+           w.type, w.discountAmount, w.discountPercent, w.quantity, w.minimumPurchase, w.description,
+           ci.name AS producto, b.name AS negocio, b.floor, b.localNumber, b.sector
+    FROM Redemption r
+    JOIN Reward w ON w.id = r.rewardId
+    JOIN User u ON u.id = r.userId
+    LEFT JOIN CatalogItem ci ON ci.id = w.catalogItemId
+    LEFT JOIN Business b ON b.id = COALESCE(r.businessId, w.businessId)"""
+
+
+def codigo_cupon(texto: str) -> str | None:
+    """El QR puede traer solo el código o una URL/JSON que lo contiene."""
+    hallado = CODIGO_CUPON.search(texto or "")
+    return hallado.group(0).upper() if hallado else None
+
+
+def _cupon(f: dict) -> dict:
+    return {
+        "id": f"cupon-{f['id']}", "tipo": "cupon", "titulo": _beneficio(f), "detalle": f["description"],
+        "estado": ESTADOS_CUPON.get(f["status"], f["status"].lower()), "puntos_usados": f["pointsSpent"],
+        "obtenido_el": _local(f["createdAt"]), "canjeado_el": _local(f["redeemedAt"]), "nombre": f["negocio"],
+        "ubicacion": {"piso": f["floor"], "local": f["localNumber"], "sector": f["sector"]},
+    }
+
+
+def _b64(texto: str) -> bytes:
+    return base64.urlsafe_b64decode(texto + "=" * (-len(texto) % 4))
+
+
+def _verificar_qr_en_api(token: str) -> tuple[int | None, str | None]:
+    """Pregunta a Paseo Points si el QR es auténtico; el secreto nunca sale de su servidor."""
+    try:
+        r = httpx.post(f"{PUNTOS_API_URL}{RUTA_VERIFICAR_QR}", json={"token": token},
+                       headers={"x-api-key": PUNTOS_API_KEY}, timeout=PUNTOS_TIMEOUT_S)
+    except httpx.HTTPError:
+        log.warning("La API de Paseo Points no respondió al verificar un QR de cliente")
+        return None, f"{NO_DISPONIBLE} Intenta de nuevo en un ratito."
+    if r.status_code == 200:
+        try:
+            return int(r.json()["userId"]), None
+        except (ValueError, KeyError, TypeError):
+            log.error("Respuesta inesperada de Paseo Points al verificar un QR de cliente")
+            return None, f"{NO_DISPONIBLE} Intenta de nuevo en un ratito."
+    if r.status_code == 410:
+        return None, QR_VENCIDO
+    if r.status_code == 404:
+        return None, CUENTA_NO_ENCONTRADA
+    if r.status_code in (400, 401):
+        # 401 es firma alterada o PUNTOS_API_KEY incorrecta; la API no los distingue
+        log.warning("Paseo Points rechazó un QR de cliente (%s)", r.status_code)
+        return None, QR_NO_VALIDO
+    log.error("Paseo Points respondió %s al verificar un QR de cliente", r.status_code)
+    return None, f"{NO_DISPONIBLE} Intenta de nuevo en un ratito."
+
+
+def _verificar_qr_local(datos: str, firma: str) -> tuple[int | None, str | None]:
+    """Respaldo sin API: valida la firma con un secreto dedicado al QR."""
+    try:
+        firma_recibida = _b64(firma)
+        carga = json.loads(_b64(datos))
+        usuario, vence_ms = int(carga["u"]), float(carga["exp"])
+    except (ValueError, KeyError, TypeError):
+        return None, QR_NO_VALIDO
+    esperada = hmac.new(PUNTOS_QR_SECRET.encode(), datos.encode(), hashlib.sha256).digest()
+    if not hmac.compare_digest(esperada, firma_recibida):
+        log.warning("QR de cliente con firma inválida")
+        return None, QR_NO_VALIDO
+    if vence_ms / 1000 < time.time():
+        return None, QR_VENCIDO
+    return usuario, None
+
+
+def cliente_del_qr(texto: str) -> tuple[int | None, str | None]:
+    """(id del cliente, None) si es un QR de cliente auténtico y vigente; (None, motivo) si no vale;
+    (None, None) si no es un QR de cliente. Sin validar la firma, cualquiera podría armar un QR con otro id."""
+    hallado = QR_CLIENTE.search(texto or "")
+    if not hallado:
+        return None, None
+    if PUNTOS_API_URL and PUNTOS_API_KEY:
+        return _verificar_qr_en_api(hallado.group(0))
+    if PUNTOS_QR_SECRET:
+        return _verificar_qr_local(*hallado.groups())
+    return None, "Este kiosco todavía no puede leer el QR de cliente. Muéstrame el QR de un cupón."
+
+
+def cupones_del_cliente(usuario: int) -> dict:
+    """Todos los cupones vigentes del cliente, los últimos usados o vencidos y su saldo de puntos."""
+    def leer(c):
+        c.execute("SELECT firstName FROM User WHERE id = %s AND status = 'ACTIVE' AND deletedAt IS NULL", (usuario,))
+        cliente = c.fetchone()
+        if not cliente:
+            return None
+        c.execute(f"{_CONSULTA_CUPON} WHERE r.userId = %s AND r.status = 'PENDING' ORDER BY r.createdAt DESC", (usuario,))
+        vigentes = c.fetchall()
+        c.execute(f"""{_CONSULTA_CUPON} WHERE r.userId = %s AND r.status <> 'PENDING'
+                      ORDER BY COALESCE(r.redeemedAt, r.createdAt) DESC LIMIT %s""", (usuario, LIMITE_CUPONES_PASADOS))
+        pasados = c.fetchall()
+        c.execute("SELECT COALESCE(SUM(amount), 0) AS n FROM PointMovement WHERE userId = %s", (usuario,))
+        saldo = int(c.fetchone()["n"])
+        c.execute("SELECT COALESCE(SUM(amount), 0) AS n FROM StatusMovement WHERE userId = %s", (usuario,))
+        return {"nombre": cliente["firstName"], "vigentes": vigentes, "pasados": pasados, "saldo": saldo,
+                "estatus": int(c.fetchone()["n"])}
+
+    try:
+        datos = _consultar(leer)
+        nivel = _nivel_actual(_programa()["niveles"], datos["estatus"]) if datos else None
+    except pymysql.MySQLError:
+        log.exception("Error leyendo los cupones de un cliente de Paseo Points")
+        return {"error": f"{NO_DISPONIBLE} Intenta de nuevo en un ratito.", "resultados": []}
+    if not datos:
+        return {"error": CUENTA_NO_ENCONTRADA, "resultados": []}
+    vigentes = [_cupon(f) for f in datos["vigentes"]]
+    pasados = [_cupon(f) for f in datos["pasados"]]
+    resumen = {"id": "mis-puntos", "tipo": "puntos", "nombre": datos["nombre"], "saldo": datos["saldo"],
+               "nivel": nivel["nombre"] if nivel else None}
+    return {"modo": "cliente", "cliente": datos["nombre"], "saldo_puntos": datos["saldo"], "vigentes": vigentes,
+            "pasados": pasados, "resultados": [resumen, *vigentes, *pasados]}
+
+
+def verificar_cupon(texto: str) -> dict:
+    """Lee el QR del kiosco: el de cliente (todos sus cupones) o el de un cupón (su estado y los demás
+    vigentes de esa persona). Paseito solo consulta, nunca canjea."""
+    if not configurado():
+        return {"error": "Paseo Points no está conectado en este kiosco.", "resultados": []}
+    usuario, problema = cliente_del_qr(texto)
+    if problema:
+        return {"error": problema, "resultados": []}
+    if usuario is not None:
+        return cupones_del_cliente(usuario)
+    codigo = codigo_cupon(texto)
+    if not codigo:
+        return {"error": "Ese QR no es de Paseo Points. Muéstrame tu QR de cliente o el de un cupón de la app.",
+                "resultados": []}
+
+    def leer(c):
+        c.execute(f"{_CONSULTA_CUPON} WHERE r.verificationToken = %s", (codigo,))
+        cupon = c.fetchone()
+        if not cupon:
+            return None, []
+        c.execute(f"""{_CONSULTA_CUPON}
+                      WHERE r.userId = (SELECT userId FROM Redemption WHERE id = %s)
+                        AND r.status = 'PENDING' AND r.id <> %s
+                      ORDER BY r.createdAt DESC LIMIT %s""", (cupon["id"], cupon["id"], LIMITE_OTROS_CUPONES))
+        return cupon, c.fetchall()
+
+    try:
+        cupon, otros = _consultar(leer)
+    except pymysql.MySQLError:
+        log.exception("Error verificando un cupón de Paseo Points")
+        return {"error": f"{NO_DISPONIBLE} Intenta de nuevo en un ratito.", "resultados": []}
+    if not cupon:
+        return {"error": "No encuentro ese cupón en Paseo Points. Revisa que sea el QR del cupón en la app.",
+                "resultados": []}
+    tarjeta = _cupon(cupon)
+    otras = [_cupon(f) for f in otros]
+    return {"cliente": cupon["firstName"], "cupon": tarjeta, "otros_cupones": otras, "resultados": [tarjeta, *otras]}

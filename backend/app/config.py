@@ -38,3 +38,8 @@ PUNTOS_DATABASE_URL = os.getenv("PUNTOS_DATABASE_URL", "").strip()
 _ca = os.getenv("PUNTOS_DB_CA", "").strip()
 PUNTOS_DB_CA = (BASE_DIR / _ca).resolve() if _ca else None
 PUNTOS_TIMEOUT_S = int(os.getenv("PUNTOS_TIMEOUT_S", "6"))
+# API de Paseo Points (p. ej. http://localhost:4000): valida el QR de cliente sin que el secreto salga de su servidor.
+PUNTOS_API_URL = os.getenv("PUNTOS_API_URL", "").strip().rstrip("/")
+PUNTOS_API_KEY = os.getenv("PUNTOS_API_KEY", "").strip()
+# Respaldo sin API: secreto propio del QR (HMAC-SHA256). Nunca el JWT_SECRET de sesiones de Paseo Points.
+PUNTOS_QR_SECRET = os.getenv("PUNTOS_QR_SECRET", "").strip()

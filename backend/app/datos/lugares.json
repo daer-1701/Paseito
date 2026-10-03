@@ -34,12 +34,12 @@
     "instagram": "https://www.instagram.com/cayenna.bistrocafe/",
     "facebook": "https://www.facebook.com/Cayenna.BistroCafe/",
     "logo_url": "https://paseoaranjuez.com/dashboard/img/brands/CAYENNA.png",
-    "hora_apertura": "12:00",
+    "hora_apertura": "11:00",
     "hora_cierre": "22:00",
-    "apertura_domingo": "12:00",
+    "apertura_domingo": "11:00",
     "cierre_domingo": "22:00",
     "horario_confirmado": false,
-    "etiquetas": "coctel,tragos,carne,brownies,jugos,nachos"
+    "etiquetas": "coctel,tragos,carne,jugos,brunch,desayuno,cafe,reposteria,pique,pastas,ensaladas,sandwich"
   },
   {
     "nombre": "Chipotle Mexican Food",
@@ -60,7 +60,7 @@
     "apertura_domingo": "12:00",
     "cierre_domingo": "22:00",
     "horario_confirmado": false,
-    "etiquetas": "mexicana,tacos,burritos,nachos"
+    "etiquetas": "mexicana,tacos,burritos,nachos,tostadas,chimichanga,guacamole"
   },
   {
     "nombre": "Churros Calientes",
@@ -123,7 +123,7 @@
     "apertura_domingo": "12:00",
     "cierre_domingo": "22:00",
     "horario_confirmado": false,
-    "etiquetas": "comida,española,calamares,ensaladas,pasta,parrilla,mariscos"
+    "etiquetas": "comida,española,paella,tapas,tablas,jamon serrano,calamares,ensaladas,parrilla,mariscos"
   },
   {
     "nombre": "Rissi's",
