@@ -1,0 +1,966 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<base href="/kiosk/">
+<title>Jarvis · Paseo Aranjuez</title>
+<script type="importmap">{ "imports": { "three": "/kiosk/vendor/three/three.module.js" } }</script>
+<style>
+  :root {
+    --vino: #7a1f3d; --vino-oscuro: #4a1026; --oro: #e7b73a; --oro-claro: #ffd977; --crema: #fffaf0;
+    --vidrio: rgba(24, 10, 20, .58); --borde: rgba(255, 255, 255, .14); --tenue: rgba(255, 250, 240, .7);
+    --rojo: #ff5470; --violeta: #8f7bff; --verde: #1fbf6a;
+    --panel: clamp(270px, 24vw, 360px); --margen: 14px; --arriba: 82px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #8cc3ec; color: var(--crema);
+               font-family: "Segoe UI", system-ui, -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  * { scrollbar-width: thin; scrollbar-color: rgba(231, 183, 58, .5) transparent; }
+
+  #escena3d { position: fixed; inset: 0; }
+  #avatar2d { display: none; }
+  body.modo-2d #escena3d { background: linear-gradient(#3f7cc4, #8fc0e8 55%, #f6d7a7); }
+  body.modo-2d #avatar2d { display: flex; position: fixed; left: calc(var(--panel) + var(--margen) * 2); right: calc(var(--panel) + var(--margen) * 2);
+                           top: var(--arriba); bottom: 110px; justify-content: center; }
+  body.modo-2d #avatar2d svg { height: 100%; }
+
+  .vidrio { background: var(--vidrio); border: 1px solid var(--borde); backdrop-filter: blur(14px) saturate(1.3);
+            -webkit-backdrop-filter: blur(14px) saturate(1.3); box-shadow: 0 18px 40px rgba(20, 5, 15, .35); }
+
+  /* ---------- barra superior ---------- */
+  header { position: fixed; top: var(--margen); left: var(--margen); right: var(--margen); height: 56px; display: flex; align-items: center;
+           justify-content: space-between; padding: 0 18px; border-radius: 18px; z-index: 3; }
+  .marca { display: flex; align-items: center; gap: 12px; }
+  .logo { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; font-weight: 800; font-size: 1.2rem;
+          color: var(--vino-oscuro); background: linear-gradient(135deg, var(--oro-claro), var(--oro));
+          box-shadow: 0 4px 14px rgba(0, 0, 0, .3); transform: perspective(200px) rotateY(-12deg); }
+  .marca b { display: block; font-size: 1.02rem; letter-spacing: .3px; }
+  .marca small { color: var(--tenue); font-size: .78rem; }
+  .derecha { display: flex; align-items: center; gap: 14px; }
+  .estado-confianza { display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; color: var(--oro-claro);
+                       background: rgba(231, 183, 58, .12); border: 1px solid rgba(231, 183, 58, .28); font-size: .72rem; font-weight: 700; }
+  .estado-confianza::before { content: "✓"; width: 15px; height: 15px; display: grid; place-items: center; border-radius: 50%;
+                              color: var(--vino-oscuro); background: var(--oro); font-size: .65rem; }
+  #reloj { text-align: right; line-height: 1.1; }
+  #reloj b { font-size: 1.25rem; font-variant-numeric: tabular-nums; }
+  #reloj small { display: block; color: var(--tenue); font-size: .75rem; text-transform: capitalize; }
+  #nueva { border: 1px solid var(--borde); background: rgba(255, 255, 255, .08); border-radius: 12px; padding: 8px 12px; font-size: .85rem; }
+  #nueva:hover { background: rgba(255, 255, 255, .16); }
+  .punto { width: 9px; height: 9px; border-radius: 50%; background: var(--verde); }
+
+  /* ---------- paneles laterales ---------- */
+  .panel { position: fixed; top: var(--arriba); bottom: var(--margen); width: var(--panel); border-radius: 22px; padding: 16px;
+           display: flex; flex-direction: column; gap: 12px; z-index: 2; }
+  #conversacion { left: var(--margen); }
+  #resultados { right: var(--margen); }
+  .panel h2 { margin: 0; font-size: .74rem; letter-spacing: 1.6px; color: var(--oro); font-weight: 700; }
+
+  .torre { display: grid; grid-template-columns: 150px 1fr; align-items: center; gap: 6px; }
+  .escenario { height: 170px; perspective: 700px; display: grid; place-items: center; }
+  .pisos { position: relative; width: 92px; height: 92px; transform-style: preserve-3d;
+           transform: rotateX(60deg) rotateZ(-42deg) translateZ(-60px); animation: girar 18s linear infinite; }
+  @keyframes girar { to { transform: rotateX(60deg) rotateZ(318deg) translateZ(-60px); } }
+  .capa { position: absolute; inset: 0; border-radius: 10px; transform: translateZ(calc(var(--i) * 20px));
+          background: rgba(255, 255, 255, .07); border: 1.5px solid rgba(255, 255, 255, .28); transition: all .35s; }
+  .capa.con { background: rgba(231, 183, 58, .35); border-color: var(--oro); }
+  .capa.activa { background: rgba(255, 217, 119, .85); border-color: #fff; transform: translateZ(calc(var(--i) * 20px + 8px)); }
+  .nombres { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; font-size: .8rem; }
+  .nombres li { display: flex; justify-content: space-between; padding: 3px 8px; border-radius: 8px; color: var(--tenue); transition: all .3s; }
+  .nombres li span { font-weight: 700; }
+  .nombres li.con { color: var(--crema); background: rgba(231, 183, 58, .18); }
+  .nombres li.activa { background: var(--oro); color: var(--vino-oscuro); }
+
+  #tarjetas { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 4px 4px 4px 0; perspective: 900px; }
+  #tarjetas:empty::before { content: "Pregúntame algo y aquí verás las tiendas, comidas y eventos que encuentre."; color: var(--tenue); font-size: .88rem; line-height: 1.5; }
+  .tarjeta { position: relative; display: grid; grid-template-columns: 46px 1fr; gap: 12px; padding: 12px; border-radius: 16px;
+             background: linear-gradient(135deg, rgba(255, 255, 255, .13), rgba(255, 255, 255, .04)); border: 1px solid var(--borde);
+             transform-style: preserve-3d; transition: transform .15s ease-out, box-shadow .2s; cursor: pointer;
+             animation: entra .55s cubic-bezier(.22, 1, .36, 1) both; animation-delay: calc(var(--n) * 70ms); }
+  .tarjeta:hover { box-shadow: 0 14px 30px rgba(0, 0, 0, .35), 0 0 0 1px var(--oro) inset; }
+  @keyframes entra { from { opacity: 0; transform: rotateY(-55deg) translateX(40px); } }
+  .icono { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; font-size: 1.45rem;
+           background: linear-gradient(135deg, var(--vino), var(--vino-oscuro)); border: 1px solid rgba(231, 183, 58, .5);
+           transform: translateZ(24px); box-shadow: 0 6px 14px rgba(0, 0, 0, .3); }
+  .info { transform: translateZ(14px); min-width: 0; }
+  .info b { display: block; font-size: .98rem; overflow-wrap: anywhere; }
+  .info small { display: block; color: var(--tenue); font-size: .8rem; margin-top: 2px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; }
+  .chip { font-size: .7rem; font-weight: 700; padding: 3px 8px; border-radius: 999px; background: rgba(255, 255, 255, .12); }
+  .chip.piso { background: var(--oro); color: var(--vino-oscuro); }
+  .chip.abierto { background: var(--verde); }
+  .chip.cerrado { background: #c0392b; }
+  .guia-btn { margin-top: 8px; width: 100%; border: 1px solid rgba(231, 183, 58, .55); border-radius: 10px; padding: 7px 9px;
+               color: var(--oro-claro); font-size: .76rem; font-weight: 800; background: rgba(231, 183, 58, .12); }
+  .guia-btn:hover { color: var(--vino-oscuro); background: var(--oro); }
+
+  /* ---------- modo acompáñame ---------- */
+  #guia { position: absolute; inset: 12px; z-index: 4; display: none; flex-direction: column; gap: 14px; padding: 16px;
+           overflow: auto; border: 1px solid rgba(231, 183, 58, .52); border-radius: 18px; background: linear-gradient(155deg, rgba(63, 16, 38, .98), rgba(35, 8, 24, .98)); }
+  #guia.activa { display: flex; animation: aparece .28s ease-out; }
+  .guia-superior { display: flex; justify-content: space-between; align-items: center; }
+  .guia-etiqueta { color: var(--oro); font-size: .7rem; letter-spacing: 1.4px; font-weight: 800; }
+  #cerrar-guia { border: 0; border-radius: 50%; width: 30px; height: 30px; background: rgba(255,255,255,.1); font-size: 1.15rem; }
+  #guia-destino { margin: 0; font-size: 1.3rem; line-height: 1.15; }
+  #guia-resumen { color: var(--tenue); margin: -6px 0 0; font-size: .86rem; }
+  .ruta { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+  .ruta li { position: relative; min-height: 50px; padding: 0 0 14px 38px; font-size: .86rem; color: var(--tenue); }
+  .ruta li::before { content: ""; position: absolute; left: 10px; top: 5px; width: 14px; height: 14px; border-radius: 50%; background: var(--vino); border: 2px solid var(--oro); }
+  .ruta li:not(:last-child)::after { content: ""; position: absolute; left: 16px; top: 22px; bottom: -1px; border-left: 2px dashed rgba(231,183,58,.6); }
+  .ruta b { display: block; color: var(--crema); margin-bottom: 2px; }
+  .qr-bloque { display: flex; gap: 12px; align-items: center; padding: 10px; border-radius: 14px; background: rgba(255,255,255,.07); }
+  .qr-bloque[hidden] { display: none; }
+  #qr-guia img { width: 78px; height: 78px; border-radius: 8px; background: #fff; }
+  .qr-bloque p { margin: 0; font-size: .78rem; color: var(--tenue); line-height: 1.4; }
+  #abrir-ficha { display: block; text-align: center; padding: 11px; border-radius: 12px; color: var(--vino-oscuro); background: var(--oro); font-weight: 800; text-decoration: none; font-size: .86rem; }
+
+  /* ---------- conversación ---------- */
+  .chat { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 4px; }
+  #oyente { display: none; align-self: flex-end; max-width: 90%; padding: 9px 14px; border-radius: 16px 16px 4px 16px; font-size: .92rem;
+            background: linear-gradient(135deg, var(--vino), var(--vino-oscuro)); border: 1px solid rgba(231, 183, 58, .35); }
+  #oyente.visible { display: block; animation: aparece .3s ease-out; }
+  @keyframes aparece { from { opacity: 0; transform: translateY(8px); } }
+  #subtitulo { align-self: stretch; padding: 12px 16px 14px; border-radius: 4px 18px 18px 18px;
+               background: rgba(255, 255, 255, .08); border: 1px solid var(--borde); border: 1px solid var(--borde); }
+  #subtitulo .quien { font-size: .7rem; letter-spacing: 1.4px; color: var(--oro); font-weight: 700; margin-bottom: 6px; }
+  #texto-respuesta { font-size: clamp(.98rem, .55vw + 1.1vh, 1.3rem); line-height: 1.5; }
+  #texto-respuesta .p { opacity: .4; transition: opacity .2s, color .2s; }
+  #texto-respuesta .p.dicha { opacity: 1; }
+  #texto-respuesta .p.ahora { color: var(--oro-claro); }
+  .pensando span { display: inline-block; width: 9px; height: 9px; margin-right: 6px; border-radius: 50%; background: var(--violeta);
+                   animation: salto 1s infinite ease-in-out; }
+  .pensando span:nth-child(2) { animation-delay: .15s; } .pensando span:nth-child(3) { animation-delay: .3s; }
+  @keyframes salto { 50% { transform: translateY(-8px); opacity: .5; } }
+
+  #sugerencias { display: flex; gap: 6px; flex-wrap: wrap; }
+  #sugerencias button { border: 1px solid var(--borde); background: rgba(255, 255, 255, .07); border-radius: 999px;
+                        padding: 7px 11px; font-size: .84rem; transition: transform .15s, background .2s; }
+  #sugerencias button:hover { background: var(--vino); transform: translateY(-2px); }
+  #contexto { display: flex; flex-wrap: wrap; gap: 6px; }
+  #contexto:empty { display: none; }
+  .contexto-chip { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 6px 9px; border-radius: 10px;
+                   background: rgba(255,255,255,.08); color: var(--tenue); font-size: .72rem; }
+
+  /* ---------- barra del micrófono (bajo Jarvis) ---------- */
+  #controles { position: fixed; bottom: var(--margen); left: calc(var(--panel) + var(--margen) * 2); right: calc(var(--panel) + var(--margen) * 2);
+               max-width: 600px; margin: 0 auto; display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 999px; z-index: 2; }
+  #microfono { position: relative; flex: none; width: 60px; height: 60px; border-radius: 50%; border: none; font-size: 1.6rem;
+               background: radial-gradient(circle at 35% 30%, var(--oro-claro), var(--oro) 60%, #b8860b);
+               box-shadow: 0 8px 22px rgba(0, 0, 0, .3), inset 0 -4px 8px rgba(0, 0, 0, .2); transition: transform .15s; }
+  #microfono:hover { transform: scale(1.05); }
+  #microfono:disabled { filter: grayscale(1); opacity: .6; }
+  #microfono .onda { position: absolute; inset: 0; border-radius: 50%; border: 3px solid var(--rojo); opacity: 0; pointer-events: none; }
+  #microfono.escuchando { background: radial-gradient(circle at 35% 30%, #ff8fa0, var(--rojo) 60%, #c2183b); }
+  #microfono::after { content: ""; position: absolute; inset: -5px; border-radius: 50%; border: 3px solid var(--verde); pointer-events: none;
+                      opacity: calc(var(--nivel, 0) * 1.6); transform: scale(calc(1 + var(--nivel, 0) * .45)); transition: transform .08s, opacity .08s; }
+  #microfono.escuchando .onda { animation: onda 1.6s infinite ease-out; }
+  #microfono.escuchando .onda:nth-child(2) { animation-delay: .5s; }
+  #microfono.escuchando .onda:nth-child(3) { animation-delay: 1s; }
+  @keyframes onda { from { transform: scale(1); opacity: .8; } to { transform: scale(2.1); opacity: 0; } }
+  #texto { flex: 1; min-width: 0; border: none; outline: none; background: transparent; color: var(--crema); font: inherit; font-size: 1.05rem; padding: 0 6px; }
+  #texto::placeholder { color: var(--tenue); }
+  #enviar { flex: none; width: 48px; height: 48px; border-radius: 50%; border: none; background: var(--vino); font-size: 1.2rem; }
+  #enviar:hover { background: #962a4e; }
+  #estado { flex: none; font-size: .8rem; color: var(--oro-claro); white-space: nowrap; }
+  #estado:empty { display: none; }
+
+  /* ---------- bienvenida ---------- */
+  #inicio { position: fixed; inset: 0; z-index: 5; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+            padding-bottom: 9vh; cursor: pointer; transition: opacity .6s;
+            background: linear-gradient(to top, rgba(40, 8, 24, .82), rgba(40, 8, 24, .25) 45%, transparent 70%); }
+  #inicio.fuera { opacity: 0; visibility: hidden; pointer-events: none; }
+  #inicio h1 { margin: 0; font-size: clamp(2.2rem, 6vh, 4rem); text-shadow: 0 6px 24px rgba(0, 0, 0, .4); }
+  #inicio h1 span { color: var(--oro-claro); }
+  #inicio p { margin: 8px 0 26px; font-size: clamp(1rem, 2.3vh, 1.35rem); color: var(--tenue); }
+  #inicio .boton { padding: 16px 34px; border-radius: 999px; font-weight: 700; font-size: 1.15rem; color: var(--vino-oscuro);
+                   background: linear-gradient(135deg, var(--oro-claro), var(--oro)); box-shadow: 0 10px 30px rgba(0, 0, 0, .3);
+                   animation: latido 1.6s infinite; }
+  @keyframes latido { 50% { transform: scale(1.06); box-shadow: 0 14px 40px rgba(0, 0, 0, .35); } }
+
+  #aviso { position: fixed; top: calc(var(--arriba) + 6px); left: 50%; transform: translate(-50%, -20px); padding: 10px 18px; border-radius: 14px;
+           z-index: 6; opacity: 0; transition: all .3s; pointer-events: none; }
+  #aviso.visible { opacity: 1; transform: translate(-50%, 0); }
+
+  /* pantallas bajas: la torre de pisos cede su lugar a las tarjetas */
+  @media (max-height: 660px) {
+    :root { --arriba: 76px; }
+    header { height: 52px; }
+    .titulo-torre, .torre { display: none; }
+    .panel { padding: 12px; gap: 10px; }
+    #sugerencias button { padding: 5px 10px; font-size: .8rem; }
+    #sugerencias button:nth-child(n+5) { display: none; }
+  }
+
+  a.chip { color: var(--oro-claro); }
+  #vistas-movil { display: none; }
+  button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid var(--oro-claro); outline-offset: 3px; }
+  .panel, .chat, #tarjetas { min-height: 0; }
+  @media (max-width: 1100px) and (min-width: 901px) {
+    :root { --panel: 30vw; }
+    .marca small, #reloj { display: none; }
+    #controles { left: 32vw; right: 32vw; flex-wrap: wrap; border-radius: 20px; }
+    #estado { width: 100%; text-align: center; }
+  }
+  @media (max-width: 900px) {
+    :root { --panel: 0px; --margen: 10px; --arriba: 136px; --teclado: 0px; }
+    html, body { background: #28101f; }
+    header { padding: 0 10px; gap: 8px; }
+    .marca { gap: 8px; } .marca small, #reloj, .punto { display: none; }
+    .derecha { gap: 6px; } .estado-confianza { font-size: .65rem; padding: 5px; max-width: 118px; }
+    #nueva { font-size: .75rem; padding: 6px; min-height: 44px; max-width: 110px; }
+    #vistas-movil { position: fixed; z-index: 3; top: 76px; left: 10px; right: 10px; display: flex; gap: 8px; }
+    #vistas-movil button { flex: 1; min-height: 44px; background: #3f1a30; border: 1px solid var(--borde); border-radius: 12px; }
+    #vistas-movil button[aria-pressed="true"] { background: var(--oro); color: var(--vino-oscuro); font-weight: 700; }
+    #conversacion, #resultados { top: var(--arriba); left: 10px; right: 10px; bottom: calc(110px + env(safe-area-inset-bottom) + var(--teclado)); width: auto; height: auto; padding: 14px; background: rgba(35, 12, 28, .97); }
+    #resultados { display: none; } body[data-vista="resultados"] #resultados { display: flex; }
+    body[data-vista="resultados"] #conversacion { display: none; }
+    #tarjetas { flex-direction: column; overflow-x: hidden; overflow-y: auto; }
+    .tarjeta { min-width: 0; transform: none !important; animation: none; }
+    .torre { grid-template-columns: 100px 1fr; } .escenario { height: 110px; }
+    #controles { left: 10px; right: 10px; bottom: calc(10px + env(safe-area-inset-bottom) + var(--teclado)); max-width: none; border-radius: 18px; gap: 6px; flex-wrap: wrap; background: #3f1a30; }
+    #microfono, #enviar { width: 44px; height: 44px; } #texto { font-size: 16px; }
+    #estado { width: 100%; text-align: center; white-space: normal; }
+    #sugerencias { flex-wrap: nowrap; overflow-x: auto; } #sugerencias button { flex: none; min-height: 44px; }
+    .guia-btn { min-height: 44px; } a.chip { min-height: 44px; display: inline-flex; align-items: center; }
+    .info small { font-size: .86rem; line-height: 1.4; } #guia { inset: 6px; }
+    body.modo-2d #avatar2d { left: 0; right: 0; top: 70px; bottom: 100px; }
+    #inicio { padding: 24px 20px 14vh; text-align: center; } #inicio p { line-height: 1.5; }
+  }
+  @media (max-width: 360px) { .estado-confianza { max-width: 70px; font-size: .65rem; } }
+  @media (max-height: 540px) and (max-width: 900px) { .torre, #contexto { display: none; } #sugerencias { max-height: 48px; } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<div id="escena3d"></div>
+<div id="avatar2d"></div>
+
+<header id="cabecera" class="vidrio">
+  <div class="marca">
+    <div class="logo">P</div>
+    <div><b>Jarvis</b><small>Asistente del Paseo Aranjuez · Cochabamba</small></div>
+  </div>
+  <div class="derecha">
+    <a class="estado-confianza" href="/catalog/demo" style="color:var(--oro-claro);text-decoration:none">Respuestas con fuentes</a>
+    <button id="nueva" title="Empezar de nuevo">↺ Nueva conversación</button>
+    <div id="reloj"><b>--:--</b><small></small></div>
+    <div class="punto" title="En línea"></div>
+  </div>
+</header>
+<nav id="vistas-movil" aria-label="Vista del asistente"><button id="vista-chat" type="button" aria-pressed="true" aria-controls="conversacion">Conversación</button><button id="vista-resultados" type="button" aria-pressed="false" aria-controls="resultados">Resultados <span id="cuenta-resultados"></span></button></nav>
+
+<aside id="conversacion" class="vidrio panel">
+  <h2>CONVERSACIÓN CON JARVIS</h2>
+  <div class="chat" id="chat">
+    <div id="oyente"></div>
+    <div id="subtitulo" role="status" aria-live="polite">
+      <div class="quien">✦ JARVIS</div>
+      <div id="texto-respuesta">¡Hola! Pregúntame por tiendas, comida, eventos o servicios del Paseo.</div>
+    </div>
+  </div>
+  <div id="contexto" aria-live="polite"></div>
+  <h2>PUEDES PREGUNTARME</h2>
+  <div id="sugerencias"></div>
+</aside>
+
+<aside id="resultados" class="vidrio panel">
+  <h2 class="titulo-torre">PISOS DEL PASEO</h2>
+  <div class="torre">
+    <div class="escenario"><div class="pisos" id="capas"></div></div>
+    <ul class="nombres" id="nombres-pisos"></ul>
+  </div>
+  <h2>RESULTADOS CON FUENTES</h2>
+  <div id="tarjetas"></div>
+  <section id="guia" aria-live="polite">
+    <div class="guia-superior"><span class="guia-etiqueta">MODO ACOMPAÑAME</span><button id="cerrar-guia" title="Cerrar guía">×</button></div>
+    <h3 id="guia-destino"></h3>
+    <p id="guia-resumen"></p>
+    <ol class="ruta" id="pasos-guia"></ol>
+    <div class="qr-bloque" hidden><div id="qr-guia"></div><p>Escanea para abrir la fuente de este destino en tu teléfono.</p></div>
+    <a id="abrir-ficha" target="_blank" rel="noopener noreferrer">Abrir fuente publicada</a>
+  </section>
+</aside>
+
+<div id="controles" class="vidrio">
+  <button id="microfono" title="Hablar (barra espaciadora)"><span class="onda"></span><span class="onda"></span><span class="onda"></span>🎤</button>
+  <input id="texto" aria-label="Tu consulta para Jarvis" placeholder="Escribe o toca el micrófono…" autocomplete="off">
+  <span id="estado"></span>
+  <button id="enviar" title="Enviar">➤</button>
+</div>
+
+<div id="inicio">
+  <h1>¡Hola! Soy <span>Jarvis</span></h1>
+  <p>Tu asistente del Paseo Aranjuez. Pregúntame lo que necesites.</p>
+  <button class="boton" type="button">Toca para empezar 👆</button>
+</div>
+<div id="aviso" class="vidrio"></div>
+
+<script type="module">
+const SALUDO = "¡Hola! Soy Jarvis, tu asistente del Paseo Aranjuez. ¿En qué te puedo ayudar hoy?";
+const SUGERENCIAS = [
+  ["🍽️", "¿Dónde puedo comer?"], ["☕", "Quiero tomar un café"], ["🎁", "Busco un regalo"],
+  ["🅿️", "¿Dónde estaciono?"], ["📅", "¿Qué eventos hay hoy?"], ["🕒", "¿Qué está abierto ahora?"],
+];
+const PISOS = [
+  ["5", "Quinto y más"], ["4", "Cuarto piso"], ["3", "Tercer piso"], ["2", "Segundo piso"],
+  ["1", "Primer piso"], ["PB", "Planta baja"], ["S", "Semisótanos"],
+];
+const INACTIVIDAD_MS = 90_000;
+const API = "";
+const { StreamPlayer } = await import("/kiosk/js/stream-player.js");
+const streamPlayer = new StreamPlayer();
+let voiceConfig = {};
+let voiceAbort = null;
+let chatAbort = null;
+
+const $ = (id) => document.getElementById(id);
+let avatar;
+let sessionId = null;
+let turno = 0;
+let ultimaActividad = Date.now();
+let hablando = false;
+let enBienvenida = true;
+
+// ---------- Avatar: 3D si hay WebGL, si no el 2D ----------
+try {
+  const { Avatar3D } = await import("/kiosk/js/avatar3d.js");
+  avatar = new Avatar3D($("escena3d"));
+  document.body.classList.add("modo-3d");
+} catch (error) {
+  console.warn("Sin WebGL; uso el avatar 2D", error);
+  const { Avatar } = await import("/kiosk/js/avatar.js");
+  avatar = new Avatar($("avatar2d"));
+  document.body.classList.add("modo-2d");
+}
+window.avatar = avatar;
+
+function encuadrar() {
+  const caja = (id) => $(id).getBoundingClientRect();
+  const holgura = 10;
+  if (innerWidth > 900) {
+    avatar.encuadre({
+      arriba: caja("cabecera").bottom + holgura,
+      abajo: innerHeight - caja("controles").top + holgura,
+      izquierda: caja("conversacion").right + holgura,
+      derecha: innerWidth - caja("resultados").left + holgura,
+    });
+  } else {
+    avatar.encuadre({ arriba: caja("resultados").bottom + holgura, abajo: innerHeight - caja("conversacion").top + holgura });
+  }
+}
+const observador = new ResizeObserver(encuadrar);
+for (const id of ["cabecera", "conversacion", "resultados", "controles"]) observador.observe($(id));
+addEventListener("resize", encuadrar);
+encuadrar();
+
+// ---------- Utilidades de interfaz ----------
+function estado(texto, modo = "normal") {
+  $("estado").textContent = texto;
+  avatar.estado = modo;
+}
+
+let temporizadorAviso;
+function aviso(texto) {
+  $("aviso").textContent = texto;
+  $("aviso").classList.add("visible");
+  clearTimeout(temporizadorAviso);
+  temporizadorAviso = setTimeout(() => $("aviso").classList.remove("visible"), 3500);
+}
+
+function oyente(texto) {
+  $("oyente").textContent = texto || "";
+  $("oyente").classList.toggle("visible", !!texto);
+  $("chat").scrollTop = 0;
+}
+
+function relojBolivia() {
+  const ahora = new Date();
+  const zona = { timeZone: "America/La_Paz" };
+  $("reloj").querySelector("b").textContent = ahora.toLocaleTimeString("es-BO", { ...zona, hour: "2-digit", minute: "2-digit" });
+  $("reloj").querySelector("small").textContent = ahora.toLocaleDateString("es-BO", { ...zona, weekday: "long", day: "numeric", month: "long" });
+}
+relojBolivia();
+setInterval(relojBolivia, 15_000);
+
+$("sugerencias").innerHTML = SUGERENCIAS.map(([icono, texto]) => `<button data-p="${texto}">${icono} ${texto}</button>`).join("");
+$("sugerencias").onclick = (e) => { const b = e.target.closest("button"); if (b) preguntar(b.dataset.p); };
+
+// ---------- Torre de pisos ----------
+$("capas").innerHTML = PISOS.map(([clave], i) => `<div class="capa" data-piso="${clave}" style="--i:${PISOS.length - 1 - i}"></div>`).join("");
+$("nombres-pisos").innerHTML = PISOS.map(([clave, nombre]) => `<li data-piso="${clave}">${nombre}<span></span></li>`).join("");
+
+function marcarPisos(cuentas, activo = null) {
+  for (const el of document.querySelectorAll(".capa[data-piso], #nombres-pisos [data-piso]")) {
+    const n = cuentas[el.dataset.piso] || 0;
+    el.classList.toggle("con", n > 0);
+    el.classList.toggle("activa", el.dataset.piso === activo);
+    const contador = el.querySelector("span");
+    if (contador) contador.textContent = n || "";
+  }
+}
+
+// ---------- Tarjetas ----------
+const ICONOS = [
+  [/pizz/, "🍕"], [/hambur/, "🍔"], [/caf|churr|reposter/, "☕"], [/helad|açaí|postre/, "🍨"], [/mexic/, "🌮"],
+  [/parrilla|brochet/, "🍢"], [/cervec|coctel|bistr/, "🍹"], [/gastron|comida|cocina|restaurante/, "🍽️"],
+  [/jugueter|bebé/, "🧸"], [/joyer/, "💍"], [/reloj/, "⌚"], [/calzado/, "👟"], [/tecnolog|telecom/, "📱"],
+  [/óptica/, "👓"], [/deport|fitness/, "🏃"], [/flor/, "💐"], [/hogar/, "🛋️"], [/videojuego/, "🎮"],
+  [/perfum|cosmét|cuidado|maquill/, "💄"], [/artesan|madera|boliv/, "🧶"], [/lencer|interior/, "🩱"],
+  [/mochila|accesorio/, "👜"], [/ropa|jeans|moda/, "👗"], [/oficina|cowork/, "🏢"], [/arte|galer/, "🖼️"],
+];
+function icono(t) {
+  if (t.tipo === "evento") return "🎤";
+  if (t.tipo === "promocion") return "🏷️";
+  if (t.tipo === "producto") return "🛍️";
+  if (t.tipo === "info") return "ℹ️";
+  const texto = `${t.categoria || ""} ${t.tipo || ""} ${t.nombre || ""}`.toLowerCase();
+  return (ICONOS.find(([re]) => re.test(texto)) || [null, "🏬"])[1];
+}
+
+function escapar(valor) {
+  return String(valor || "").replace(/[&<>"']/g, (caracter) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  })[caracter]);
+}
+
+const { tarjetasDeEvidencia, clavePiso } = await import("/kiosk/js/evidence.mjs");
+function cambiarVista(vista) {
+  document.body.dataset.vista = vista;
+  $("vista-chat").setAttribute("aria-pressed", String(vista === "chat"));
+  $("vista-resultados").setAttribute("aria-pressed", String(vista === "resultados"));
+}
+$("vista-chat").onclick = () => cambiarVista("chat");
+$("vista-resultados").onclick = () => cambiarVista("resultados");
+if (window.visualViewport) {
+  const ajustarTeclado = () => document.documentElement.style.setProperty("--teclado", `${Math.max(0, innerHeight - visualViewport.height - visualViewport.offsetTop)}px`);
+  visualViewport.addEventListener("resize", ajustarTeclado);
+  visualViewport.addEventListener("scroll", ajustarTeclado);
+}
+let puntoKiosco = "Punto del kiosco pendiente de configurar";
+let baseMovil = "";
+fetch("/kiosk/config").then(r => r.json()).then(c => { puntoKiosco = c.origin; baseMovil = c.public_base_url || ""; if (c.demo_catalog) { const label = document.querySelector(".estado-confianza"); label.textContent = "Modo demo"; label.title = "Catálogo, promociones y algunos horarios son datos de prueba. Consulta /catalog/demo para conocer su alcance."; } }).catch(() => {});
+
+function tarjetaHtml(t, n) {
+  const u = t.ubicacion || t.tienda || {};
+  const piso = clavePiso(u.piso);
+  const chips = [];
+  if (piso) chips.push(`<span class="chip piso">${piso === "PB" ? "Planta baja" : piso === "S" ? "Semisótano" : "Piso " + piso}</span>`);
+  if (u.local) chips.push(`<span class="chip">Local ${escapar(u.local)}</span>`);
+  if (t.abierto_ahora != null) chips.push(`<span class="chip ${t.abierto_ahora ? "abierto" : "cerrado"}">${t.abierto_ahora ? "Abierto" : "Cerrado"}</span>`);
+  let titulo = t.nombre, detalle = t.categoria || u.sector || "";
+  if (t.tipo === "producto") detalle = `${t.precio_bs != null ? "Bs " + t.precio_bs : "Consulta el precio"} · ${t.tienda?.nombre || ""}`;
+  if (t.tipo === "promocion") { titulo = t.titulo; detalle = `${t.descripcion} · ${t.tienda?.nombre || ""} · ${t.condiciones}`; }
+  if (t.tipo === "evento") detalle = `${t.fecha} · ${t.lugar || ""} · ${t.descripcion_evento}`;
+  if (t.tipo === "info") { titulo = t.pregunta; detalle = t.respuesta || ""; }
+  const extra = (u.sector ? `<small>Sector: ${escapar(u.sector)}</small>` : "") +
+    (t.torre ? `<small>Torre: ${escapar(t.torre)}</small>` : "") +
+    (u.referencia ? `<small>${escapar(u.referencia)}</small>` : "") +
+    (t.horario ? `<small>🕒 ${escapar(t.horario)}</small>` : "") +
+    (t.demo ? "" : `<small>${escapar(t.verificacion)}${t.verificado_en ? " · " + escapar(t.verificado_en.slice(0, 10)) : ""}</small>`) +
+    (t.vence ? `<small>Vigencia: ${escapar(t.vence)}</small>` : "");
+  const nombre = escapar(t.nombre || titulo || "");
+  const fuente = t.fuente_url && !t.demo
+    ? `<a class="chip" href="${escapar(t.fuente_url)}" target="_blank" rel="noopener noreferrer">${t.demo ? "Sobre la demo" : "Fuente"}</a>`
+    : "";
+  const guia = piso && t.fuente_url
+    ? `<button class="guia-btn" type="button" data-guia="${n}">✦ Guíame hasta aquí</button>`
+    : "";
+  return `<div class="tarjeta" style="--n:${n}" data-piso="${piso || ""}" data-nombre="${nombre}" data-tipo="${escapar(t.tipo)}">
+    <div class="icono">${icono(t)}</div>
+    <div class="info"><b>${escapar(titulo)}</b><small>${escapar(detalle)}</small>${extra}<div class="chips">${chips.join("")}${fuente}</div>${guia}</div>
+  </div>`;
+}
+
+let cuentasPisos = {};
+let tarjetasActuales = [];
+function mostrarTarjetas(tarjetas) {
+  const lista = tarjetas.slice(0, 8);
+  tarjetasActuales = lista;
+  $("cuenta-resultados").textContent = lista.length ? `(${lista.length})` : "";
+  $("tarjetas").innerHTML = lista.map(tarjetaHtml).join("");
+  cuentasPisos = {};
+  for (const t of lista) {
+    const p = clavePiso((t.ubicacion || t.tienda || {}).piso);
+    if (p) cuentasPisos[p] = (cuentasPisos[p] || 0) + 1;
+  }
+  marcarPisos(cuentasPisos);
+}
+
+$("tarjetas").addEventListener("pointermove", (e) => {
+  const tarjeta = e.target.closest(".tarjeta");
+  if (!tarjeta) return;
+  const r = tarjeta.getBoundingClientRect();
+  const x = (e.clientX - r.left) / r.width - 0.5;
+  const y = (e.clientY - r.top) / r.height - 0.5;
+  tarjeta.style.transform = `rotateY(${x * 16}deg) rotateX(${-y * 16}deg) translateZ(10px)`;
+  marcarPisos(cuentasPisos, tarjeta.dataset.piso || null);
+});
+$("tarjetas").addEventListener("pointerout", (e) => {
+  const tarjeta = e.target.closest(".tarjeta");
+  if (tarjeta && !tarjeta.contains(e.relatedTarget)) { tarjeta.style.transform = ""; marcarPisos(cuentasPisos); }
+});
+$("tarjetas").addEventListener("click", (e) => {
+  const botonGuia = e.target.closest("[data-guia]");
+  if (botonGuia) {
+    e.preventDefault();
+    abrirGuia(tarjetasActuales[Number(botonGuia.dataset.guia)]);
+    return;
+  }
+  const tarjeta = e.target.closest(".tarjeta");
+  if (tarjeta?.dataset.tipo === "lugar") preguntar(`Muéstrame el catálogo de ${tarjeta.dataset.nombre}`);
+});
+
+function abrirGuia(destino) {
+  if (!destino) return;
+  cambiarVista("resultados");
+  const ubicacion = destino.ubicacion || {};
+  const piso = clavePiso(ubicacion.piso);
+  const pisoTexto = piso === "PB" ? "planta baja" : piso === "S" ? "semisótano" : `piso ${piso || ubicacion.piso}`;
+  const local = ubicacion.local ? `local ${ubicacion.local}` : "el destino señalado";
+  const pasos = [
+    ["Punto de partida", puntoKiosco],
+    ["Ubicación publicada", `Destino en ${pisoTexto}. No tengo un recorrido interior validado.`],
+    ["Referencia", `${ubicacion.local ? "Busca " + local : "Número de local pendiente"}: ${destino.nombre}.${ubicacion.referencia ? " " + ubicacion.referencia : ""}`],
+  ];
+  $("guia-destino").textContent = destino.nombre;
+  $("guia-resumen").textContent = `${pisoTexto}${ubicacion.local ? ` · local ${ubicacion.local}` : ""}`;
+  $("pasos-guia").innerHTML = pasos.map(([titulo, detalle]) => `<li><b>${escapar(titulo)}</b>${escapar(detalle)}</li>`).join("");
+  const fichaLocal = `${location.origin}/destination/${encodeURIComponent(destino.id)}`;
+  $("abrir-ficha").href = fichaLocal;
+  $("abrir-ficha").textContent = "Abrir ficha del destino";
+  const qrHolder = $("qr-guia");
+  qrHolder.replaceChildren();
+  const qr = new Image();
+  qr.alt = baseMovil ? "Código QR de la ficha del destino" : "Código QR de la fuente del destino";
+  const bloqueQr = $("guia").querySelector(".qr-bloque");
+  bloqueQr.hidden = true;
+  qr.onload = () => { qrHolder.replaceChildren(qr); bloqueQr.hidden = false; };
+  qr.onerror = () => { bloqueQr.hidden = true; };
+  bloqueQr.querySelector("p").textContent = baseMovil ? "Escanea para llevar la ficha del destino a tu teléfono." : "Escanea para abrir la fuente publicada. La ficha móvil necesita una URL accesible desde tu teléfono.";
+  qr.src = `/qr/destination/${encodeURIComponent(destino.id)}`;
+  $("guia").classList.add("activa");
+  marcarPisos(cuentasPisos, piso);
+  avatar.gesto("presentar", 2400);
+  hablar(`Te acompaño a ${destino.nombre}. Ve al ${pisoTexto}${ubicacion.local ? `, local ${ubicacion.local}` : ""}.`);
+}
+
+$("cerrar-guia").onclick = () => { $("guia").classList.remove("activa"); marcarPisos(cuentasPisos); };
+
+function actualizarContexto(datos) {
+  const fuentes = datos.sources || [];
+  const chips = [];
+  if (datos.intent === "weather" && fuentes[0]) {
+    const clima = fuentes[0].attributes || {};
+    chips.push(`☀ ${clima.condition || "Clima actualizado"} · ${Math.round(clima.temperature_c || 0)} °C`);
+  }
+  if (datos.intent === "hours") {
+    const abiertos = fuentes.filter((fuente) => fuente.attributes?.open_now).length;
+    chips.push(`◷ ${abiertos}/${fuentes.length} áreas publicadas abiertas`);
+  }
+  if (datos.preferences?.budget_bs != null) chips.push(`Presupuesto: Bs ${datos.preferences.budget_bs}`);
+  if (datos.preferences?.recipient === "infantil") chips.push("Regalo para niño/a");
+  $("contexto").innerHTML = chips.map((chip) => `<span class="contexto-chip">${escapar(chip)}</span>`).join("");
+}
+
+// ---------- Subtítulos sincronizados ----------
+function dividirFrases(texto) {
+  const unidas = [];
+  for (const f of texto.split(/(?<=[.!?…])\s+/).map((s) => s.trim()).filter(Boolean)) {
+    if (unidas.length && unidas[unidas.length - 1].length < 40) unidas[unidas.length - 1] += " " + f;
+    else unidas.push(f);
+  }
+  return unidas;
+}
+
+function pintarSubtitulo(frases) {
+  $("texto-respuesta").innerHTML = frases
+    .map((f, i) => f.split(/\s+/).map((p) => `<span class="p" data-f="${i}">${escapar(p)}</span>`).join(" "))
+    .join(" ");
+}
+
+function progresoFrase(i, fraccion) {
+  const palabras = [...$("texto-respuesta").querySelectorAll(`[data-f="${i}"]`)];
+  const hasta = Math.ceil(fraccion * palabras.length);
+  palabras.forEach((p, j) => {
+    p.classList.toggle("dicha", j < hasta);
+    p.classList.toggle("ahora", j === hasta - 1 && fraccion < 1);
+  });
+}
+
+function pensando() {
+  $("texto-respuesta").innerHTML = `<span class="pensando"><span></span><span></span><span></span></span>`;
+}
+
+// ---------- Voz ----------
+function textoParaVoz(texto) {
+  return texto.replace(/\bBs\.?\s*(\d+(?:[.,]\d+)?)/gi, "$1 bolivianos").replace(/(\d{1,2}:\d{2})[–—](\d{1,2}:\d{2})/g, "$1 a $2");
+}
+
+async function pedirAudio(texto, signal) {
+  const r = await fetch(`${API}/voice/synthesize`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: textoParaVoz(texto) }), signal });
+  if (!r.ok) throw new Error(r.status);
+  return URL.createObjectURL(await r.blob());
+}
+
+function vozNavegador(texto, alProgresar) {
+  return new Promise((resolve) => {
+    const hablado = textoParaVoz(texto);
+    const u = new SpeechSynthesisUtterance(hablado);
+    const voces = speechSynthesis.getVoices().filter((v) => v.lang.startsWith("es"));
+    u.voice = voces.find((v) => /BO|419|MX|US/.test(v.lang)) || voces[0] || null;
+    u.lang = u.voice?.lang || "es-419";
+    u.onstart = () => avatar.hablarSimulado(true);
+    u.onboundary = (e) => alProgresar(e.charIndex / hablado.length);
+    u.onend = u.onerror = () => { avatar.hablarSimulado(false); alProgresar(1); resolve(); };
+    speechSynthesis.speak(u);
+  });
+}
+
+async function hablar(texto, { presentar = false } = {}) {
+  callar();
+  const miTurno = ++turno;
+  const controller = new AbortController();
+  voiceAbort = controller;
+  const audioUrls = new Set();
+  const frases = dividirFrases(texto);
+  pintarSubtitulo(frases);
+  hablando = true;
+  try {
+    if (voiceConfig.streaming) {
+      estado("");
+      if (presentar) avatar.gesto("presentar", 2600);
+      try {
+        await streamPlayer.play(`${API}/voice/stream`, textoParaVoz(texto), {
+          signal: controller.signal,
+          onAnalyser: (analyser) => {
+            if (miTurno !== turno) return;
+            avatar.analizador = analyser;
+            avatar.buffer = analyser ? new Uint8Array(analyser.fftSize) : null;
+          },
+          onFirstAudio: (ms) => console.info("Jarvis TTS primer audio: %d ms", Math.round(ms)),
+        });
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        // Keep the verified text; do not repeat a partially played reply in another voice.
+        aviso("La voz no está disponible; puedes leer la respuesta");
+        console.warn("Streaming de voz", error);
+      }
+      if (miTurno === turno) frases.forEach((_, i) => progresoFrase(i, 1));
+      return;
+    }
+    const prepararAudio = (frase) => pedirAudio(frase, controller.signal).then(url => {
+      if (miTurno !== turno) { URL.revokeObjectURL(url); return null; }
+      audioUrls.add(url);
+      return url;
+    }).catch(() => null);
+    let siguienteAudio = prepararAudio(frases[0]);
+    for (let i = 0; i < frases.length; i++) {
+      const url = await siguienteAudio;
+      if (miTurno !== turno) return;
+      // Prepare only the next sentence while this one plays; keep requests bounded.
+      if (i + 1 < frases.length) siguienteAudio = prepararAudio(frases[i + 1]);
+      estado("");
+      if (i === 0 && presentar) avatar.gesto("presentar", 2600);
+      const alProgresar = (f) => progresoFrase(i, f);
+      if (url) {
+        try { await avatar.hablarAudio(url, { alProgresar }); }
+        finally { URL.revokeObjectURL(url); audioUrls.delete(url); }
+      }
+      else await vozNavegador(frases[i], alProgresar);
+    }
+  } finally {
+    controller.abort();
+    for (const url of audioUrls) URL.revokeObjectURL(url);
+    if (miTurno === turno) { hablando = false; ultimaActividad = Date.now(); }
+  }
+}
+
+function callar() {
+  turno++;
+  voiceAbort?.abort();
+  chatAbort?.abort();
+  avatar.analizador = null;
+  hablando = false;
+  speechSynthesis.cancel();
+  avatar.callar();
+}
+
+// ---------- Conversación ----------
+async function preguntar(texto) {
+  texto = (texto || "").trim();
+  if (!texto) return;
+  if (enBienvenida) salirBienvenida(false);
+  ultimaActividad = Date.now();
+  callar();
+  const controller = new AbortController();
+  chatAbort = controller;
+  oyente(texto);
+  pensando();
+  estado("Pensando…", "pensando");
+  avatar.gesto("pensar");
+  try {
+    const r = await fetch(`${API}/chat`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: texto, session_id: sessionId }),
+      signal: controller.signal,
+    });
+    const datos = await r.json();
+    if (controller.signal.aborted) return;
+    if (!r.ok) throw new Error(datos.error || r.status);
+    chatAbort = null;
+    sessionId = datos.session_id;
+    avatar.gesto("normal");
+    estado("", "normal");
+    const tarjetas = tarjetasDeEvidencia(datos.sources);
+    $("guia").classList.remove("activa");
+    mostrarTarjetas(tarjetas);
+    actualizarContexto(datos);
+    if (datos.suggestions?.length) {
+      $("sugerencias").innerHTML = datos.suggestions.slice(0, 5).map(text => `<button data-p="${escapar(text)}">${escapar(text)}</button>`).join("");
+    }
+    if (datos.intent === "navigation" && tarjetas[0]?.ubicacion?.piso) abrirGuia(tarjetas[0]);
+    else await hablar(datos.answer, { presentar: tarjetas.length > 0 });
+  } catch (error) {
+    if (controller.signal.aborted) return;
+    avatar.gesto("normal");
+    estado("", "normal");
+    pintarSubtitulo(["Disculpa, tuve un problema. ¿Puedes repetirlo?"]);
+    progresoFrase(0, 1);
+    aviso("No pude conectar con el asistente");
+  }
+}
+
+$("enviar").onclick = () => { preguntar($("texto").value); $("texto").value = ""; };
+$("texto").onkeydown = (e) => { if (e.key === "Enter") $("enviar").click(); };
+
+async function reiniciar() {
+  callar();
+  if (sessionId) fetch(`${API}/chat/${sessionId}`, { method: "DELETE" }).catch(() => {});
+  sessionId = null;
+  $("tarjetas").innerHTML = "";
+  tarjetasActuales = [];
+  $("guia").classList.remove("activa");
+  $("contexto").innerHTML = "";
+  cuentasPisos = {};
+  marcarPisos({});
+  oyente("");
+  pintarSubtitulo(["¡Hola! Pregúntame por tiendas, comida, eventos o servicios del Paseo."]);
+  progresoFrase(0, 1);
+  estado("", "normal");
+}
+$("nueva").onclick = () => { reiniciar(); aviso("Conversación nueva"); };
+
+// ---------- Bienvenida e inactividad ----------
+let saludoPeriodico = setInterval(() => enBienvenida && avatar.gesto("saludar", 2400), 7000);
+avatar.gesto("saludar", 2400);
+
+function salirBienvenida(saludar = true) {
+  enBienvenida = false;
+  $("inicio").classList.add("fuera");
+  avatar.desbloquear();
+  streamPlayer.unlock().catch(() => {});
+  ultimaActividad = Date.now();
+  if (saludar) {
+    avatar.gesto("saludar", 2600);
+    hablar(SALUDO);
+  }
+}
+$("inicio").onclick = () => salirBienvenida(true);
+
+for (const evento of ["pointerdown", "keydown"]) addEventListener(evento, () => { ultimaActividad = Date.now(); });
+setInterval(() => {
+  if (!enBienvenida && !hablando && Date.now() - ultimaActividad > INACTIVIDAD_MS) {
+    reiniciar();
+    enBienvenida = true;
+    $("inicio").classList.remove("fuera");
+  }
+}, 5000);
+
+// ---------- Micrófono ----------
+// Primero el reconocimiento del navegador (Chrome/Edge, con texto en vivo). Si no existe o no tiene servicio
+// (p. ej. navegadores embebidos sin acceso a los servidores de Google), se graba aquí y el backend local transcribe.
+const Reconocimiento = window.SpeechRecognition || window.webkitSpeechRecognition;
+const SIN_SERVICIO = ["network", "service-not-allowed", "language-not-supported"];
+const ERRORES_MICROFONO = {
+  "not-allowed": "Permite el micrófono: toca el candado junto a la dirección",
+  "audio-capture": "No encuentro un micrófono conectado",
+  NotAllowedError: "Permite el micrófono: toca el candado junto a la dirección",
+  NotFoundError: "No encuentro un micrófono conectado",
+  NotReadableError: "Otro programa está usando el micrófono",
+};
+const UMBRAL_VOZ = 0.02;
+let SILENCIO_FIN_MS = 1300;
+const ESPERA_SIN_VOZ_MS = 7000;
+const MAX_GRABACION_MS = 15000;
+
+let modoMicrofono = Reconocimiento ? "navegador" : "servidor";
+const voiceConfigReady = fetch(`${API}/voice/status`).then(r => r.json()).then(config => {
+  voiceConfig = config;
+  if (config.prefer_server_stt) modoMicrofono = "servidor";
+  if (config.silence_ms) SILENCIO_FIN_MS = Math.max(450, Math.min(1500, config.silence_ms));
+}).catch(() => {});
+let escuchando = false;
+let preparando = false;
+let detenerGrabacion = null;
+
+function marcarEscucha(activo) {
+  escuchando = activo;
+  $("microfono").classList.toggle("escuchando", activo);
+  if (activo) estado("Escuchando…", "escuchando");
+  else if (avatar.estado === "escuchando") estado("");
+}
+
+let rec = null;
+if (Reconocimiento) {
+  rec = new Reconocimiento();
+  rec.lang = "es-BO";
+  rec.interimResults = true;
+  rec.onstart = () => marcarEscucha(true);
+  rec.onend = () => { if (modoMicrofono === "navegador") marcarEscucha(false); };
+  rec.onerror = (e) => {
+    if (SIN_SERVICIO.includes(e.error)) {
+      console.info("Reconocimiento del navegador sin servicio (%s); uso la transcripción local", e.error);
+      modoMicrofono = "servidor";
+      marcarEscucha(false);
+      escucharConServidor();
+    } else if (ERRORES_MICROFONO[e.error]) {
+      aviso(ERRORES_MICROFONO[e.error]);
+    }
+  };
+  rec.onresult = (e) => {
+    ultimaActividad = Date.now();
+    const r = e.results[e.results.length - 1];
+    oyente(r[0].transcript);
+    if (r.isFinal) preguntar(r[0].transcript);
+  };
+}
+
+async function aWav(blob, ctx) {
+  const original = await ctx.decodeAudioData(await blob.arrayBuffer());
+  const tasa = 16000;
+  const offline = new OfflineAudioContext(1, Math.ceil(original.duration * tasa), tasa);
+  const fuente = offline.createBufferSource();
+  fuente.buffer = original;
+  fuente.connect(offline.destination);
+  fuente.start();
+  const datos = (await offline.startRendering()).getChannelData(0);
+  const v = new DataView(new ArrayBuffer(44 + datos.length * 2));
+  const escribir = (o, s) => [...s].forEach((c, i) => v.setUint8(o + i, c.charCodeAt(0)));
+  escribir(0, "RIFF"); v.setUint32(4, 36 + datos.length * 2, true); escribir(8, "WAVE");
+  escribir(12, "fmt "); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, tasa, true); v.setUint32(28, tasa * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+  escribir(36, "data"); v.setUint32(40, datos.length * 2, true);
+  datos.forEach((m, i) => v.setInt16(44 + i * 2, Math.max(-1, Math.min(1, m)) * 0x7fff, true));
+  return new Blob([v], { type: "audio/wav" });
+}
+
+async function transcribir(trozos, tipo, ctx) {
+  estado("Entendiendo…", "pensando");
+  try {
+    const wav = await aWav(new Blob(trozos, { type: tipo }), ctx);
+    const r = await fetch(`${API}/voice/transcribe`, { method: "POST", headers: { "Content-Type": "audio/wav" }, body: wav });
+    const datos = await r.json();
+    if (!r.ok) throw new Error(datos.error || r.status);
+    if (!datos.text) { estado(""); aviso("No te entendí, ¿puedes repetirlo?"); return; }
+    preguntar(datos.text);
+  } catch (error) {
+    console.warn("Transcripción falló", error);
+    estado("");
+    aviso("No pude entender el audio, intenta de nuevo");
+  } finally {
+    ctx.close();
+  }
+}
+
+async function escucharConServidor() {
+  if (preparando || escuchando) return;
+  preparando = true;
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
+  } catch (e) {
+    aviso(ERRORES_MICROFONO[e.name] || "No pude abrir el micrófono");
+    return;
+  } finally {
+    preparando = false;
+  }
+
+  const ctx = new AudioContext();
+  await ctx.resume();
+  const analizador = ctx.createAnalyser();
+  analizador.fftSize = 1024;
+  ctx.createMediaStreamSource(stream).connect(analizador);
+  const muestras = new Float32Array(analizador.fftSize);
+  const grabadora = new MediaRecorder(stream);
+  const trozos = [];
+  grabadora.ondataavailable = (e) => { if (e.data.size) trozos.push(e.data); };
+
+  const inicio = performance.now();
+  let hablo = false;
+  let ultimaVoz = inicio;
+  let terminado = false;
+  const terminar = () => {
+    if (terminado) return;
+    terminado = true;
+    detenerGrabacion = null;
+    grabadora.stop();
+  };
+  detenerGrabacion = terminar;
+
+  grabadora.onstop = () => {
+    stream.getTracks().forEach((t) => t.stop());
+    $("microfono").style.setProperty("--nivel", 0);
+    marcarEscucha(false);
+    if (!hablo) {
+      ctx.close();
+      aviso("No te escuché. Revisa que el micrófono de Windows correcto esté activo");
+      return;
+    }
+    transcribir(trozos, grabadora.mimeType, ctx);
+  };
+  grabadora.start(250);
+  marcarEscucha(true);
+
+  const medir = () => {
+    if (terminado) return;
+    analizador.getFloatTimeDomainData(muestras);
+    let suma = 0;
+    for (const m of muestras) suma += m * m;
+    const nivel = Math.sqrt(suma / muestras.length);
+    $("microfono").style.setProperty("--nivel", Math.min(1, nivel * 10).toFixed(2));
+    const ahora = performance.now();
+    if (nivel > UMBRAL_VOZ) { hablo = true; ultimaVoz = ahora; ultimaActividad = Date.now(); }
+    const callado = hablo && ahora - ultimaVoz > SILENCIO_FIN_MS;
+    if (callado || (!hablo && ahora - inicio > ESPERA_SIN_VOZ_MS) || ahora - inicio > MAX_GRABACION_MS) return terminar();
+    requestAnimationFrame(medir);
+  };
+  medir();
+}
+
+async function alternar() {
+  if (enBienvenida) salirBienvenida(false);
+  avatar.desbloquear();
+  streamPlayer.unlock().catch(() => {});
+  await voiceConfigReady;
+  if (escuchando) {
+    if (detenerGrabacion) detenerGrabacion();
+    else rec?.stop();
+    return;
+  }
+  callar();
+  if (modoMicrofono === "servidor") return escucharConServidor();
+  try { rec.start(); } catch { /* ya estaba escuchando */ }
+}
+
+if (!navigator.mediaDevices?.getUserMedia && !Reconocimiento) {
+  $("microfono").disabled = true;
+  $("microfono").title = "Este navegador no permite usar el micrófono";
+}
+$("microfono").onclick = alternar;
+addEventListener("keydown", (e) => {
+  if (e.code === "Space" && document.activeElement !== $("texto")) { e.preventDefault(); alternar(); }
+});
+</script>
+</body>
+</html>

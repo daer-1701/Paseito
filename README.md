@@ -1,104 +1,95 @@
-﻿# Paseito
+# Paseito · integración con Jarvis
 
-Asistente inteligente del **Paseo Aranjuez** (Cochabamba, Bolivia), creado para la Hackathon By Paseo 2026.
+Esta rama reúne el último `main` de `daer-1701/Paseito` y el trabajo del
+monorepo Paseo Aranjuez Digital, conservando ambos historiales Git.
 
-Paseito es una cochabambina virtual que conversa por voz o texto con los visitantes: les dice dónde
-encontrar tiendas, comida, servicios, eventos y promociones, si un local está abierto ahora y cómo llegar.
-Todo lo que responde sale de la base de datos del Paseo; el modelo no inventa lugares ni precios.
+## Aplicaciones disponibles
 
-## Qué incluye
+| Aplicación | Carpetas | Arranque |
+|---|---|---|
+| Paseito con avatar cochabambino, Gemini y FastAPI | `backend/`, `frontend/` | [Guía de Paseito](docs/paseito-original.md) |
+| Jarvis con voz local GPU, catálogo conversacional y demo WhatsApp | `apps/jarvis-backend/`, `services/voice/` | [Arranque Windows y WSL2](docs/arranque-torre-windows.md) |
 
-- **Agente conversacional** con Google Gemini y function calling sobre los datos reales del Paseo
-  (70 tiendas importadas del sitio oficial, espacios, eventos y preguntas frecuentes).
-- **Voz boliviana** (`es-BO-SofiaNeural`) para leer las respuestas en ~1,5 s.
-- **Avatar 3D** (Three.js) con sombrero blanco cochabambino, trenzas, manta de aguayo y pollera, frente al
-  Tunari y el Cristo de la Concordia; la boca sigue el audio real. Respaldo 2D en SVG si no hay WebGL.
-- **Kiosco** con micrófono, subtítulos sincronizados y tarjetas de los lugares encontrados.
-- **Analítica** de lo más buscado y de la demanda no cubierta (lo que la gente pide y el Paseo no tiene).
+Son dos aplicaciones independientes dentro del mismo repositorio. Sus APIs,
+sesiones y bases SQLite todavía no están unificadas. El frontend de Paseito
+utiliza su backend FastAPI; el kiosco Jarvis utiliza su propia API. Ambos usan
+el puerto 8000 por defecto: ejecuta uno a la vez o inicia Paseito con
+`uvicorn app.main:app --port 8002` desde `backend/` y abre `http://localhost:8002`.
 
-## Cómo correrlo
+Los archivos `.env`, bases de datos locales y descargas temporales se mantienen
+fuera de Git. Los ejemplos de configuración de ambos proyectos se conservan.
 
-El proyecto está separado en dos partes:
+[Detalle de esta integración](docs/integracion-paseito.md).
 
-- `backend/`: API en FastAPI + Gemini + SQLite (Python 3.11 o superior).
-- `frontend/`: kiosco en HTML/JS puro con Three.js incluido; no necesita build ni `npm install`.
+---
 
-### Backend
+# Paseo Aranjuez Digital
 
-```bash
-cd backend
-pip install -r requirements.txt
-cp .env.example .env        # en Windows: copy .env.example .env
-# editar .env y poner GEMINI_API_KEY (https://aistudio.google.com/apikey)
-uvicorn app.main:app --port 8000
-```
-
-La base SQLite (`backend/paseo.db`) se crea y se llena sola en el primer arranque.
-La documentación interactiva de la API queda en http://localhost:8000/docs.
-
-### Frontend
-
-La forma más simple: el backend sirve la carpeta `frontend/` en la raíz, así que con el backend corriendo
-basta abrir **http://localhost:8000** (kiosco) o http://localhost:8000/prueba-voz.html.
-
-Para trabajarlo por separado, con cualquier servidor estático:
-
-```bash
-cd frontend
-python -m http.server 5500
-```
-
-y abrir http://localhost:5500. El frontend busca la API en el puerto 8000 del mismo host; para otro servidor
-se cambia `frontend/config.js` o se abre la página con `?api=https://mi-backend.com`.
-
-El micrófono solo funciona en `localhost` o con HTTPS. En Chrome y Edge se usa el reconocimiento del
-navegador; en los demás, el audio se transcribe con Gemini en `POST /voz/escuchar`.
-
-## API principal
-
-| Método y ruta | Uso |
-|---|---|
-| `POST /chat` | `{"mensaje": "...", "session_id": "opcional"}` → respuesta, tarjetas, herramientas usadas |
-| `DELETE /chat/{session_id}` | Olvida la conversación (nuevo visitante) |
-| `POST /voz` | `{"texto": "..."}` → MP3 con la voz de Paseito |
-| `POST /voz/escuchar` | Audio en el cuerpo (`Content-Type: audio/wav`, `audio/mp3`…) → `{"texto": "..."}` |
-| `GET /lugares`, `/productos`, `/promociones`, `/eventos`, `/faqs` | Catálogo |
-| `GET /analitica/resumen` | Consultas, términos más buscados y demanda no cubierta |
-| `/admin/...` | Altas, bajas y cambios (header `X-Admin-Token` si `ADMIN_TOKEN` está definido) |
-
-Para usar el avatar en otro frontend:
-
-```js
-import { Avatar } from "http://localhost:8000/js/avatar.js";
-const avatar = new Avatar(document.getElementById("avatar"));
-avatar.desbloquear();                 // dentro de un clic del usuario
-await avatar.hablarAudio(urlDelMp3);  // reproduce y mueve la boca
-```
+Monorepo del equipo para la Hackatón by Paseo Aranjuez. Agrupa los tres retos
+con una aplicación separada para cada uno y contratos compartidos para que se
+puedan integrar sin acoplar sus implementaciones.
 
 ## Estructura
 
-```
-backend/                 API (FastAPI)
-  app/
-    main.py          app, CORS y montaje opcional del frontend
-    agente.py        agente Gemini con herramientas y memoria por sesión
-    herramientas.py  búsquedas sobre la base del Paseo
-    voz.py           texto a voz (edge-tts o Gemini TTS) y transcripción con Gemini
-    rutas/           endpoints de chat, catálogo, admin, analítica y voz
-    datos/           lugares.json generado por el importador
-  scripts/
-    importar_paseo.py  regenera lugares.json desde paseoaranjuez.com
-frontend/                kiosco (HTML/JS sin build)
-  index.html         pantalla del kiosco con Paseito en 3D
-  prueba-voz.html    página simple para probar chat y voz
-  config.js          URL del backend
-  js/
-    avatar3d.js      Paseito en Three.js con la escena de Cochabamba
-    avatar.js        avatar 2D en SVG (respaldo sin WebGL)
-  vendor/three/      Three.js 0.186.1
+```text
+apps/
+  jarvis-backend/   API conversacional y búsqueda de conocimiento
+  paseoya/          Marketplace y retiro presencial
+  paseo-points/     Fidelización y recompensas
+packages/
+  contracts/        Contratos API y modelos compartidos
+docs/
+  retos/            Enunciado oficial
 ```
 
-## Configuración
+Jarvis está inicializado en `apps/jarvis-backend`. PaseoYa y Paseo Points tienen
+un README inicial para que sus responsables agreguen ahí sus aplicaciones.
+Los contratos entre equipos se documentan en `packages/contracts`.
 
-Todas las opciones están documentadas en `backend/.env.example`: modelo principal y de respaldo de
-Gemini, motor y voz de TTS, orígenes CORS y token de administración. El archivo `.env` nunca se sube al repositorio.
+## Correr Jarvis
+
+Para la **torre Windows 11 + WSL2 + RTX 4070**, seguir el
+[arranque con Docker y voz local](docs/arranque-torre-windows.md).
+Una vez instalados Docker Desktop y el controlador NVIDIA:
+
+```bash
+bash scripts/start-tower.sh
+```
+
+Para desarrollo directo en la Mac:
+
+```bash
+cd apps/jarvis-backend
+python3 -m pip install -r requirements.txt
+python3 -m jarvis.seed
+export JARVIS_INGEST_TOKEN="un-secreto-para-la-demo"
+python3 -m jarvis.api
+```
+
+Abrir `http://localhost:8000` para probar el chat y la voz local. Consulta el
+[README de Jarvis](apps/jarvis-backend/README.md) para preparar Whisper y Piper
+en otra máquina.
+
+Consulta el README de cada aplicación para sus detalles. El repositorio no fija
+un lenguaje ni framework común a las tres aplicaciones; cada equipo puede
+escogerlos y compartir únicamente los contratos de integración.
+
+La [recomendación técnica](docs/decisiones-tecnicas.md) propone un stack y los
+acuerdos de datos que el equipo debe cerrar antes de integrar la demo.
+La [propuesta de Jarvis presencial](docs/propuesta-jarvis-presencial.md) describe
+la experiencia, el servidor central, las garantías sobre fuentes y la
+demostración para el jurado.
+El [plan de implementación futura](docs/implementacion-futura-jarvis.md) define
+la transición hacia kioscos Raspberry Pi, un servidor central, voz local y el
+uso posterior de Vercel y AWS.
+
+El [estado actual de datos e investigación](docs/investigacion-datos-publicos.md)
+documenta fuentes, horarios contradictorios, límites del catálogo y pendientes.
+El [acceso móvil](docs/acceso-movil.md) explica el QR local y la pasarela opcional.
+
+El [estado de requerimientos, catálogo demo y WhatsApp](docs/estado-requerimientos-y-whatsapp.md) detalla lo implementado y las consultas pendientes. El catálogo ficticio se habilita con `JARVIS_DEMO_CATALOG=1`; su procedencia se conserva en los datos y en la indicación general de modo demo.
+
+La [demo conversacional y el respaldo de WhatsApp](docs/whatsapp-mvp-y-presentacion.md)
+explican el flujo de tiendas → catálogo, horarios, promociones y el conector Twilio.
+Abrir `http://localhost:8000/whatsapp/demo` para el respaldo local sin cuenta externa.
+El alcance de los datos se indica una vez mediante “Modo demo”, sin repetirlo en cada respuesta.

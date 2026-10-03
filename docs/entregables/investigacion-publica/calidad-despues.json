@@ -1,0 +1,876 @@
+{
+  "counts": {
+    "event": 1,
+    "faq": 4,
+    "product": 4,
+    "venue": 79
+  },
+  "issues": [
+    {
+      "id": "event:bingo-familiar-2026-10-04",
+      "title": "Bingo Familiar en El Club",
+      "kind": "event",
+      "missing": [
+        "human_review"
+      ]
+    },
+    {
+      "id": "faq:cowork",
+      "title": "Cowork y espacios de trabajo",
+      "kind": "faq",
+      "missing": [
+        "human_review"
+      ]
+    },
+    {
+      "id": "faq:parking",
+      "title": "Parqueo privado del Paseo",
+      "kind": "faq",
+      "missing": [
+        "human_review"
+      ]
+    },
+    {
+      "id": "faq:cinema",
+      "title": "Programación habitual de Cinema Lounge",
+      "kind": "faq",
+      "missing": [
+        "human_review"
+      ]
+    },
+    {
+      "id": "faq:contact",
+      "title": "Ubicación y atención del Paseo",
+      "kind": "faq",
+      "missing": [
+        "human_review"
+      ]
+    },
+    {
+      "id": "product:rezzom-corte",
+      "title": "Corte y estilismo en Rezzom Beauty",
+      "kind": "product",
+      "missing": [
+        "price_bs",
+        "stock",
+        "human_review"
+      ]
+    },
+    {
+      "id": "product:sky-games-activities",
+      "title": "Juegos y actividades de Sky Games",
+      "kind": "product",
+      "missing": [
+        "price_bs",
+        "stock",
+        "human_review"
+      ]
+    },
+    {
+      "id": "product:rezzom-manicura",
+      "title": "Manicura y pedicura en Rezzom Beauty",
+      "kind": "product",
+      "missing": [
+        "price_bs",
+        "stock",
+        "human_review"
+      ]
+    },
+    {
+      "id": "product:rezzom-color",
+      "title": "Mechas y color en Rezzom Beauty",
+      "kind": "product",
+      "missing": [
+        "price_bs",
+        "stock",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-appleland",
+      "title": "APPLE LAND",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:almacen-de-pizzas",
+      "title": "Almacén de Pizzas",
+      "kind": "venue",
+      "missing": [
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-altocavaliere",
+      "title": "Alto Cavaliere",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-amore",
+      "title": "Amore",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-atractivamakeup",
+      "title": "Atractiva Makeup",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-ayvannareverbolivia",
+      "title": "Ayvanna Rever Bolivia",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-acaigolden",
+      "title": "Açaí Golden",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-beluboutique",
+      "title": "BELU Boutique",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-blancetblancjoyasdeautor",
+      "title": "BLANC ET BLANC - Joyas de Autor",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-babycorp",
+      "title": "Baby Corp",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-bold",
+      "title": "Bold",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-boliviafitness",
+      "title": "Bolivia Fitness",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:brocheta-king",
+      "title": "Brocheta King",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-burbank",
+      "title": "Burbank",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-bypassburger",
+      "title": "Bypass Burger",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-cayenna",
+      "title": "CAYENNA",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:century-21-cochabamba",
+      "title": "Century 21 Cochabamba",
+      "kind": "venue",
+      "missing": [
+        "hours",
+        "human_review",
+        "source_date"
+      ]
+    },
+    {
+      "id": "venue:official-chipotlemexicanfood",
+      "title": "Chipotle Mexican Food",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-chottomatte",
+      "title": "Chotto Matte",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-churroscalientes",
+      "title": "Churros Calientes",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-cinnabon",
+      "title": "Cinnabon",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-cosbelle",
+      "title": "Cosbelle",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-cottonviu",
+      "title": "Cotton Viu",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:crocs",
+      "title": "Crocs",
+      "kind": "venue",
+      "missing": [
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-culturemen",
+      "title": "Culture Men",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-deaguayo",
+      "title": "DEAGUAYO",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-delistambul",
+      "title": "Deli Stambul",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-eelenceria",
+      "title": "E&E Lenceria",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:el-cuarto",
+      "title": "El Cuarto by Paseo",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:emperador",
+      "title": "Emperador",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review",
+        "source_date"
+      ]
+    },
+    {
+      "id": "venue:official-facephone",
+      "title": "Face Phone",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-fairplaykids",
+      "title": "Fair Play Kids",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-flavorburst",
+      "title": "Flavor Burst",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-floristeriaflordeamor",
+      "title": "Floristeria Flor de Amor",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-fossil",
+      "title": "Fossil",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-gameshop",
+      "title": "Game Shop",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:gap",
+      "title": "Gap",
+      "kind": "venue",
+      "missing": [
+        "floor",
+        "unit",
+        "hours",
+        "human_review",
+        "source_date"
+      ]
+    },
+    {
+      "id": "venue:gool-store",
+      "title": "Gool Store",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-hoyhay",
+      "title": "HOY HAY",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-hauscenter",
+      "title": "Hauscenter",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-heladosvacafria",
+      "title": "Helados Vacafría",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-hermassi",
+      "title": "Hermassi",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:impulse",
+      "title": "Impulse",
+      "kind": "venue",
+      "missing": [
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-joyasdiego",
+      "title": "Joyas DIEGO",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-joyeriaimperio",
+      "title": "Joyería Imperio",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-kosijeans",
+      "title": "KOSI Jeans",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:lynx-samsung",
+      "title": "LYNX / Samsung",
+      "kind": "venue",
+      "missing": [
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-lasangucheriacafe",
+      "title": "La Sanguchería Cafe",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:legend",
+      "title": "Legend",
+      "kind": "venue",
+      "missing": [
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:lili-pink",
+      "title": "Lili Pink",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-maybelline",
+      "title": "Maybelline",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:minerva-montero",
+      "title": "Minerva Montero Dermatología y Estética",
+      "kind": "venue",
+      "missing": [
+        "hours",
+        "human_review",
+        "source_date"
+      ]
+    },
+    {
+      "id": "venue:official-miskisimi",
+      "title": "Miski Simi",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:monalisa",
+      "title": "Monalisa Bier Haus",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-mrmrsfragrance",
+      "title": "Mr&Mrs Fragrance",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-muymimados",
+      "title": "Muy Mimados",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-nailsexpressgel",
+      "title": "Nails Express Gel",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-pacha",
+      "title": "PACHA",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-parrilleros",
+      "title": "PARRILLEROS",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-puma",
+      "title": "PUMA",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-patanegracocinaespanola",
+      "title": "Patanegra, cocina española",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-pawitos",
+      "title": "Pawitos",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:rezzom-beauty",
+      "title": "Rezzom Beauty",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-rissis",
+      "title": "Rissi's",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:sajama-store",
+      "title": "Sajama Store",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-sassycherry",
+      "title": "Sassy Cherry",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-sento",
+      "title": "Sento",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:sky-games",
+      "title": "Sky Games",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-solopastas",
+      "title": "Solo Pastas",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-status",
+      "title": "Status",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:tuc-toys",
+      "title": "TUC TOYS",
+      "kind": "venue",
+      "missing": [
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-tigo",
+      "title": "Tigo",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:top-collection",
+      "title": "Top Collection",
+      "kind": "venue",
+      "missing": [
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:totto",
+      "title": "Totto",
+      "kind": "venue",
+      "missing": [
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-tuctuc",
+      "title": "TucTuc",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-tunariexpress",
+      "title": "Tunari Express",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-waffleking",
+      "title": "Waffle King",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:official-yummycandybar",
+      "title": "Yummy Candy Bar",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "hours",
+        "human_review"
+      ]
+    },
+    {
+      "id": "venue:opticas-pauker",
+      "title": "Ópticas Pauker",
+      "kind": "venue",
+      "missing": [
+        "unit",
+        "human_review"
+      ]
+    }
+  ],
+  "generated_at": "2026-10-03T11:54:37.223380+00:00",
+  "note": "Los campos ausentes requieren confirmación; no deben inferirse."
+}

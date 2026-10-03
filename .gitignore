@@ -1,18 +1,21 @@
+**/__pycache__/
+**/*.py[cod]
+**/*.sqlite3
+**/.env
+**/.venv/
+.DS_Store
+tmp/
 # Secretos y datos locales
 .env
 *.db
-
 # Material de los organizadores y descargas del sitio (no es código del proyecto)
 retos/
-
 # Python
 __pycache__/
 *.pyc
 .venv/
 venv/
-
 # Editores y sistema
 .vscode/
 .idea/
 Thumbs.db
-.DS_Store

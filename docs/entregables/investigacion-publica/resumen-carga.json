@@ -1,0 +1,21 @@
+{
+  "observed_at": "2026-10-03T07:44:00-04:00",
+  "directory_entries": 70,
+  "enriched_venues": 74,
+  "new_services": 3,
+  "new_events": 1,
+  "unmatched_directory_entries": [],
+  "conflicts": [
+    {
+      "id": "venue:lynx-samsung",
+      "field": "hours",
+      "published_values": [
+        "Lunes a viernes 10:00–20:00",
+        "Lunes a domingo 10:00–21:00"
+      ],
+      "source": "https://samsung.com.bo/tiendas-samsung",
+      "resolution": "No schedule loaded; confirm with branch"
+    }
+  ],
+  "note": "Public sources only; no human approvals, branch stock or active promotions inferred."
+}
