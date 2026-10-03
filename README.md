@@ -1,104 +1,57 @@
-# Paseito · integración con Jarvis
+# Paseito · Asistente del Paseo Aranjuez
 
-Esta rama reúne el último `main` de `daer-1701/Paseito` y el trabajo del
-monorepo Paseo Aranjuez Digital, conservando ambos historiales Git.
+Una aplicación web responsive para el reto Jarvis: avatar, voz, catálogo, horarios,
+promociones, eventos, WhatsApp y analítica consultan el mismo servicio.
 
-## Aplicación principal: Jarvis con avatar actualizado
+## Arranque
 
-Seguir la [guía única del equipo](docs/arranque-equipo.md): opciones con Docker
-sin GPU, Python en Windows y voz local NVIDIA. El kiosco principal ya usa la
-última versión del avatar incorporada desde Paseito y mantiene nuestro agente,
-catálogo y demo WhatsApp.
-
-Ver la [auditoría de cada requisito y porcentaje de avance](docs/auditoria-reto-jarvis.md).
-
-## Aplicaciones disponibles
-
-| Aplicación | Carpetas | Arranque |
-|---|---|---|
-| Paseito original (alternativo), Gemini y FastAPI | `backend/`, `frontend/` | [Guía de Paseito](docs/paseito-original.md) |
-| Jarvis principal con avatar actualizado, voz GPU, catálogo y demo WhatsApp | `apps/jarvis-backend/`, `services/voice/` | [Arranque Windows y WSL2](docs/arranque-torre-windows.md) |
-
-Son dos aplicaciones independientes dentro del mismo repositorio. Sus APIs,
-sesiones y bases SQLite todavía no están unificadas. El frontend de Paseito
-utiliza su backend FastAPI; el kiosco Jarvis utiliza su propia API. Ambos usan
-el puerto 8000 por defecto: ejecuta uno a la vez o inicia Paseito con
-`uvicorn app.main:app --port 8002` desde `backend/` y abre `http://localhost:8002/?api=http://localhost:8002`.
-
-Los archivos `.env`, bases de datos locales y descargas temporales se mantienen
-fuera de Git. Los ejemplos de configuración de ambos proyectos se conservan.
-
-[Detalle de esta integración](docs/integracion-paseito.md).
-
----
-
-# Paseo Aranjuez Digital
-
-Monorepo del equipo para la Hackatón by Paseo Aranjuez. Agrupa los tres retos
-con una aplicación separada para cada uno y contratos compartidos para que se
-puedan integrar sin acoplar sus implementaciones.
-
-## Estructura
-
-```text
-apps/
-  jarvis-backend/   API conversacional y búsqueda de conocimiento
-  paseoya/          Marketplace y retiro presencial
-  paseo-points/     Fidelización y recompensas
-packages/
-  contracts/        Contratos API y modelos compartidos
-docs/
-  retos/            Enunciado oficial
-```
-
-Jarvis está inicializado en `apps/jarvis-backend`. PaseoYa y Paseo Points tienen
-un README inicial para que sus responsables agreguen ahí sus aplicaciones.
-Los contratos entre equipos se documentan en `packages/contracts`.
-
-## Correr Jarvis
-
-Para la **torre Windows 11 + WSL2 + RTX 4070**, seguir el
-[arranque con Docker y voz local](docs/arranque-torre-windows.md).
-Una vez instalados Docker Desktop y el controlador NVIDIA:
+[Guía única para el equipo](docs/arranque-equipo.md) ·
+[Windows, WSL y NVIDIA](docs/arranque-torre-windows.md) ·
+[Estado y pendientes](docs/version-unica-estado.md)
 
 ```bash
-bash scripts/start-tower.sh
+git clone --branch feat/version-unica-openai https://github.com/daer-1701/Paseito.git
+cd Paseito
+# Preparar .env siguiendo la guía; requiere un token administrativo local.
+docker compose -f compose.portable.yaml up -d --build
 ```
 
-Para desarrollo directo en la Mac:
+Abrir http://localhost:8000. La versión portable usa texto y voz del navegador;
+la torre usa Whisper y Kokoro en GPU mediante `docker compose up -d --build`.
+Sin Docker: instalar `apps/jarvis-backend/requirements.txt` y ejecutar
+`python scripts/serve.py` desde la raíz. Se carga únicamente el `.env` raíz.
 
-```bash
-cd apps/jarvis-backend
-python3 -m pip install -r requirements.txt
-python3 -m jarvis.seed
-export JARVIS_INGEST_TOKEN="un-secreto-para-la-demo"
-python3 -m jarvis.api
-```
+## Una sola arquitectura
 
-Abrir `http://localhost:8000` para probar el chat y la voz local. Consulta el
-[README de Jarvis](apps/jarvis-backend/README.md) para preparar Whisper y Piper
-en otra máquina.
+| Parte | Implementación |
+|---|---|
+| Servidor | `backend/app/main.py`, FastAPI |
+| Datos y sesiones | SQLite versionado en `jarvis.store` |
+| Agente común | `jarvis.orchestrator`, OpenAI Responses con herramientas y respaldo local |
+| Interfaz | `frontend/`, responsive con el último avatar del compañero |
+| Voz de torre | `services/voice/`, Whisper y Kokoro con streaming y cancelación |
+| WhatsApp | Twilio firmado e idempotente; demo local del mismo agente |
+| Analítica y administración | `/admin.html`, API con credencial obligatoria |
+| Points | Programa público, MySQL de solo lectura con TLS y caché limitada; demo pública de respaldo |
+| Mirada | Evento `gaze_at_kiosk` para saludar en bienvenida, con demo manual |
 
-Consulta el README de cada aplicación para sus detalles. El repositorio no fija
-un lenguaje ni framework común a las tres aplicaciones; cada equipo puede
-escogerlos y compartir únicamente los contratos de integración.
+El backend Gemini, su SQLite independiente, el servidor HTTP anterior y las
+copias del kiosco se retiraron. Los historiales de ambos equipos se conservan
+con Git. `python -m jarvis.bootstrap` redirige al mismo FastAPI por compatibilidad.
 
-La [recomendación técnica](docs/decisiones-tecnicas.md) propone un stack y los
-acuerdos de datos que el equipo debe cerrar antes de integrar la demo.
-La [propuesta de Jarvis presencial](docs/propuesta-jarvis-presencial.md) describe
-la experiencia, el servidor central, las garantías sobre fuentes y la
-demostración para el jurado.
-El [plan de implementación futura](docs/implementacion-futura-jarvis.md) define
-la transición hacia kioscos Raspberry Pi, un servidor central, voz local y el
-uso posterior de Vercel y AWS.
+## Configuración y límites
 
-El [estado actual de datos e investigación](docs/investigacion-datos-publicos.md)
-documenta fuentes, horarios contradictorios, límites del catálogo y pendientes.
-El [acceso móvil](docs/acceso-movil.md) explica el QR local y la pasarela opcional.
+- OpenAI: `OPENAI_API_KEY`, `OPENAI_TEXT_MODEL` (por defecto `gpt-4.1-mini`).
+  La clave queda en el servidor; si falta o falla, responde el respaldo local.
+- `JARVIS_DEMO_CATALOG=1` activa precios, promociones, horarios faltantes y
+  programa público Points de demostración. El modo aparece en la interfaz,
+  sin repetir advertencias en cada respuesta. `0` excluye esos datos.
+- WhatsApp real requiere Twilio y HTTPS. La demo está en `/whatsapp/demo`.
+- No se consultan saldos personales, ni se realizan compras, reservas o canjes.
+  Inventario real, PaseoYa, identidad Points, navegación paso a paso y hardware
+  eye tracker siguen sujetos a sus integraciones externas.
+- Nunca subir `.env`, claves, bases locales o certificados privados al repositorio.
 
-El [estado de requerimientos, catálogo demo y WhatsApp](docs/estado-requerimientos-y-whatsapp.md) detalla lo implementado y las consultas pendientes. El catálogo ficticio se habilita con `JARVIS_DEMO_CATALOG=1`; su procedencia se conserva en los datos y en la indicación general de modo demo.
-
-La [demo conversacional y el respaldo de WhatsApp](docs/whatsapp-mvp-y-presentacion.md)
-explican el flujo de tiendas → catálogo, horarios, promociones y el conector Twilio.
-Abrir `http://localhost:8000/whatsapp/demo` para el respaldo local sin cuenta externa.
-El alcance de los datos se indica una vez mediante “Modo demo”, sin repetirlo en cada respuesta.
+[Definición acordada](docs/definicion-version-unica.md) ·
+[Conflictos de datos conservados para revisión](docs/conflictos-catalogo.json) ·
+[Auditoría del enunciado](docs/auditoria-reto-jarvis.md)

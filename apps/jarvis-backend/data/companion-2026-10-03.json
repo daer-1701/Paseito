@@ -1,0 +1,3855 @@
+[
+  {
+    "id": "venue:brocheta-king",
+    "kind": "venue",
+    "title": "Brocheta King",
+    "text": "Restaurante de brochetas y parrilla en Paseo Aranjuez. Brochetas y parrilla en el Cuarto Piso del Paseo Aranjuez. brocheta,carne,jugos,cerveza,pique,frapes",
+    "attributes": {
+      "category": "brochetas y parrilla",
+      "area": "centro comercial",
+      "floor": "4",
+      "evidence": "publicaciones del negocio replicadas en 2026",
+      "review_status": "sourced",
+      "directory_categories": [
+        "brocheta",
+        "carne",
+        "jugos",
+        "cerveza",
+        "pique",
+        "frapes"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/BrochetaKing/",
+        "instagram": "https://www.instagram.com/brochetaking/",
+        "whatsapp": "https://wa.me/59162210506",
+        "telefono": "62210506"
+      },
+      "menu_url": "https://drive.google.com/file/d/1sds1ufpglYkmQaS317M6I9AJvt85zmNj/preview",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "source_type": "official_public_research",
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores",
+        "menu_url": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://www.restaurants10.com/BO/Cochabamba/309213909917890/Brocheta-King",
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Brochetas y parrilla en el Cuarto Piso del Paseo Aranjuez.",
+      "description": "Brochetas y parrilla en el Cuarto Piso del Paseo Aranjuez.",
+      "tags": [
+        "brocheta",
+        "carne",
+        "jugos",
+        "cerveza",
+        "pique",
+        "frapes"
+      ],
+      "venue_type": "restaurante",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-cayenna",
+    "kind": "venue",
+    "title": "CAYENNA",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: coctel, tragos, carne, brownies, jugos, nachos. Bistró y coctelería en el Cuarto Piso del Paseo Aranjuez. coctel,tragos,carne,brownies,jugos,nachos",
+    "attributes": {
+      "category": "coctel, tragos, carne, brownies, jugos, nachos",
+      "floor": "Cuarto Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "coctel",
+        "tragos",
+        "carne",
+        "brownies",
+        "jugos",
+        "nachos"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/Cayenna.BistroCafe/",
+        "instagram": "https://www.instagram.com/cayenna.bistrocafe/",
+        "whatsapp": "https://wa.me/59170346760",
+        "telefono": "70346760"
+      },
+      "menu_url": "https://drive.google.com/file/d/1nJYinJa547Uf2gRTh4EnSuciA3WN8-Bm/preview",
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores",
+        "menu_url": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Bistró y coctelería en el Cuarto Piso del Paseo Aranjuez.",
+      "description": "Bistró y coctelería en el Cuarto Piso del Paseo Aranjuez.",
+      "tags": [
+        "coctel",
+        "tragos",
+        "carne",
+        "brownies",
+        "jugos",
+        "nachos"
+      ],
+      "venue_type": "restaurante",
+      "area": "El Cuarto (terraza gourmet)",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-chipotlemexicanfood",
+    "kind": "venue",
+    "title": "Chipotle Mexican Food",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: negocio. Comida mexicana en el Cuarto Piso del Paseo Aranjuez. mexicana,tacos,burritos,nachos",
+    "attributes": {
+      "category": "negocio",
+      "floor": "Cuarto Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/SaborChipotleCbba/",
+        "whatsapp": "https://api.whatsapp.com/send/?phone=59172700585",
+        "instagram": "https://www.instagram.com/chipotle_cochabamba/?hl=es",
+        "telefono": "72700585"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Comida mexicana en el Cuarto Piso del Paseo Aranjuez.",
+      "description": "Comida mexicana en el Cuarto Piso del Paseo Aranjuez.",
+      "tags": [
+        "mexicana",
+        "tacos",
+        "burritos",
+        "nachos"
+      ],
+      "venue_type": "restaurante",
+      "area": "El Cuarto (terraza gourmet)",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-churroscalientes",
+    "kind": "venue",
+    "title": "Churros Calientes",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: churros, coctel, jugos, cafe, frape, helado, hamburguesa. Churrería y cafetería en el Cuarto Piso del Paseo Aranjuez. churros,coctel,jugos,cafe,frape,helado,hamburguesa",
+    "attributes": {
+      "category": "churros, coctel, jugos, cafe, frape, helado, hamburguesa",
+      "floor": "Cuarto Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "churros",
+        "coctel",
+        "jugos",
+        "cafe",
+        "frape",
+        "helado",
+        "hamburguesa"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/ChurrosCalientesBO/",
+        "instagram": "https://www.instagram.com/churroscalientesbo/",
+        "whatsapp": "https://wa.me/59160780108",
+        "telefono": "60780108"
+      },
+      "menu_url": "https://drive.google.com/file/d/1ezcgDIekTGgp1OUgzumcDpr8IiUkKZwt/preview",
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores",
+        "menu_url": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Churrería y cafetería en el Cuarto Piso del Paseo Aranjuez.",
+      "description": "Churrería y cafetería en el Cuarto Piso del Paseo Aranjuez.",
+      "tags": [
+        "churros",
+        "coctel",
+        "jugos",
+        "cafe",
+        "frape",
+        "helado",
+        "hamburguesa"
+      ],
+      "venue_type": "restaurante",
+      "area": "El Cuarto (terraza gourmet)",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:monalisa",
+    "kind": "venue",
+    "title": "Monalisa Bier Haus",
+    "text": "Restaurante y cervecería artesanal en Paseo Aranjuez. Cervecería y restaurante en el Cuarto Piso del Paseo Aranjuez. carne,pastas,postres,cerveza,trago,coctel,alitas",
+    "attributes": {
+      "category": "restaurante y cerveza artesanal",
+      "area": "centro comercial",
+      "floor": "4",
+      "evidence": "publicaciones del negocio replicadas en 2026",
+      "review_status": "sourced",
+      "directory_categories": [
+        "carne",
+        "pastas",
+        "postres",
+        "cerveza",
+        "trago",
+        "coctel",
+        "alitas"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/MonalisaBierHaus/",
+        "instagram": "https://www.instagram.com/monalisabierhaus/",
+        "whatsapp": "https://wa.me/59177999033",
+        "telefono": "77999033"
+      },
+      "menu_url": "https://drive.google.com/file/d/1c38bjsE1_NoeSKzCKl5ov5VetkFEPS2M/preview",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "source_type": "official_public_research",
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores",
+        "menu_url": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://www.restaurants10.com/BO/Cochabamba/1611985532425571/Monalisa-Bier-Haus",
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Cervecería y restaurante en el Cuarto Piso del Paseo Aranjuez.",
+      "description": "Cervecería y restaurante en el Cuarto Piso del Paseo Aranjuez.",
+      "tags": [
+        "carne",
+        "pastas",
+        "postres",
+        "cerveza",
+        "trago",
+        "coctel",
+        "alitas"
+      ],
+      "venue_type": "restaurante",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-patanegracocinaespanola",
+    "kind": "venue",
+    "title": "Patanegra, cocina española",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: comida, española, calamares, ensaladas, pasta, parrilla, mariscos. Cocina española en el Cuarto Piso del Paseo Aranjuez. comida,española,calamares,ensaladas,pasta,parrilla,mariscos",
+    "attributes": {
+      "category": "comida, española, calamares, ensaladas, pasta, parrilla, mariscos",
+      "floor": "Cuarto Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "comida",
+        "española",
+        "calamares",
+        "ensaladas",
+        "pasta",
+        "parrilla",
+        "mariscos"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/Patanegrasaborytradicion/",
+        "instagram": "https://www.instagram.com/patanegrabary/",
+        "whatsapp": "https://wa.me/59175977797",
+        "telefono": "75977797"
+      },
+      "menu_url": "https://drive.google.com/file/d/1O7wRcTPCGyUBxGV8sM8dkx14IZ9ukjTQ/preview",
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores",
+        "menu_url": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Cocina española en el Cuarto Piso del Paseo Aranjuez.",
+      "description": "Cocina española en el Cuarto Piso del Paseo Aranjuez.",
+      "tags": [
+        "comida",
+        "española",
+        "calamares",
+        "ensaladas",
+        "pasta",
+        "parrilla",
+        "mariscos"
+      ],
+      "venue_type": "restaurante",
+      "area": "El Cuarto (terraza gourmet)",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-rissis",
+    "kind": "venue",
+    "title": "Rissi's",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: comida, italiana, pastas, cocteles, tragos. Comida italiana en el Cuarto Piso del Paseo Aranjuez. comida,italiana,pastas,cocteles,tragos",
+    "attributes": {
+      "category": "comida, italiana, pastas, cocteles, tragos",
+      "floor": "Cuarto Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "comida",
+        "italiana",
+        "pastas",
+        "cocteles",
+        "tragos"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/profile.php?id=100075907429777",
+        "instagram": "https://www.instagram.com/rissis.1/",
+        "whatsapp": "https://wa.me/59163957691",
+        "telefono": "63957691"
+      },
+      "menu_url": "https://drive.google.com/file/d/1CMgJ3g8Psw055waZYe1cDeX2pd3Qkfvc/preview",
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores",
+        "menu_url": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Comida italiana en el Cuarto Piso del Paseo Aranjuez.",
+      "description": "Comida italiana en el Cuarto Piso del Paseo Aranjuez.",
+      "tags": [
+        "comida",
+        "italiana",
+        "pastas",
+        "cocteles",
+        "tragos"
+      ],
+      "venue_type": "restaurante",
+      "area": "El Cuarto (terraza gourmet)",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-bold",
+    "kind": "venue",
+    "title": "Bold",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Calzado. Calzado en el Planta Baja del Paseo Aranjuez. zapatos,zapateria,zapatillas,calzado,sandalias",
+    "attributes": {
+      "category": "Calzado",
+      "floor": "Planta Baja",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Calzado"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/Boldshoesbolivia",
+        "instagram": "https://www.instagram.com/Boldshoesbolivia/",
+        "whatsapp": "https://wa.me/59160700526",
+        "telefono": "60700526"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Calzado en el Planta Baja del Paseo Aranjuez.",
+      "description": "Calzado en el Planta Baja del Paseo Aranjuez.",
+      "tags": [
+        "zapatos",
+        "zapateria",
+        "zapatillas",
+        "calzado",
+        "sandalias"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-cinnabon",
+    "kind": "venue",
+    "title": "Cinnabon",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Comida. Cafetería y repostería en el Planta Baja del Paseo Aranjuez. rolls de canela,postres,cafe,dulce,merienda,comida",
+    "attributes": {
+      "category": "Comida",
+      "floor": "Planta Baja",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Comida"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/CinnabonBolivia",
+        "instagram": "https://www.instagram.com/Cinnabonbolivia",
+        "whatsapp": "https://wa.me/59172120490",
+        "telefono": "72120490"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Cafetería y repostería en el Planta Baja del Paseo Aranjuez.",
+      "description": "Cafetería y repostería en el Planta Baja del Paseo Aranjuez.",
+      "tags": [
+        "rolls de canela",
+        "postres",
+        "cafe",
+        "dulce",
+        "merienda",
+        "comida"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-facephone",
+    "kind": "venue",
+    "title": "Face Phone",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Tecnología. Tecnología en el Planta Baja del Paseo Aranjuez. celulares,accesorios,audifonos,cargadores,tecnologia,fundas,tecnología",
+    "attributes": {
+      "category": "Tecnología",
+      "floor": "Planta Baja",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Tecnología"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/FacePhone-150486788716042",
+        "instagram": "https://www.instagram.com/Facephone_2020",
+        "whatsapp": "https://wa.me/59175979221",
+        "telefono": "75979221"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Tecnología en el Planta Baja del Paseo Aranjuez.",
+      "description": "Tecnología en el Planta Baja del Paseo Aranjuez.",
+      "tags": [
+        "celulares",
+        "accesorios",
+        "audifonos",
+        "cargadores",
+        "tecnologia",
+        "fundas",
+        "tecnología"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-fairplaykids",
+    "kind": "venue",
+    "title": "Fair Play Kids",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Juguetería. Juguetería en el Planta Baja del Paseo Aranjuez. juguetes,niños,regalo,juegos,juguetería",
+    "attributes": {
+      "category": "Juguetería",
+      "floor": "Planta Baja",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Juguetería"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/FairPlayKids.Bo",
+        "instagram": "https://www.instagram.com/fairplay_kids/",
+        "whatsapp": "https://wa.me/59178701212",
+        "telefono": "78701212"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Juguetería en el Planta Baja del Paseo Aranjuez.",
+      "description": "Juguetería en el Planta Baja del Paseo Aranjuez.",
+      "tags": [
+        "juguetes",
+        "niños",
+        "regalo",
+        "juegos",
+        "juguetería"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-floristeriaflordeamor",
+    "kind": "venue",
+    "title": "Floristeria Flor de Amor",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: negocio. Floristería en el Planta Baja del Paseo Aranjuez. flores,arreglos florales,ramos,regalo",
+    "attributes": {
+      "category": "negocio",
+      "floor": "Planta Baja",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [],
+      "public_contacts": {
+        "instagram": "https://www.instagram.com/flordeamorfloristeria/",
+        "whatsapp": "https://api.whatsapp.com/send/?phone=59160389995",
+        "telefono": "60389995"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Floristería en el Planta Baja del Paseo Aranjuez.",
+      "description": "Floristería en el Planta Baja del Paseo Aranjuez.",
+      "tags": [
+        "flores",
+        "arreglos florales",
+        "ramos",
+        "regalo"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-hauscenter",
+    "kind": "venue",
+    "title": "Hauscenter",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Hogar. Hogar en el Planta Baja del Paseo Aranjuez. hogar,decoracion,cocina,menaje,regalo",
+    "attributes": {
+      "category": "Hogar",
+      "floor": "Planta Baja",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Hogar"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/Hauscenter.Bolivia",
+        "instagram": "https://www.instagram.com/hauscenterbo/",
+        "whatsapp": "https://wa.me/59165069921",
+        "telefono": "65069921"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Hogar en el Planta Baja del Paseo Aranjuez.",
+      "description": "Hogar en el Planta Baja del Paseo Aranjuez.",
+      "tags": [
+        "hogar",
+        "decoracion",
+        "cocina",
+        "menaje",
+        "regalo"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-joyeriaimperio",
+    "kind": "venue",
+    "title": "Joyería Imperio",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Joyería. Joyería en el Planta Baja del Paseo Aranjuez. joyas,anillos,collares,aretes,pulseras,regalo,joyería",
+    "attributes": {
+      "category": "Joyería",
+      "floor": "Planta Baja",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Joyería"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/profile.php?id=61559741667037",
+        "instagram": "https://www.instagram.com/joyerias_.imperio._/",
+        "whatsapp": "https://wa.me/59160701253",
+        "telefono": "60701253"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Joyería en el Planta Baja del Paseo Aranjuez.",
+      "description": "Joyería en el Planta Baja del Paseo Aranjuez.",
+      "tags": [
+        "joyas",
+        "anillos",
+        "collares",
+        "aretes",
+        "pulseras",
+        "regalo",
+        "joyería"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:legend",
+    "kind": "venue",
+    "title": "Legend",
+    "text": "Tienda Legend de Impulse en Paseo Aranjuez. Ropa en el Planta Baja del Paseo Aranjuez. ropa,moda,vestir",
+    "attributes": {
+      "category": "ropa y calzado",
+      "area": "centro comercial",
+      "floor": "planta baja",
+      "evidence": "sitio del negocio",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Ropa"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/legendbolivia",
+        "instagram": "https://www.instagram.com/bolivialegend/",
+        "whatsapp": "https://wa.me/59160700526",
+        "telefono": "60700526"
+      },
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "source_type": "official_public_research",
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores",
+        "floor": "https://www.impulse.bo/cms/page/view/page_id/7",
+        "unit": "https://www.impulse.bo/cms/page/view/page_id/7",
+        "reference": "https://www.impulse.bo/cms/page/view/page_id/7"
+      },
+      "source_urls": [
+        "https://www.impulse.bo/cms/page/view/page_id/7",
+        "https://paseoaranjuez.com/stores"
+      ],
+      "unit": "6 y 3",
+      "reference": "La marca publica planta baja, locales 6 y 3.",
+      "companion_description": "Ropa en el Planta Baja del Paseo Aranjuez.",
+      "description": "Ropa en el Planta Baja del Paseo Aranjuez.",
+      "tags": [
+        "ropa",
+        "moda",
+        "vestir"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://www.impulse.bo/cms/page/view/page_id/7",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:lili-pink",
+    "kind": "venue",
+    "title": "Lili Pink",
+    "text": "Tienda de lencería y ropa interior en Paseo Aranjuez. Ropa interior y cosméticos en el Planta Baja del Paseo Aranjuez. ropa interior,lenceria,pijamas,cosmeticos,regalo",
+    "attributes": {
+      "category": "lencería y ropa interior",
+      "area": "centro comercial",
+      "floor": "planta baja",
+      "evidence": "publicaciones del negocio replicadas en 2026",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Ropa Interior"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/lilipinkbol",
+        "instagram": "https://www.instagram.com/lilipinkbol/",
+        "whatsapp": "https://wa.me/59178561233",
+        "telefono": "78561233"
+      },
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "source_type": "official_public_research",
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores",
+        "hours": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://www.yellowmega.com/BO/Santa-Cruz-de-la-Sierra/104016519033874/Lili-Pink-Bolivia",
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Ropa interior y cosméticos en el Planta Baja del Paseo Aranjuez.",
+      "description": "Ropa interior y cosméticos en el Planta Baja del Paseo Aranjuez.",
+      "tags": [
+        "ropa interior",
+        "lenceria",
+        "pijamas",
+        "cosmeticos",
+        "regalo"
+      ],
+      "venue_type": "tienda",
+      "hours": {
+        "0": [
+          [
+            "10:00",
+            "22:00"
+          ]
+        ],
+        "1": [
+          [
+            "10:00",
+            "22:00"
+          ]
+        ],
+        "2": [
+          [
+            "10:00",
+            "22:00"
+          ]
+        ],
+        "3": [
+          [
+            "10:00",
+            "22:00"
+          ]
+        ],
+        "4": [
+          [
+            "10:00",
+            "22:00"
+          ]
+        ],
+        "5": [
+          [
+            "10:00",
+            "22:00"
+          ]
+        ],
+        "6": [
+          [
+            "10:00",
+            "21:00"
+          ]
+        ]
+      },
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:opticas-pauker",
+    "kind": "venue",
+    "title": "Ópticas Pauker",
+    "text": "Óptica con gafas de sol y monturas en Paseo Aranjuez. Óptica en el Planta Baja del Paseo Aranjuez. lentes,gafas,anteojos,gafas de sol,monturas,examen visual,óptica",
+    "attributes": {
+      "category": "óptica",
+      "area": "centro comercial",
+      "evidence": "sitio del negocio",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Óptica"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/OpticasPaukerBolivia",
+        "instagram": "https://www.instagram.com/Opticaspaukerbolivia",
+        "whatsapp": "https://wa.me/59177000207",
+        "telefono": "77000207"
+      },
+      "floor": "Planta Baja",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "source_type": "official_public_research",
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores",
+        "floor": "https://paseoaranjuez.com/stores",
+        "hours": "https://opticaspauker.com/sucursales/",
+        "reference": "https://opticaspauker.com/sucursales/"
+      },
+      "source_urls": [
+        "https://opticaspauker.com/contacto/",
+        "https://paseoaranjuez.com/stores",
+        "https://opticaspauker.com/sucursales/"
+      ],
+      "hours": {
+        "0": [
+          [
+            "10:00",
+            "22:00"
+          ]
+        ],
+        "1": [
+          [
+            "10:00",
+            "22:00"
+          ]
+        ],
+        "2": [
+          [
+            "10:00",
+            "22:00"
+          ]
+        ],
+        "3": [
+          [
+            "10:00",
+            "22:00"
+          ]
+        ],
+        "4": [
+          [
+            "10:00",
+            "22:00"
+          ]
+        ],
+        "5": [
+          [
+            "10:00",
+            "22:00"
+          ]
+        ],
+        "6": [
+          [
+            "11:00",
+            "21:00"
+          ]
+        ]
+      },
+      "reference": "Horario de la sucursal publicado por Pauker; sujeto a cambios y fechas especiales. Contacto público: +591 77000207.",
+      "companion_description": "Óptica en el Planta Baja del Paseo Aranjuez.",
+      "description": "Óptica en el Planta Baja del Paseo Aranjuez.",
+      "tags": [
+        "lentes",
+        "gafas",
+        "anteojos",
+        "gafas de sol",
+        "monturas",
+        "examen visual",
+        "óptica"
+      ],
+      "venue_type": "servicio",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://opticaspauker.com/sucursales/",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-puma",
+    "kind": "venue",
+    "title": "PUMA",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Deportes. Deportes en el Planta Baja del Paseo Aranjuez. deportes,zapatillas,ropa deportiva",
+    "attributes": {
+      "category": "Deportes",
+      "floor": "Planta Baja",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Deportes"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/PUMALATAM/",
+        "instagram": "https://www.instagram.com/puma._latam/"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Deportes en el Planta Baja del Paseo Aranjuez.",
+      "description": "Deportes en el Planta Baja del Paseo Aranjuez.",
+      "tags": [
+        "deportes",
+        "zapatillas",
+        "ropa deportiva"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-tuctuc",
+    "kind": "venue",
+    "title": "TucTuc",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Ropa Infantil. Ropa infantil en el Planta Baja del Paseo Aranjuez. ropa de niños,niños,bebes,infantil,ropa infantil",
+    "attributes": {
+      "category": "Ropa Infantil",
+      "floor": "Planta Baja",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Ropa Infantil"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/TucTucBolivia",
+        "instagram": "https://www.instagram.com/tuctuc_bolivia/",
+        "whatsapp": "https://wa.me/59177900199",
+        "telefono": "77900199"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Ropa infantil en el Planta Baja del Paseo Aranjuez.",
+      "description": "Ropa infantil en el Planta Baja del Paseo Aranjuez.",
+      "tags": [
+        "ropa de niños",
+        "niños",
+        "bebes",
+        "infantil",
+        "ropa infantil"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-amore",
+    "kind": "venue",
+    "title": "Amore",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Ropa. Ropa en el Primer Piso del Paseo Aranjuez. ropa,moda,vestir",
+    "attributes": {
+      "category": "Ropa",
+      "floor": "Primer Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Ropa"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/amorebolivia",
+        "instagram": "https://www.instagram.com/amorebolivia/",
+        "whatsapp": "https://wa.me/59172732745",
+        "telefono": "72732745"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Ropa en el Primer Piso del Paseo Aranjuez.",
+      "description": "Ropa en el Primer Piso del Paseo Aranjuez.",
+      "tags": [
+        "ropa",
+        "moda",
+        "vestir"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-atractivamakeup",
+    "kind": "venue",
+    "title": "Atractiva Makeup",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Cosméticos. Cosméticos en el Primer Piso del Paseo Aranjuez. maquillaje,cosmeticos,belleza,cuidado de la piel,regalo,cosméticos",
+    "attributes": {
+      "category": "Cosméticos",
+      "floor": "Primer Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Cosméticos"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/p/Atractiva-Makeup-100026634656071",
+        "instagram": "https://www.instagram.com/atractiva_make_up",
+        "whatsapp": "https://wa.me/59175922510",
+        "telefono": "75922510"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Cosméticos en el Primer Piso del Paseo Aranjuez.",
+      "description": "Cosméticos en el Primer Piso del Paseo Aranjuez.",
+      "tags": [
+        "maquillaje",
+        "cosmeticos",
+        "belleza",
+        "cuidado de la piel",
+        "regalo",
+        "cosméticos"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-beluboutique",
+    "kind": "venue",
+    "title": "BELU Boutique",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: negocio. Boutique de ropa femenina; dentro funciona Ohanna Accesorios (joyería). ropa de mujer,moda,accesorios,joyas,bisuteria,ohanna accesorios",
+    "attributes": {
+      "category": "negocio",
+      "floor": "Primer Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [],
+      "public_contacts": {
+        "instagram": "https://www.instagram.com/belu.bol/",
+        "whatsapp": "https://api.whatsapp.com/send/?phone=59161684849&text&type=phone_number&app_absent=0",
+        "telefono": "61684849"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores",
+        "hours": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Boutique de ropa femenina; dentro funciona Ohanna Accesorios (joyería).",
+      "description": "Boutique de ropa femenina; dentro funciona Ohanna Accesorios (joyería).",
+      "tags": [
+        "ropa de mujer",
+        "moda",
+        "accesorios",
+        "joyas",
+        "bisuteria",
+        "ohanna accesorios"
+      ],
+      "venue_type": "tienda",
+      "reference": "Al lado del ascensor sur",
+      "hours": {
+        "0": [
+          [
+            "10:00",
+            "22:00"
+          ]
+        ],
+        "1": [
+          [
+            "10:00",
+            "22:00"
+          ]
+        ],
+        "2": [
+          [
+            "10:00",
+            "22:00"
+          ]
+        ],
+        "3": [
+          [
+            "10:00",
+            "22:00"
+          ]
+        ],
+        "4": [
+          [
+            "10:00",
+            "22:00"
+          ]
+        ],
+        "5": [
+          [
+            "10:00",
+            "22:00"
+          ]
+        ],
+        "6": [
+          [
+            "11:00",
+            "21:00"
+          ]
+        ]
+      },
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-blancetblancjoyasdeautor",
+    "kind": "venue",
+    "title": "BLANC ET BLANC - Joyas de Autor",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Joyería. Joyería en el Primer Piso del Paseo Aranjuez. joyas,anillos,collares,aretes,pulseras,regalo,joyería",
+    "attributes": {
+      "category": "Joyería",
+      "floor": "Primer Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Joyería"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/profile.php?id=100094358344738",
+        "instagram": "https://www.instagram.com/blancetblanc_joyasdeautor/",
+        "whatsapp": "https://wa.me/59162697007",
+        "telefono": "62697007"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Joyería en el Primer Piso del Paseo Aranjuez.",
+      "description": "Joyería en el Primer Piso del Paseo Aranjuez.",
+      "tags": [
+        "joyas",
+        "anillos",
+        "collares",
+        "aretes",
+        "pulseras",
+        "regalo",
+        "joyería"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-burbank",
+    "kind": "venue",
+    "title": "Burbank",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Ropa. Ropa en el Primer Piso del Paseo Aranjuez. ropa,moda,vestir",
+    "attributes": {
+      "category": "Ropa",
+      "floor": "Primer Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Ropa"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/burbank.bo",
+        "instagram": "https://www.instagram.com/burbank.bo/",
+        "whatsapp": "https://wa.me/59175881040",
+        "telefono": "75881040"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Ropa en el Primer Piso del Paseo Aranjuez.",
+      "description": "Ropa en el Primer Piso del Paseo Aranjuez.",
+      "tags": [
+        "ropa",
+        "moda",
+        "vestir"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-cosbelle",
+    "kind": "venue",
+    "title": "Cosbelle",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Cosméticos. Cosméticos en el Primer Piso del Paseo Aranjuez. maquillaje,cosmeticos,belleza,cuidado de la piel,regalo,cosméticos",
+    "attributes": {
+      "category": "Cosméticos",
+      "floor": "Primer Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Cosméticos"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/perfumeriacosbelle",
+        "instagram": "https://www.instagram.com/perfumeriacosbelle/",
+        "whatsapp": "https://wa.me/59174560116",
+        "telefono": "74560116"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Cosméticos en el Primer Piso del Paseo Aranjuez.",
+      "description": "Cosméticos en el Primer Piso del Paseo Aranjuez.",
+      "tags": [
+        "maquillaje",
+        "cosmeticos",
+        "belleza",
+        "cuidado de la piel",
+        "regalo",
+        "cosméticos"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-hermassi",
+    "kind": "venue",
+    "title": "Hermassi",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Ropa. Ropa en el Primer Piso del Paseo Aranjuez. ropa,moda,vestir",
+    "attributes": {
+      "category": "Ropa",
+      "floor": "Primer Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Ropa"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/Hermassi.bo",
+        "instagram": "https://www.instagram.com/hermassi.bolivia/",
+        "whatsapp": "https://wa.me/59168489382",
+        "telefono": "68489382"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Ropa en el Primer Piso del Paseo Aranjuez.",
+      "description": "Ropa en el Primer Piso del Paseo Aranjuez.",
+      "tags": [
+        "ropa",
+        "moda",
+        "vestir"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:impulse",
+    "kind": "venue",
+    "title": "Impulse",
+    "text": "Tienda Impulse en Paseo Aranjuez. Ropa en el Primer Piso del Paseo Aranjuez. ropa,moda,vestir",
+    "attributes": {
+      "category": "ropa y calzado",
+      "area": "centro comercial",
+      "floor": "1",
+      "unit": "101-102",
+      "evidence": "sitio del negocio",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Ropa"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/Impulse.Bo",
+        "instagram": "https://www.instagram.com/impulse_oficial/",
+        "whatsapp": "https://wa.me/59161681735",
+        "telefono": "61681735"
+      },
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "source_type": "official_public_research",
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores",
+        "floor": "https://www.impulse.bo/cms/page/view/page_id/7",
+        "unit": "https://www.impulse.bo/cms/page/view/page_id/7"
+      },
+      "source_urls": [
+        "https://www.impulse.bo/cms/page/view/page_id/7",
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Ropa en el Primer Piso del Paseo Aranjuez.",
+      "description": "Ropa en el Primer Piso del Paseo Aranjuez.",
+      "tags": [
+        "ropa",
+        "moda",
+        "vestir"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://www.impulse.bo/cms/page/view/page_id/7",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-kosijeans",
+    "kind": "venue",
+    "title": "KOSI Jeans",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Jeans. Jeans en el Primer Piso del Paseo Aranjuez. jeans,pantalones,ropa",
+    "attributes": {
+      "category": "Jeans",
+      "floor": "Primer Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Jeans"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/DOREK.JEANS",
+        "instagram": "https://www.instagram.com/kosi_jeans/",
+        "whatsapp": "https://wa.me/59178181385",
+        "telefono": "78181385"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Jeans en el Primer Piso del Paseo Aranjuez.",
+      "description": "Jeans en el Primer Piso del Paseo Aranjuez.",
+      "tags": [
+        "jeans",
+        "pantalones",
+        "ropa"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-maybelline",
+    "kind": "venue",
+    "title": "Maybelline",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Cosméticos. Cosméticos en el Primer Piso del Paseo Aranjuez. maquillaje,cosmeticos,belleza,cuidado de la piel,regalo,cosméticos",
+    "attributes": {
+      "category": "Cosméticos",
+      "floor": "Primer Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Cosméticos"
+      ],
+      "public_contacts": {
+        "instagram": "https://www.instagram.com/maybellinenybolivia/",
+        "whatsapp": "https://wa.me/59177440903",
+        "telefono": "77440903"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Cosméticos en el Primer Piso del Paseo Aranjuez.",
+      "description": "Cosméticos en el Primer Piso del Paseo Aranjuez.",
+      "tags": [
+        "maquillaje",
+        "cosmeticos",
+        "belleza",
+        "cuidado de la piel",
+        "regalo",
+        "cosméticos"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-miskisimi",
+    "kind": "venue",
+    "title": "Miski Simi",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Ropa. Ropa en el Primer Piso del Paseo Aranjuez. ropa,moda,vestir",
+    "attributes": {
+      "category": "Ropa",
+      "floor": "Primer Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Ropa"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/miskisimibo",
+        "instagram": "https://www.instagram.com/miskisimibo/"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Ropa en el Primer Piso del Paseo Aranjuez.",
+      "description": "Ropa en el Primer Piso del Paseo Aranjuez.",
+      "tags": [
+        "ropa",
+        "moda",
+        "vestir"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-muymimados",
+    "kind": "venue",
+    "title": "Muy Mimados",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Juguetería. Juguetería en el Primer Piso del Paseo Aranjuez. juguetes,niños,regalo,juegos,juguetería",
+    "attributes": {
+      "category": "Juguetería",
+      "floor": "Primer Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Juguetería"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/MuyMimados/",
+        "instagram": "https://www.instagram.com/MuyMimados",
+        "whatsapp": "https://wa.me/59172274400",
+        "telefono": "72274400"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Juguetería en el Primer Piso del Paseo Aranjuez.",
+      "description": "Juguetería en el Primer Piso del Paseo Aranjuez.",
+      "tags": [
+        "juguetes",
+        "niños",
+        "regalo",
+        "juegos",
+        "juguetería"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-pacha",
+    "kind": "venue",
+    "title": "PACHA",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Relojería. Relojería en el Primer Piso del Paseo Aranjuez. relojes,accesorios,regalo,relojería",
+    "attributes": {
+      "category": "Relojería",
+      "floor": "Primer Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Relojería"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/p/PACHA-100093196026734/",
+        "instagram": "https://www.instagram.com/pacharelojes/",
+        "whatsapp": "https://wa.me/59167410148",
+        "telefono": "67410148"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Relojería en el Primer Piso del Paseo Aranjuez.",
+      "description": "Relojería en el Primer Piso del Paseo Aranjuez.",
+      "tags": [
+        "relojes",
+        "accesorios",
+        "regalo",
+        "relojería"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:sajama-store",
+    "kind": "venue",
+    "title": "Sajama Store",
+    "text": "Tienda de accesorios, gafas y relojes en Paseo Aranjuez. Primera marca boliviana de relojes, gafas de sol y monturas trabajadas en madera. relojes,gafas de sol,monturas,madera,diseño boliviano,regalo,artesanías",
+    "attributes": {
+      "category": "accesorios",
+      "area": "centro comercial",
+      "floor": "1",
+      "evidence": "sitio del negocio",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Artesanías"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/sajama.bo",
+        "instagram": "https://www.instagram.com/sajama_bo",
+        "whatsapp": "https://wa.me/59177514384",
+        "telefono": "77514384"
+      },
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "source_type": "official_public_research",
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores",
+        "hours": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://sajamastore.com/",
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Primera marca boliviana de relojes, gafas de sol y monturas trabajadas en madera.",
+      "description": "Primera marca boliviana de relojes, gafas de sol y monturas trabajadas en madera.",
+      "tags": [
+        "relojes",
+        "gafas de sol",
+        "monturas",
+        "madera",
+        "diseño boliviano",
+        "regalo",
+        "artesanías"
+      ],
+      "venue_type": "tienda",
+      "hours": {
+        "0": [
+          [
+            "10:00",
+            "22:00"
+          ]
+        ],
+        "1": [
+          [
+            "10:00",
+            "22:00"
+          ]
+        ],
+        "2": [
+          [
+            "10:00",
+            "22:00"
+          ]
+        ],
+        "3": [
+          [
+            "10:00",
+            "22:00"
+          ]
+        ],
+        "4": [
+          [
+            "10:00",
+            "22:00"
+          ]
+        ],
+        "5": [
+          [
+            "10:00",
+            "22:00"
+          ]
+        ],
+        "6": [
+          [
+            "10:00",
+            "22:00"
+          ]
+        ]
+      },
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-sassycherry",
+    "kind": "venue",
+    "title": "Sassy Cherry",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Accesorios. Accesorios en el Primer Piso del Paseo Aranjuez. accesorios,bisuteria,carteras,regalo",
+    "attributes": {
+      "category": "Accesorios",
+      "floor": "Primer Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Accesorios"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/Sassycherr/",
+        "instagram": "https://www.instagram.com/sassycherry_store/",
+        "whatsapp": "https://wa.me/59179600545",
+        "telefono": "79600545"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Accesorios en el Primer Piso del Paseo Aranjuez.",
+      "description": "Accesorios en el Primer Piso del Paseo Aranjuez.",
+      "tags": [
+        "accesorios",
+        "bisuteria",
+        "carteras",
+        "regalo"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-sento",
+    "kind": "venue",
+    "title": "Sento",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Cosméticos. Cosméticos en el Primer Piso del Paseo Aranjuez. maquillaje,cosmeticos,belleza,cuidado de la piel,regalo,cosméticos",
+    "attributes": {
+      "category": "Cosméticos",
+      "floor": "Primer Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Cosméticos"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/comedica",
+        "instagram": "https://www.instagram.com/sento.comedica/",
+        "whatsapp": "https://wa.me/59170349617",
+        "telefono": "70349617"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Cosméticos en el Primer Piso del Paseo Aranjuez.",
+      "description": "Cosméticos en el Primer Piso del Paseo Aranjuez.",
+      "tags": [
+        "maquillaje",
+        "cosmeticos",
+        "belleza",
+        "cuidado de la piel",
+        "regalo",
+        "cosméticos"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-status",
+    "kind": "venue",
+    "title": "Status",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Ropa. Ropa en el Primer Piso del Paseo Aranjuez. ropa,moda,vestir",
+    "attributes": {
+      "category": "Ropa",
+      "floor": "Primer Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Ropa"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/profile.php?id=100071756373050",
+        "whatsapp": "https://api.whatsapp.com/send/?phone=59178339491",
+        "instagram": "https://www.instagram.com/status_bolivia_/",
+        "telefono": "78339491"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Ropa en el Primer Piso del Paseo Aranjuez.",
+      "description": "Ropa en el Primer Piso del Paseo Aranjuez.",
+      "tags": [
+        "ropa",
+        "moda",
+        "vestir"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:tuc-toys",
+    "kind": "venue",
+    "title": "TUC TOYS",
+    "text": "Juguetería de TUC TOYS en Paseo Aranjuez, Cochabamba. Juguetería en el Primer Piso del Paseo Aranjuez. juguetes,niños,regalo,juegos,juguetería",
+    "attributes": {
+      "category": "juguetes",
+      "area": "centro comercial",
+      "evidence": "sitio del negocio",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Juguetería"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/homebabyandtoys",
+        "instagram": "https://www.instagram.com/tuc_toys_tujugueteria/",
+        "whatsapp": "https://wa.me/59177915434",
+        "telefono": "77915434"
+      },
+      "floor": "1",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "source_type": "official_public_research",
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores",
+        "floor": "https://toys.tuctuc.com.bo/contacto/",
+        "unit": "https://toys.tuctuc.com.bo/contacto/"
+      },
+      "source_urls": [
+        "https://toys.tuctuc.com.bo/product-tag/paseo-aranjuez/",
+        "https://paseoaranjuez.com/stores",
+        "https://toys.tuctuc.com.bo/contacto/"
+      ],
+      "unit": "114",
+      "companion_description": "Juguetería en el Primer Piso del Paseo Aranjuez.",
+      "description": "Juguetería en el Primer Piso del Paseo Aranjuez.",
+      "tags": [
+        "juguetes",
+        "niños",
+        "regalo",
+        "juegos",
+        "juguetería"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://toys.tuctuc.com.bo/contacto/",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-altocavaliere",
+    "kind": "venue",
+    "title": "Alto Cavaliere",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Ropa, de, Hombre. Ropa de hombre en el Segundo Piso del Paseo Aranjuez. ropa de hombre,camisas,trajes,pantalones,caballero,ropa,hombre",
+    "attributes": {
+      "category": "Ropa, de, Hombre",
+      "floor": "Segundo Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Ropa",
+        "de",
+        "Hombre"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/Altocavalierebolivia",
+        "instagram": "https://www.instagram.com/altocavaliere",
+        "whatsapp": "https://wa.me/59162693166",
+        "telefono": "62693166"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Ropa de hombre en el Segundo Piso del Paseo Aranjuez.",
+      "description": "Ropa de hombre en el Segundo Piso del Paseo Aranjuez.",
+      "tags": [
+        "ropa de hombre",
+        "camisas",
+        "trajes",
+        "pantalones",
+        "caballero",
+        "ropa",
+        "hombre"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-appleland",
+    "kind": "venue",
+    "title": "APPLE LAND",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Tecnología. Tecnología en el Segundo Piso del Paseo Aranjuez. iphone,apple,celulares,accesorios,tecnologia,tecnología",
+    "attributes": {
+      "category": "Tecnología",
+      "floor": "Segundo Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Tecnología"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/applelandbolivia/",
+        "instagram": "https://www.instagram.com/apple_land_bolivia/",
+        "whatsapp": "https://wa.me/59168609050",
+        "telefono": "68609050"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Tecnología en el Segundo Piso del Paseo Aranjuez.",
+      "description": "Tecnología en el Segundo Piso del Paseo Aranjuez.",
+      "tags": [
+        "iphone",
+        "apple",
+        "celulares",
+        "accesorios",
+        "tecnologia",
+        "tecnología"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-ayvannareverbolivia",
+    "kind": "venue",
+    "title": "Ayvanna Rever Bolivia",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Ropa. Ropa en el Segundo Piso del Paseo Aranjuez. ropa,moda,vestir",
+    "attributes": {
+      "category": "Ropa",
+      "floor": "Segundo Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Ropa"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/ayvannarever.bo/",
+        "instagram": "https://www.instagram.com/ayvannarever.bo/",
+        "whatsapp": "https://wa.me/59169257662",
+        "telefono": "69257662"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Ropa en el Segundo Piso del Paseo Aranjuez.",
+      "description": "Ropa en el Segundo Piso del Paseo Aranjuez.",
+      "tags": [
+        "ropa",
+        "moda",
+        "vestir"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-babycorp",
+    "kind": "venue",
+    "title": "Baby Corp",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Bebés. Bebés en el Segundo Piso del Paseo Aranjuez. bebes,ropa de bebe,coches,maternidad,bebés",
+    "attributes": {
+      "category": "Bebés",
+      "floor": "Segundo Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Bebés"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/babycorpbolivia",
+        "instagram": "https://www.instagram.com/Babycorp_bolivia/",
+        "whatsapp": "https://wa.me/59177661496",
+        "telefono": "77661496"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Bebés en el Segundo Piso del Paseo Aranjuez.",
+      "description": "Bebés en el Segundo Piso del Paseo Aranjuez.",
+      "tags": [
+        "bebes",
+        "ropa de bebe",
+        "coches",
+        "maternidad",
+        "bebés"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-boliviafitness",
+    "kind": "venue",
+    "title": "Bolivia Fitness",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: negocio. Fitness en el Segundo Piso del Paseo Aranjuez. fitness,deporte,gimnasio,suplementos",
+    "attributes": {
+      "category": "negocio",
+      "floor": "Segundo Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [],
+      "public_contacts": {
+        "instagram": "https://www.instagram.com/boliviafitness",
+        "whatsapp": "https://api.whatsapp.com/send/?phone=59169207033&text&type=phone_number&app_absent=0",
+        "facebook": "https://www.facebook.com/Boliviafitnessbol/",
+        "telefono": "69207033"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Fitness en el Segundo Piso del Paseo Aranjuez.",
+      "description": "Fitness en el Segundo Piso del Paseo Aranjuez.",
+      "tags": [
+        "fitness",
+        "deporte",
+        "gimnasio",
+        "suplementos"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-cottonviu",
+    "kind": "venue",
+    "title": "Cotton Viu",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Ropa. Ropa en el Segundo Piso del Paseo Aranjuez. ropa,moda,vestir",
+    "attributes": {
+      "category": "Ropa",
+      "floor": "Segundo Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Ropa"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/cotton.viu2",
+        "instagram": "https://www.instagram.com/cotton_viu/",
+        "whatsapp": "https://wa.me/59170122610",
+        "telefono": "70122610"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Ropa en el Segundo Piso del Paseo Aranjuez.",
+      "description": "Ropa en el Segundo Piso del Paseo Aranjuez.",
+      "tags": [
+        "ropa",
+        "moda",
+        "vestir"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:crocs",
+    "kind": "venue",
+    "title": "Crocs",
+    "text": "Tienda de calzado Crocs en Paseo Aranjuez. Calzado en el Segundo Piso del Paseo Aranjuez. zapatos,zapateria,zapatillas,calzado,sandalias",
+    "attributes": {
+      "category": "calzado",
+      "area": "centro comercial",
+      "floor": "2",
+      "unit": "13",
+      "evidence": "sitio del negocio",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Calzado"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/crocsbolivia",
+        "instagram": "https://www.instagram.com/Crocsbolivia",
+        "whatsapp": "https://wa.me/59176020826",
+        "telefono": "76020826"
+      },
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "source_type": "official_public_research",
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores",
+        "floor": "https://crocs.com.bo/nuestras-tiendas",
+        "unit": "https://crocs.com.bo/nuestras-tiendas"
+      },
+      "source_urls": [
+        "https://crocs.com.bo/nuestras-tiendas",
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Calzado en el Segundo Piso del Paseo Aranjuez.",
+      "description": "Calzado en el Segundo Piso del Paseo Aranjuez.",
+      "tags": [
+        "zapatos",
+        "zapateria",
+        "zapatillas",
+        "calzado",
+        "sandalias"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://crocs.com.bo/nuestras-tiendas",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-culturemen",
+    "kind": "venue",
+    "title": "Culture Men",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Ropa, de, Hombre. Ropa de hombre en el Segundo Piso del Paseo Aranjuez. ropa de hombre,camisas,trajes,pantalones,caballero,ropa,hombre",
+    "attributes": {
+      "category": "Ropa, de, Hombre",
+      "floor": "Segundo Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Ropa",
+        "de",
+        "Hombre"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/CULTUREmens",
+        "instagram": "https://www.instagram.com/culture_men_/",
+        "whatsapp": "https://wa.me/59160351303",
+        "telefono": "60351303"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Ropa de hombre en el Segundo Piso del Paseo Aranjuez.",
+      "description": "Ropa de hombre en el Segundo Piso del Paseo Aranjuez.",
+      "tags": [
+        "ropa de hombre",
+        "camisas",
+        "trajes",
+        "pantalones",
+        "caballero",
+        "ropa",
+        "hombre"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-deaguayo",
+    "kind": "venue",
+    "title": "DEAGUAYO",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Artesanías. Artesanías y diseño boliviano en el Segundo Piso del Paseo Aranjuez. artesania,souvenirs,recuerdos,regalo,diseño boliviano,artesanías",
+    "attributes": {
+      "category": "Artesanías",
+      "floor": "Segundo Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Artesanías"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/DeAguayoBolivia/",
+        "instagram": "https://www.instagram.com/deaguayobolivia",
+        "whatsapp": "https://wa.me/59167070260",
+        "telefono": "67070260"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Artesanías y diseño boliviano en el Segundo Piso del Paseo Aranjuez.",
+      "description": "Artesanías y diseño boliviano en el Segundo Piso del Paseo Aranjuez.",
+      "tags": [
+        "artesania",
+        "souvenirs",
+        "recuerdos",
+        "regalo",
+        "diseño boliviano",
+        "artesanías"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-eelenceria",
+    "kind": "venue",
+    "title": "E&E Lenceria",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Lencería. Lencería en el Segundo Piso del Paseo Aranjuez. lenceria,ropa interior,lencería",
+    "attributes": {
+      "category": "Lencería",
+      "floor": "Segundo Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Lencería"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/Eyelenceria",
+        "instagram": "https://www.instagram.com/Eyelenceria",
+        "whatsapp": "https://wa.me/59169437573",
+        "telefono": "69437573"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Lencería en el Segundo Piso del Paseo Aranjuez.",
+      "description": "Lencería en el Segundo Piso del Paseo Aranjuez.",
+      "tags": [
+        "lenceria",
+        "ropa interior",
+        "lencería"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-fossil",
+    "kind": "venue",
+    "title": "Fossil",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Relojería. Relojería en el Segundo Piso del Paseo Aranjuez. relojes,accesorios,regalo,relojería",
+    "attributes": {
+      "category": "Relojería",
+      "floor": "Segundo Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Relojería"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/fossilblaalva",
+        "instagram": "https://www.instagram.com/Fossilbolivia",
+        "whatsapp": "https://wa.me/59165723208",
+        "telefono": "65723208"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Relojería en el Segundo Piso del Paseo Aranjuez.",
+      "description": "Relojería en el Segundo Piso del Paseo Aranjuez.",
+      "tags": [
+        "relojes",
+        "accesorios",
+        "regalo",
+        "relojería"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-gameshop",
+    "kind": "venue",
+    "title": "Game Shop",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Juegos. Videojuegos en el Segundo Piso del Paseo Aranjuez. videojuegos,consolas,gaming,juegos",
+    "attributes": {
+      "category": "Juegos",
+      "floor": "Segundo Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Juegos"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/gameshopcbba",
+        "instagram": "https://www.instagram.com/Gameshopcbba",
+        "whatsapp": "https://wa.me/59170779587",
+        "telefono": "70779587"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Videojuegos en el Segundo Piso del Paseo Aranjuez.",
+      "description": "Videojuegos en el Segundo Piso del Paseo Aranjuez.",
+      "tags": [
+        "videojuegos",
+        "consolas",
+        "gaming",
+        "juegos"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-joyasdiego",
+    "kind": "venue",
+    "title": "Joyas DIEGO",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Joyería. Joyería en el Segundo Piso del Paseo Aranjuez. joyas,anillos,collares,aretes,pulseras,regalo,joyería",
+    "attributes": {
+      "category": "Joyería",
+      "floor": "Segundo Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Joyería"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/p/Joyas-DIEGO-100063679924817/",
+        "instagram": "https://www.tiktok.com/@joyas.diego.cbba",
+        "whatsapp": "https://wa.me/59176414401",
+        "telefono": "76414401"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Joyería en el Segundo Piso del Paseo Aranjuez.",
+      "description": "Joyería en el Segundo Piso del Paseo Aranjuez.",
+      "tags": [
+        "joyas",
+        "anillos",
+        "collares",
+        "aretes",
+        "pulseras",
+        "regalo",
+        "joyería"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-mrmrsfragrance",
+    "kind": "venue",
+    "title": "Mr&Mrs Fragrance",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Perfumería. Perfumería en el Segundo Piso del Paseo Aranjuez. perfumes,fragancias,regalo,perfumería",
+    "attributes": {
+      "category": "Perfumería",
+      "floor": "Segundo Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Perfumería"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/mrmrsfragrancebo/",
+        "instagram": "https://www.instagram.com/mrandmrsfragranceofficial/",
+        "whatsapp": "https://wa.me/59162620079",
+        "telefono": "62620079"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Perfumería en el Segundo Piso del Paseo Aranjuez.",
+      "description": "Perfumería en el Segundo Piso del Paseo Aranjuez.",
+      "tags": [
+        "perfumes",
+        "fragancias",
+        "regalo",
+        "perfumería"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-nailsexpressgel",
+    "kind": "venue",
+    "title": "Nails Express Gel",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Cuidado, personal. Cuidado personal en el Segundo Piso del Paseo Aranjuez. uñas,manicure,pedicure,belleza,cuidado,personal",
+    "attributes": {
+      "category": "Cuidado, personal",
+      "floor": "Segundo Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Cuidado",
+        "personal"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/p/Nails-Express-Gel-100063509291580/",
+        "instagram": "https://www.instagram.com/nails.express.gel/",
+        "whatsapp": "https://wa.me/59160714119",
+        "telefono": "60714119"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Cuidado personal en el Segundo Piso del Paseo Aranjuez.",
+      "description": "Cuidado personal en el Segundo Piso del Paseo Aranjuez.",
+      "tags": [
+        "uñas",
+        "manicure",
+        "pedicure",
+        "belleza",
+        "cuidado",
+        "personal"
+      ],
+      "venue_type": "servicio",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-tigo",
+    "kind": "venue",
+    "title": "Tigo",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: Telecomunicaciones. Telecomunicaciones en el Segundo Piso del Paseo Aranjuez. telefonia,chip,planes,internet,celulares,lineas,telecomunicaciones",
+    "attributes": {
+      "category": "Telecomunicaciones",
+      "floor": "Segundo Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Telecomunicaciones"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/BoliviaTigo",
+        "instagram": "https://www.instagram.com/tigobol/",
+        "whatsapp": "https://wa.me/59176600300",
+        "telefono": "76600300"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Telecomunicaciones en el Segundo Piso del Paseo Aranjuez.",
+      "description": "Telecomunicaciones en el Segundo Piso del Paseo Aranjuez.",
+      "tags": [
+        "telefonia",
+        "chip",
+        "planes",
+        "internet",
+        "celulares",
+        "lineas",
+        "telecomunicaciones"
+      ],
+      "venue_type": "servicio",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:top-collection",
+    "kind": "venue",
+    "title": "Top Collection",
+    "text": "Tienda de ropa masculina en Paseo Aranjuez. Ropa en el Segundo Piso del Paseo Aranjuez. ropa,moda,vestir",
+    "attributes": {
+      "category": "ropa masculina",
+      "area": "centro comercial",
+      "floor": "2",
+      "unit": "212",
+      "evidence": "publicaciones del negocio replicadas",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Ropa"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/TopCollectionBolivia",
+        "instagram": "https://www.instagram.com/Top_collection_bolivia",
+        "whatsapp": "https://wa.me/59176961145",
+        "telefono": "76961145"
+      },
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "source_type": "official_public_research",
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://www.findglocal.com/BO/Ciudad-Cochabamba/186197558218216/Top--Collection",
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Ropa en el Segundo Piso del Paseo Aranjuez.",
+      "description": "Ropa en el Segundo Piso del Paseo Aranjuez.",
+      "tags": [
+        "ropa",
+        "moda",
+        "vestir"
+      ],
+      "venue_type": "tienda",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:totto",
+    "kind": "venue",
+    "title": "Totto",
+    "text": "Tienda de mochilas, accesorios y ropa Totto en Paseo Aranjuez. Mochilas, ropa y accesorios en el Segundo Piso del Paseo Aranjuez. mochilas,maletas,ropa,accesorios,viaje",
+    "attributes": {
+      "category": "mochilas y accesorios",
+      "area": "centro comercial",
+      "floor": "2",
+      "unit": "203",
+      "evidence": "sitio del negocio; listado 2026",
+      "review_status": "sourced",
+      "directory_categories": [
+        "Ropa",
+        "y",
+        "Accesorios"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/totto.bolivia",
+        "instagram": "https://www.instagram.com/Home.select_paseo.aranjuez",
+        "whatsapp": "https://wa.me/59178983491",
+        "telefono": "78983491"
+      },
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "source_type": "official_public_research",
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores",
+        "hours": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://bo.totto.com/promociones-vigentes-26",
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Mochilas, ropa y accesorios en el Segundo Piso del Paseo Aranjuez.",
+      "description": "Mochilas, ropa y accesorios en el Segundo Piso del Paseo Aranjuez.",
+      "tags": [
+        "mochilas",
+        "maletas",
+        "ropa",
+        "accesorios",
+        "viaje"
+      ],
+      "venue_type": "tienda",
+      "hours": {
+        "0": [
+          [
+            "10:00",
+            "22:00"
+          ]
+        ],
+        "1": [
+          [
+            "10:00",
+            "22:00"
+          ]
+        ],
+        "2": [
+          [
+            "10:00",
+            "22:00"
+          ]
+        ],
+        "3": [
+          [
+            "10:00",
+            "22:00"
+          ]
+        ],
+        "4": [
+          [
+            "10:00",
+            "22:00"
+          ]
+        ],
+        "5": [
+          [
+            "10:00",
+            "22:00"
+          ]
+        ],
+        "6": [
+          [
+            "10:00",
+            "22:00"
+          ]
+        ]
+      },
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-acaigolden",
+    "kind": "venue",
+    "title": "Açaí Golden",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: helado, postre, dulce. Açaí y postres en el Tercer Piso del Paseo Aranjuez. helado,postre,dulce",
+    "attributes": {
+      "category": "helado, postre, dulce",
+      "floor": "Tercer Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "helado",
+        "postre",
+        "dulce"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/acaigolden10/",
+        "instagram": "https://www.instagram.com/_acaigolden/",
+        "whatsapp": "https://wa.me/59161787485",
+        "telefono": "61787485"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Açaí y postres en el Tercer Piso del Paseo Aranjuez.",
+      "description": "Açaí y postres en el Tercer Piso del Paseo Aranjuez.",
+      "tags": [
+        "helado",
+        "postre",
+        "dulce"
+      ],
+      "venue_type": "restaurante",
+      "area": "Mercado Gastronómico",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:almacen-de-pizzas",
+    "kind": "venue",
+    "title": "Almacén de Pizzas",
+    "text": "Pizzería especializada en pizza en Paseo Aranjuez. Pizzería en el Tercer Piso del Paseo Aranjuez. pizzas",
+    "attributes": {
+      "category": "pizzería",
+      "area": "centro comercial",
+      "floor": "3",
+      "unit": "311",
+      "evidence": "publicaciones del negocio replicadas en 2026",
+      "review_status": "sourced",
+      "directory_categories": [
+        "pizzas"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/almacendepizzasbo/",
+        "instagram": "https://www.instagram.com/almacendepizzasbo/",
+        "whatsapp": "https://wa.me/59176912142",
+        "telefono": "76912142"
+      },
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "source_type": "official_public_research",
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://www.restaurants10.com/BO/Cochabamba/102219924763975/Almac%C3%A9n-de-Pizzas",
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Pizzería en el Tercer Piso del Paseo Aranjuez.",
+      "description": "Pizzería en el Tercer Piso del Paseo Aranjuez.",
+      "tags": [
+        "pizzas"
+      ],
+      "venue_type": "restaurante",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-bypassburger",
+    "kind": "venue",
+    "title": "Bypass Burger",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: hamburguesa, sandwich, lomito. Hamburguesas en el Tercer Piso del Paseo Aranjuez. hamburguesa,sandwich,lomito",
+    "attributes": {
+      "category": "hamburguesa, sandwich, lomito",
+      "floor": "Tercer Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "hamburguesa",
+        "sandwich",
+        "lomito"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/profile.php?id=100086464282347",
+        "instagram": "https://www.instagram.com/bypassburgerbo/",
+        "whatsapp": "https://wa.me/59169030766",
+        "telefono": "69030766"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Hamburguesas en el Tercer Piso del Paseo Aranjuez.",
+      "description": "Hamburguesas en el Tercer Piso del Paseo Aranjuez.",
+      "tags": [
+        "hamburguesa",
+        "sandwich",
+        "lomito"
+      ],
+      "venue_type": "restaurante",
+      "area": "Mercado Gastronómico",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-chottomatte",
+    "kind": "venue",
+    "title": "Chotto Matte",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: negocio. Gastronomía en el Tercer Piso del Paseo Aranjuez. comida",
+    "attributes": {
+      "category": "negocio",
+      "floor": "Tercer Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [],
+      "public_contacts": {
+        "instagram": "https://www.instagram.com/chotto_matte591/",
+        "whatsapp": "https://www.whatsapp.com/catalog/59176097602/?app_absent=0",
+        "facebook": "https://www.facebook.com/chottomattecbba16"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Gastronomía en el Tercer Piso del Paseo Aranjuez.",
+      "description": "Gastronomía en el Tercer Piso del Paseo Aranjuez.",
+      "tags": [
+        "comida"
+      ],
+      "venue_type": "restaurante",
+      "area": "Mercado Gastronómico",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-delistambul",
+    "kind": "venue",
+    "title": "Deli Stambul",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: negocio. Gastronomía en el Tercer Piso del Paseo Aranjuez. comida",
+    "attributes": {
+      "category": "negocio",
+      "floor": "Tercer Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/DeliStanbul",
+        "whatsapp": "https://api.whatsapp.com/send/?phone=59177227023",
+        "telefono": "77227023"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Gastronomía en el Tercer Piso del Paseo Aranjuez.",
+      "description": "Gastronomía en el Tercer Piso del Paseo Aranjuez.",
+      "tags": [
+        "comida"
+      ],
+      "venue_type": "restaurante",
+      "area": "Mercado Gastronómico",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-flavorburst",
+    "kind": "venue",
+    "title": "Flavor Burst",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: helados, frapes, café. Heladería y cafetería en el Tercer Piso del Paseo Aranjuez. helados,frapes,café",
+    "attributes": {
+      "category": "helados, frapes, café",
+      "floor": "Tercer Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "helados",
+        "frapes",
+        "café"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/flavorburstbolivia",
+        "instagram": "https://www.instagram.com/flavor_burst_bolivia/"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Heladería y cafetería en el Tercer Piso del Paseo Aranjuez.",
+      "description": "Heladería y cafetería en el Tercer Piso del Paseo Aranjuez.",
+      "tags": [
+        "helados",
+        "frapes",
+        "café"
+      ],
+      "venue_type": "restaurante",
+      "area": "Mercado Gastronómico",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-heladosvacafria",
+    "kind": "venue",
+    "title": "Helados Vacafría",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: negocio. Heladería en el Tercer Piso del Paseo Aranjuez. helados,postre,dulce",
+    "attributes": {
+      "category": "negocio",
+      "floor": "Tercer Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/vacafria",
+        "instagram": "https://www.instagram.com/vacafria/?hl=es"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Heladería en el Tercer Piso del Paseo Aranjuez.",
+      "description": "Heladería en el Tercer Piso del Paseo Aranjuez.",
+      "tags": [
+        "helados",
+        "postre",
+        "dulce"
+      ],
+      "venue_type": "restaurante",
+      "area": "Mercado Gastronómico",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-hoyhay",
+    "kind": "venue",
+    "title": "HOY HAY",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: negocio. Gastronomía en el Tercer Piso del Paseo Aranjuez. comida",
+    "attributes": {
+      "category": "negocio",
+      "floor": "Tercer Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/cafeteriaespecialidadmercadito",
+        "whatsapp": "https://api.whatsapp.com/send/?phone=59169537021",
+        "instagram": "https://www.instagram.com/hoyhay.bo",
+        "telefono": "69537021"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Gastronomía en el Tercer Piso del Paseo Aranjuez.",
+      "description": "Gastronomía en el Tercer Piso del Paseo Aranjuez.",
+      "tags": [
+        "comida"
+      ],
+      "venue_type": "restaurante",
+      "area": "Mercado Gastronómico",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-lasangucheriacafe",
+    "kind": "venue",
+    "title": "La Sanguchería Cafe",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: sandwich, hamburguesa, pollo, carne. Sándwiches y hamburguesas en el Tercer Piso del Paseo Aranjuez. sandwich,hamburguesa,pollo,carne",
+    "attributes": {
+      "category": "sandwich, hamburguesa, pollo, carne",
+      "floor": "Tercer Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "sandwich",
+        "hamburguesa",
+        "pollo",
+        "carne"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/lasangucheriarl/",
+        "instagram": "https://www.instagram.com/lasangucheria_cafe",
+        "whatsapp": "https://wa.me/59175750520",
+        "telefono": "75750520"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Sándwiches y hamburguesas en el Tercer Piso del Paseo Aranjuez.",
+      "description": "Sándwiches y hamburguesas en el Tercer Piso del Paseo Aranjuez.",
+      "tags": [
+        "sandwich",
+        "hamburguesa",
+        "pollo",
+        "carne"
+      ],
+      "venue_type": "restaurante",
+      "area": "Mercado Gastronómico",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-parrilleros",
+    "kind": "venue",
+    "title": "PARRILLEROS",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: negocio. Parrilla en el Tercer Piso del Paseo Aranjuez. parrilla,carne,asado,almuerzo",
+    "attributes": {
+      "category": "negocio",
+      "floor": "Tercer Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [],
+      "public_contacts": {
+        "instagram": "https://www.instagram.com/parrilleros_de_full_brasa/"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Parrilla en el Tercer Piso del Paseo Aranjuez.",
+      "description": "Parrilla en el Tercer Piso del Paseo Aranjuez.",
+      "tags": [
+        "parrilla",
+        "carne",
+        "asado",
+        "almuerzo"
+      ],
+      "venue_type": "restaurante",
+      "area": "Mercado Gastronómico",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-pawitos",
+    "kind": "venue",
+    "title": "Pawitos",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: negocio. Gastronomía en el Tercer Piso del Paseo Aranjuez. comida",
+    "attributes": {
+      "category": "negocio",
+      "floor": "Tercer Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [],
+      "public_contacts": {
+        "tiktok": "https://www.tiktok.com/@cafeteria_pawitos",
+        "instagram": "https://www.instagram.com/cafeteria_pawitos/"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Gastronomía en el Tercer Piso del Paseo Aranjuez.",
+      "description": "Gastronomía en el Tercer Piso del Paseo Aranjuez.",
+      "tags": [
+        "comida"
+      ],
+      "venue_type": "restaurante",
+      "area": "Mercado Gastronómico",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-solopastas",
+    "kind": "venue",
+    "title": "Solo Pastas",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: pastas. Comida italiana en el Tercer Piso del Paseo Aranjuez. pastas,italiana,almuerzo,cena",
+    "attributes": {
+      "category": "pastas",
+      "floor": "Tercer Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "pastas"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/solopastas.PaseoAranjuez/",
+        "instagram": "https://www.instagram.com/solopastascochabamba/",
+        "whatsapp": "https://wa.me/59177498891",
+        "telefono": "77498891"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores",
+        "hours": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Comida italiana en el Tercer Piso del Paseo Aranjuez.",
+      "description": "Comida italiana en el Tercer Piso del Paseo Aranjuez.",
+      "tags": [
+        "pastas",
+        "italiana",
+        "almuerzo",
+        "cena"
+      ],
+      "venue_type": "restaurante",
+      "unit": "301",
+      "area": "Mercado Gastronómico",
+      "hours": {
+        "0": [
+          [
+            "11:00",
+            "22:00"
+          ]
+        ],
+        "1": [
+          [
+            "11:00",
+            "22:00"
+          ]
+        ],
+        "2": [
+          [
+            "11:00",
+            "22:00"
+          ]
+        ],
+        "3": [
+          [
+            "11:00",
+            "22:00"
+          ]
+        ],
+        "4": [
+          [
+            "11:00",
+            "22:00"
+          ]
+        ],
+        "5": [
+          [
+            "11:00",
+            "22:00"
+          ]
+        ],
+        "6": [
+          [
+            "11:00",
+            "22:00"
+          ]
+        ]
+      },
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-tunariexpress",
+    "kind": "venue",
+    "title": "Tunari Express",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: carne, charque, pique, chorizo, nacional. Comida nacional en el Tercer Piso del Paseo Aranjuez. carne,charque,pique,chorizo,nacional",
+    "attributes": {
+      "category": "carne, charque, pique, chorizo, nacional",
+      "floor": "Tercer Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "carne",
+        "charque",
+        "pique",
+        "chorizo",
+        "nacional"
+      ],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/Tunarielprado/",
+        "instagram": "https://www.instagram.com/tunarioficial/",
+        "whatsapp": "https://wa.me/59177644234",
+        "telefono": "77644234"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Comida nacional en el Tercer Piso del Paseo Aranjuez.",
+      "description": "Comida nacional en el Tercer Piso del Paseo Aranjuez.",
+      "tags": [
+        "carne",
+        "charque",
+        "pique",
+        "chorizo",
+        "nacional"
+      ],
+      "venue_type": "restaurante",
+      "area": "Mercado Gastronómico",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-waffleking",
+    "kind": "venue",
+    "title": "Waffle King",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: waffle, postres, helado. Waffles y postres en el Tercer Piso del Paseo Aranjuez. waffle,postres,helado",
+    "attributes": {
+      "category": "waffle, postres, helado",
+      "floor": "Tercer Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [
+        "waffle",
+        "postres",
+        "helado"
+      ],
+      "public_contacts": {
+        "tiktok": "https://www.tiktok.com/@waffleking.bo"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Waffles y postres en el Tercer Piso del Paseo Aranjuez.",
+      "description": "Waffles y postres en el Tercer Piso del Paseo Aranjuez.",
+      "tags": [
+        "waffle",
+        "postres",
+        "helado"
+      ],
+      "venue_type": "restaurante",
+      "area": "Mercado Gastronómico",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:official-yummycandybar",
+    "kind": "venue",
+    "title": "Yummy Candy Bar",
+    "text": "Negocio del directorio oficial del Paseo Aranjuez. Categoría: negocio. Dulces en el Tercer Piso del Paseo Aranjuez. dulces,golosinas,caramelos,regalo",
+    "attributes": {
+      "category": "negocio",
+      "floor": "Tercer Piso",
+      "source_type": "official_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "review_status": "sourced",
+      "directory_categories": [],
+      "public_contacts": {
+        "facebook": "https://www.facebook.com/profile.php?id=61573740985305",
+        "whatsapp": "https://api.whatsapp.com/send?phone=59173752885",
+        "instagram": "https://www.instagram.com/yummy_candy_bar/",
+        "telefono": "73752885"
+      },
+      "field_sources": {
+        "directory_categories": "https://paseoaranjuez.com/stores",
+        "public_contacts": "https://paseoaranjuez.com/stores"
+      },
+      "source_urls": [
+        "https://paseoaranjuez.com/stores"
+      ],
+      "companion_description": "Dulces en el Tercer Piso del Paseo Aranjuez.",
+      "description": "Dulces en el Tercer Piso del Paseo Aranjuez.",
+      "tags": [
+        "dulces",
+        "golosinas",
+        "caramelos",
+        "regalo"
+      ],
+      "venue_type": "restaurante",
+      "area": "Mercado Gastronómico",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:el-cuarto",
+    "kind": "venue",
+    "title": "El Cuarto by Paseo",
+    "text": "Bar y espacio de gastronomía y música en vivo en Paseo Aranjuez. Terraza gourmet del cuarto piso con cabinas de restaurantes especializados, servicio de bar por la noche y vista al Tunari y al Cristo de la Concordia. Acepta reservas por WhatsApp al +591 61795511. terraza,bar,tragos,cocteles,cena,vista,reserva,gourmet,after office",
+    "attributes": {
+      "category": "bar y gastronomía",
+      "area": "centro comercial",
+      "floor": "4",
+      "evidence": "publicaciones del negocio replicadas en 2026",
+      "review_status": "sourced",
+      "reference": "El Cuarto: lunes a jueves 12:00–23:00, viernes y sábado 12:00–01:00; domingos y feriados 12:00–22:00. Horario del área publicado por el Paseo.",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "source_type": "official_public_research",
+      "field_sources": {
+        "floor": "https://paseoaranjuez.com/",
+        "reference": "https://paseoaranjuez.com/"
+      },
+      "source_urls": [
+        "https://www.findglocal.com/BO/Cochabamba/100111042144963/El-Cuarto-by-Paseo",
+        "https://paseoaranjuez.com/"
+      ],
+      "companion_description": "Terraza gourmet del cuarto piso con cabinas de restaurantes especializados, servicio de bar por la noche y vista al Tunari y al Cristo de la Concordia. Acepta reservas por WhatsApp al +591 61795511.",
+      "description": "Terraza gourmet del cuarto piso con cabinas de restaurantes especializados, servicio de bar por la noche y vista al Tunari y al Cristo de la Concordia. Acepta reservas por WhatsApp al +591 61795511.",
+      "tags": [
+        "terraza",
+        "bar",
+        "tragos",
+        "cocteles",
+        "cena",
+        "vista",
+        "reserva",
+        "gourmet",
+        "after office"
+      ],
+      "venue_type": "restaurante",
+      "public_contacts": {
+        "telefono": "61795511",
+        "whatsapp": "https://wa.me/59161795511",
+        "instagram": "https://www.instagram.com/elcuartobypaseo/"
+      },
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "faq:companion-1",
+    "kind": "faq",
+    "title": "¿Dónde queda el Paseo Aranjuez y cómo llego?",
+    "text": "Está en la avenida América número 488, esquina calle Pantaleón Dalence, en la zona norte de Cochabamba. direccion,ubicacion,llegar,donde queda,como llego,avenida america",
+    "attributes": {
+      "answer": "Está en la avenida América número 488, esquina calle Pantaleón Dalence, en la zona norte de Cochabamba.",
+      "tags": [
+        "direccion",
+        "ubicacion",
+        "llegar",
+        "donde queda",
+        "como llego",
+        "avenida america"
+      ],
+      "review_status": "sourced",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "source_type": "companion_public_research",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "faq:companion-2",
+    "kind": "faq",
+    "title": "¿Cuál es el horario del Paseo?",
+    "text": "Las tiendas suelen atender de lunes a sábado de 10:00 a 22:00 y los domingos de 11:00 a 21:00. La zona gastronómica puede extenderse los viernes y sábados. Cada local puede tener su propio horario. horario,abre,cierra,hora,atencion,domingo",
+    "attributes": {
+      "answer": "Las tiendas suelen atender de lunes a sábado de 10:00 a 22:00 y los domingos de 11:00 a 21:00. La zona gastronómica puede extenderse los viernes y sábados. Cada local puede tener su propio horario.",
+      "tags": [
+        "horario",
+        "abre",
+        "cierra",
+        "hora",
+        "atencion",
+        "domingo"
+      ],
+      "review_status": "draft",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "source_type": "companion_public_research",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "faq:companion-3",
+    "kind": "faq",
+    "title": "¿Hay estacionamiento?",
+    "text": "Sí, el Paseo tiene estacionamiento propio en cinco semisótanos, con señalización de espacios libres. Ofrece parqueo validado al consumir en restaurantes y cafeterías o al hacer compras. estacionamiento,parqueo,parquear,auto,garaje,parking,validado",
+    "attributes": {
+      "answer": "Sí, el Paseo tiene estacionamiento propio en cinco semisótanos, con señalización de espacios libres. Ofrece parqueo validado al consumir en restaurantes y cafeterías o al hacer compras.",
+      "tags": [
+        "estacionamiento",
+        "parqueo",
+        "parquear",
+        "auto",
+        "garaje",
+        "parking",
+        "validado"
+      ],
+      "review_status": "draft",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "source_type": "companion_public_research",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "faq:companion-4",
+    "kind": "faq",
+    "title": "¿Cómo están distribuidos los pisos?",
+    "text": "Planta baja, primer y segundo piso son de tiendas; el tercer piso es el Mercado Gastronómico; el cuarto piso es El Cuarto, la terraza gourmet; y desde el quinto piso están las torres de oficinas. pisos,distribucion,niveles,plantas,mapa,donde esta",
+    "attributes": {
+      "answer": "Planta baja, primer y segundo piso son de tiendas; el tercer piso es el Mercado Gastronómico; el cuarto piso es El Cuarto, la terraza gourmet; y desde el quinto piso están las torres de oficinas.",
+      "tags": [
+        "pisos",
+        "distribucion",
+        "niveles",
+        "plantas",
+        "mapa",
+        "donde esta"
+      ],
+      "review_status": "sourced",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "source_type": "companion_public_research",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "faq:companion-5",
+    "kind": "faq",
+    "title": "¿Cómo contacto al Paseo Aranjuez?",
+    "text": "Por WhatsApp al +591 61795513 o al correo info@paseoaranjuez.com. En redes es @paseoaranjuez en Instagram y Facebook, y @paseoaranjuezoficial en TikTok. contacto,telefono,whatsapp,correo,email,redes sociales,informacion,atencion al cliente",
+    "attributes": {
+      "answer": "Por WhatsApp al +591 61795513 o al correo info@paseoaranjuez.com. En redes es @paseoaranjuez en Instagram y Facebook, y @paseoaranjuezoficial en TikTok.",
+      "tags": [
+        "contacto",
+        "telefono",
+        "whatsapp",
+        "correo",
+        "email",
+        "redes sociales",
+        "informacion",
+        "atencion al cliente"
+      ],
+      "review_status": "sourced",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "source_type": "companion_public_research",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "faq:companion-6",
+    "kind": "faq",
+    "title": "¿Cómo reservo una mesa en El Cuarto?",
+    "text": "Las reservas de El Cuarto, la terraza gourmet del cuarto piso, se hacen por WhatsApp al +591 61795511. reserva,reservar,mesa,el cuarto,terraza,cumpleaños,celebracion",
+    "attributes": {
+      "answer": "Las reservas de El Cuarto, la terraza gourmet del cuarto piso, se hacen por WhatsApp al +591 61795511.",
+      "tags": [
+        "reserva",
+        "reservar",
+        "mesa",
+        "el cuarto",
+        "terraza",
+        "cumpleaños",
+        "celebracion"
+      ],
+      "review_status": "sourced",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "source_type": "companion_public_research",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "faq:companion-7",
+    "kind": "faq",
+    "title": "¿Hay oficinas o cowork?",
+    "text": "Sí. Desde el quinto piso hay dos torres empresariales con oficinas de distintos tipos y un cowork empresarial con acceso 24/7 y wifi de alta velocidad. Informes por WhatsApp al +591 70721225. oficina,oficinas,cowork,coworking,alquiler,sala de reuniones,trabajar,torre",
+    "attributes": {
+      "answer": "Sí. Desde el quinto piso hay dos torres empresariales con oficinas de distintos tipos y un cowork empresarial con acceso 24/7 y wifi de alta velocidad. Informes por WhatsApp al +591 70721225.",
+      "tags": [
+        "oficina",
+        "oficinas",
+        "cowork",
+        "coworking",
+        "alquiler",
+        "sala de reuniones",
+        "trabajar",
+        "torre"
+      ],
+      "review_status": "draft",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "source_type": "companion_public_research",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "faq:companion-8",
+    "kind": "faq",
+    "title": "¿Qué hay para niños?",
+    "text": "El Mercado Gastronómico del tercer piso tiene áreas de recreación y entretenimiento para niños y jóvenes, y hay jugueterías como Fair Play Kids en planta baja, y Muy Mimados y TUC TOYS en el primer piso. niños,infantil,juegos,familia,recreacion,jugueteria",
+    "attributes": {
+      "answer": "El Mercado Gastronómico del tercer piso tiene áreas de recreación y entretenimiento para niños y jóvenes, y hay jugueterías como Fair Play Kids en planta baja, y Muy Mimados y TUC TOYS en el primer piso.",
+      "tags": [
+        "niños",
+        "infantil",
+        "juegos",
+        "familia",
+        "recreacion",
+        "jugueteria"
+      ],
+      "review_status": "sourced",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "source_type": "companion_public_research",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "faq:companion-9",
+    "kind": "faq",
+    "title": "¿Qué actividades culturales hay?",
+    "text": "El Paseo tiene una galería de arte con obras de artistas nacionales y espacios para artistas. Organiza actividades como Cinema Lounge, Feria del Libro, desfiles y actividades semanales. arte,galeria,cultura,cine,cinema,feria del libro,desfiles,actividades,eventos",
+    "attributes": {
+      "answer": "El Paseo tiene una galería de arte con obras de artistas nacionales y espacios para artistas. Organiza actividades como Cinema Lounge, Feria del Libro, desfiles y actividades semanales.",
+      "tags": [
+        "arte",
+        "galeria",
+        "cultura",
+        "cine",
+        "cinema",
+        "feria del libro",
+        "desfiles",
+        "actividades",
+        "eventos"
+      ],
+      "review_status": "sourced",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "source_type": "companion_public_research",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "faq:companion-10",
+    "kind": "faq",
+    "title": "¿Se puede ir con mascotas?",
+    "text": "El Paseo Aranjuez promueve el bienestar de las mascotas. Para conocer las condiciones de ingreso, consulta por WhatsApp al +591 61795513. mascotas,perro,gato,pet friendly,animales",
+    "attributes": {
+      "answer": "El Paseo Aranjuez promueve el bienestar de las mascotas. Para conocer las condiciones de ingreso, consulta por WhatsApp al +591 61795513.",
+      "tags": [
+        "mascotas",
+        "perro",
+        "gato",
+        "pet friendly",
+        "animales"
+      ],
+      "review_status": "sourced",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "source_type": "companion_public_research",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "faq:companion-11",
+    "kind": "faq",
+    "title": "¿Qué es el Paseo Aranjuez?",
+    "text": "Es un centro comercial y empresarial inaugurado en noviembre de 2020: un edificio inteligente y ecológico de 16 pisos y cinco semisótanos, con más de 60 locales, galería de arte, mercado gastronómico, terraza gourmet y torres de oficinas. paseo aranjuez,historia,que es,edificio,inteligente,ecologico,sobre el paseo",
+    "attributes": {
+      "answer": "Es un centro comercial y empresarial inaugurado en noviembre de 2020: un edificio inteligente y ecológico de 16 pisos y cinco semisótanos, con más de 60 locales, galería de arte, mercado gastronómico, terraza gourmet y torres de oficinas.",
+      "tags": [
+        "paseo aranjuez",
+        "historia",
+        "que es",
+        "edificio",
+        "inteligente",
+        "ecologico",
+        "sobre el paseo"
+      ],
+      "review_status": "sourced",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "source_type": "companion_public_research",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "event:hackathon-1",
+    "kind": "event",
+    "title": "Hackathon By Paseo 2026: inauguración y presentación de retos",
+    "text": "Inicio de la hackathon: inauguración, palabras del CEO de On Business y presentación de retos.",
+    "attributes": {
+      "description": "Inicio de la hackathon: inauguración, palabras del CEO de On Business y presentación de retos.",
+      "starts_at": "2026-10-02T09:00:00-04:00",
+      "ends_at": "2026-10-02T11:00:00-04:00",
+      "location": "Paseo Aranjuez",
+      "review_status": "sourced",
+      "observed_at": "2026-10-02T00:00:00-04:00",
+      "source_type": "hackathon_schedule",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/",
+    "updated_at": "2026-10-02T00:00:00-04:00",
+    "expires_at": "2026-10-02T11:00:00-04:00"
+  },
+  {
+    "id": "event:hackathon-2",
+    "kind": "event",
+    "title": "Hackathon: charla de oratoria a cargo de Zontes",
+    "text": "Charla de oratoria para los equipos participantes.",
+    "attributes": {
+      "description": "Charla de oratoria para los equipos participantes.",
+      "starts_at": "2026-10-02T11:00:00-04:00",
+      "ends_at": "2026-10-02T12:00:00-04:00",
+      "location": "Paseo Aranjuez",
+      "review_status": "sourced",
+      "observed_at": "2026-10-02T00:00:00-04:00",
+      "source_type": "hackathon_schedule",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/",
+    "updated_at": "2026-10-02T00:00:00-04:00",
+    "expires_at": "2026-10-02T12:00:00-04:00"
+  },
+  {
+    "id": "event:hackathon-3",
+    "kind": "event",
+    "title": "Hackathon: charla «Cómo patentar un producto digital»",
+    "text": "Charla abierta durante la segunda jornada de la hackathon.",
+    "attributes": {
+      "description": "Charla abierta durante la segunda jornada de la hackathon.",
+      "starts_at": "2026-10-03T11:00:00-04:00",
+      "ends_at": "2026-10-03T12:00:00-04:00",
+      "location": "Paseo Aranjuez",
+      "review_status": "sourced",
+      "observed_at": "2026-10-02T00:00:00-04:00",
+      "source_type": "hackathon_schedule",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/",
+    "updated_at": "2026-10-02T00:00:00-04:00",
+    "expires_at": "2026-10-03T12:00:00-04:00"
+  },
+  {
+    "id": "event:hackathon-4",
+    "kind": "event",
+    "title": "Hackathon: charla «UX/UI para desarrolladores»",
+    "text": "Charla sobre diseño de experiencia e interfaces.",
+    "attributes": {
+      "description": "Charla sobre diseño de experiencia e interfaces.",
+      "starts_at": "2026-10-03T16:00:00-04:00",
+      "ends_at": "2026-10-03T17:00:00-04:00",
+      "location": "Paseo Aranjuez",
+      "review_status": "sourced",
+      "observed_at": "2026-10-02T00:00:00-04:00",
+      "source_type": "hackathon_schedule",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/",
+    "updated_at": "2026-10-02T00:00:00-04:00",
+    "expires_at": "2026-10-03T17:00:00-04:00"
+  },
+  {
+    "id": "event:hackathon-5",
+    "kind": "event",
+    "title": "Demo Day de la Hackathon By Paseo 2026",
+    "text": "Presentaciones de los equipos concursantes en dos bloques (11:15 a 13:00 y 14:00 a 16:30).",
+    "attributes": {
+      "description": "Presentaciones de los equipos concursantes en dos bloques (11:15 a 13:00 y 14:00 a 16:30).",
+      "starts_at": "2026-10-04T11:15:00-04:00",
+      "ends_at": "2026-10-04T16:30:00-04:00",
+      "location": "Paseo Aranjuez",
+      "review_status": "sourced",
+      "observed_at": "2026-10-02T00:00:00-04:00",
+      "source_type": "hackathon_schedule",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/",
+    "updated_at": "2026-10-02T00:00:00-04:00",
+    "expires_at": "2026-10-04T16:30:00-04:00"
+  },
+  {
+    "id": "event:hackathon-6",
+    "kind": "event",
+    "title": "Premiación de la Hackathon By Paseo 2026",
+    "text": "Oportunidades ON WORK, anuncio de ganadores, ceremonia de premiación y networking.",
+    "attributes": {
+      "description": "Oportunidades ON WORK, anuncio de ganadores, ceremonia de premiación y networking.",
+      "starts_at": "2026-10-04T17:00:00-04:00",
+      "ends_at": "2026-10-04T18:00:00-04:00",
+      "location": "Paseo Aranjuez",
+      "review_status": "sourced",
+      "observed_at": "2026-10-02T00:00:00-04:00",
+      "source_type": "hackathon_schedule",
+      "companion_import": "28b9729"
+    },
+    "source_url": "https://paseoaranjuez.com/",
+    "updated_at": "2026-10-02T00:00:00-04:00",
+    "expires_at": "2026-10-04T18:00:00-04:00"
+  },
+  {
+    "id": "venue:mercado-gastronomico",
+    "kind": "venue",
+    "title": "Mercado Gastronómico",
+    "text": "Lounge gastronómico con comida estilo exprés, unos 450 asientos, áreas lounge, coworking, recreación y entretenimiento para niños y jóvenes. patio de comidas,comida,almorzar,comer,niños,coworking,sentarse",
+    "attributes": {
+      "category": "Patio de comidas",
+      "description": "Lounge gastronómico con comida estilo exprés, unos 450 asientos, áreas lounge, coworking, recreación y entretenimiento para niños y jóvenes.",
+      "floor": "Tercer Piso",
+      "area": "Mercado Gastronómico",
+      "venue_type": "restaurante",
+      "review_status": "sourced",
+      "source_type": "companion_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "companion_import": "28b9729",
+      "public_contacts": {
+        "instagram": "https://www.instagram.com/mercado_gastronomico_bypaseo/"
+      }
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:paseo-aranjuez-office",
+    "kind": "venue",
+    "title": "Paseo Aranjuez Office",
+    "text": "Dos torres de oficinas a partir del quinto piso, con oficinas tipo A a D y cowork empresarial con acceso 24/7, wifi de alta velocidad y salas de reunión. oficinas,cowork,coworking,sala de reuniones,alquiler de oficinas,trabajo",
+    "attributes": {
+      "category": "Torres empresariales y cowork",
+      "description": "Dos torres de oficinas a partir del quinto piso, con oficinas tipo A a D y cowork empresarial con acceso 24/7, wifi de alta velocidad y salas de reunión.",
+      "floor": "Quinto piso en adelante",
+      "area": "Torres empresariales",
+      "venue_type": "oficina",
+      "review_status": "sourced",
+      "source_type": "companion_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "companion_import": "28b9729",
+      "public_contacts": {
+        "telefono": "70721225",
+        "whatsapp": "https://wa.me/59170721225"
+      }
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  },
+  {
+    "id": "venue:galeria-de-arte",
+    "kind": "venue",
+    "title": "Galería de Arte",
+    "text": "Espacio dedicado a exponer pinturas, esculturas e instalaciones de artistas nacionales; es de acceso libre para el público. arte,galeria,exposicion,cultura,pinturas,esculturas",
+    "attributes": {
+      "category": "Arte y cultura",
+      "description": "Espacio dedicado a exponer pinturas, esculturas e instalaciones de artistas nacionales; es de acceso libre para el público.",
+      "floor": "Por confirmar",
+      "area": "",
+      "venue_type": "servicio",
+      "review_status": "sourced",
+      "source_type": "companion_public_research",
+      "observed_at": "2026-10-03T07:44:00-04:00",
+      "companion_import": "28b9729",
+      "public_contacts": {
+        "instagram": "https://www.instagram.com/galeriadeartebo/"
+      }
+    },
+    "source_url": "https://paseoaranjuez.com/stores",
+    "updated_at": "2026-10-03T14:00:00-04:00",
+    "expires_at": null
+  }
+]

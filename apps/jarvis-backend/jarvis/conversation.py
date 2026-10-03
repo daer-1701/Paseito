@@ -73,6 +73,7 @@ def catalog_prices(db, products, budget=None):
                 product = {**product, 'attributes': {**attrs, 'catalog_price_bs': attrs.get('price_bs'),
                             'price_bs': promo['attributes']['price_bs'], 'active_promotion': promo['attributes']['benefit'],
                             'promotion_id': promo['id'], 'promotion_expires_at': promo['expires_at']}}
+                product['text'] = product['title'] + f". Precio vigente: Bs {promo['attributes']['price_bs']:g}. " + promo['attributes']['terms']
         if budget is None or product['attributes'].get('price_bs') is not None and product['attributes']['price_bs'] <= budget:
             result.append(product)
     return result
@@ -116,7 +117,7 @@ def shopping_dialogue(db, message, mode, preferences, previous_ids):
         if preferences.get('shop_topic') and (words & {'nino', 'nina', 'pareja', 'infantil', 'presupuesto', 'bolivianos', 'bs'} or raw.replace('.', '').replace(',', '').isdigit() and preferences.get('budget_bs') is not None):
             useful, prepared = prepare(preferences['shop_topic'])
         elif raw in {'hola', 'buenas', 'buenos dias', 'buenas tardes', 'buenas noches'}:
-            return response('¡Hola! Soy Jarvis. ¿Buscas una tienda, algo para comer o un regalo?', stage='welcome')
+            return response('¡Hola! Soy Paseito. ¿Buscas una tienda, algo para comer o un regalo?', stage='welcome')
         else:
             return None
     if inventory_query:
