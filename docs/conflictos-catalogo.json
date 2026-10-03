@@ -1,0 +1,24 @@
+{
+  "base": "28b9729",
+  "matched_venues": 74,
+  "conflicts": [
+    {
+      "id": "faq:companion-2",
+      "reason": "Versión divergente o afirmación sin confirmar; draft excluido del agente"
+    },
+    {
+      "id": "faq:companion-3",
+      "reason": "Versión divergente o afirmación sin confirmar; draft excluido del agente"
+    },
+    {
+      "id": "faq:companion-7",
+      "reason": "Versión divergente o afirmación sin confirmar; draft excluido del agente"
+    }
+  ],
+  "note": "Descripciones del compañero conservadas sin marcar aprobación humana. Eventos heredados del cronograma; fuente primaria pendiente de revisión editorial.",
+  "new_public_spaces": {
+    "Mercado Gastronómico": "venue:mercado-gastronomico",
+    "Paseo Aranjuez Office": "venue:paseo-aranjuez-office",
+    "Galería de Arte": "venue:galeria-de-arte"
+  }
+}

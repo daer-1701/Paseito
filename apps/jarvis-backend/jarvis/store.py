@@ -45,6 +45,7 @@ def connect(path: Path | None = None) -> sqlite3.Connection:
     db.execute("CREATE INDEX IF NOT EXISTS idx_turns_session ON turns(session_id, id)")
     db.execute("CREATE TABLE IF NOT EXISTS session_context (session_id TEXT PRIMARY KEY, record_ids TEXT NOT NULL, updated_at TEXT NOT NULL)")
     db.execute("CREATE TABLE IF NOT EXISTS session_preferences (session_id TEXT PRIMARY KEY, preferences TEXT NOT NULL, updated_at TEXT NOT NULL)")
+    db.execute('CREATE TABLE IF NOT EXISTS record_tombstones (id TEXT PRIMARY KEY, deleted_at TEXT NOT NULL)')
     return db
 
 
@@ -129,8 +130,12 @@ def validate_record(record: dict) -> dict:
             "expires_at": expires.astimezone(timezone.utc).isoformat() if expires else None}
 
 
-def upsert(db: sqlite3.Connection, record: dict) -> None:
+def upsert(db: sqlite3.Connection, record: dict, restore: bool = False) -> None:
     r = validate_record(record)
+    if restore:
+        db.execute('DELETE FROM record_tombstones WHERE id=?', (r['id'],))
+    elif db.execute('SELECT 1 FROM record_tombstones WHERE id=?', (r['id'],)).fetchone():
+        return
     db.execute("""
         INSERT INTO records (id, kind, title, text, attributes, source_url, updated_at, expires_at)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -146,6 +151,8 @@ def upsert(db: sqlite3.Connection, record: dict) -> None:
 
 def delete(db: sqlite3.Connection, record_id: str) -> bool:
     cursor = db.execute("DELETE FROM records WHERE id=?", (record_id,))
+    if cursor.rowcount:
+        db.execute('INSERT OR REPLACE INTO record_tombstones VALUES (?, ?)', (record_id, datetime.now(timezone.utc).isoformat()))
     db.commit()
     return cursor.rowcount > 0
 

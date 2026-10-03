@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<base href="/kiosk/">
 <title>Paseito · Paseo Aranjuez</title>
-<script type="importmap">{ "imports": { "three": "./vendor/three/three.module.js" } }</script>
-<script src="config.js"></script>
+<script type="importmap">{ "imports": { "three": "/kiosk/vendor/three/three.module.js" } }</script>
 <style>
   :root {
     --vino: #7a1f3d; --vino-oscuro: #4a1026; --oro: #e7b73a; --oro-claro: #ffd977; --crema: #fffaf0;
@@ -35,16 +35,20 @@
   .marca { display: flex; align-items: center; gap: 12px; }
   .logo { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; font-weight: 800; font-size: 1.2rem;
           color: var(--vino-oscuro); background: linear-gradient(135deg, var(--oro-claro), var(--oro));
-          box-shadow: 0 4px 14px rgba(231, 183, 58, .5); transform: perspective(200px) rotateY(-12deg); }
+          box-shadow: 0 4px 14px rgba(0, 0, 0, .3); transform: perspective(200px) rotateY(-12deg); }
   .marca b { display: block; font-size: 1.02rem; letter-spacing: .3px; }
   .marca small { color: var(--tenue); font-size: .78rem; }
   .derecha { display: flex; align-items: center; gap: 14px; }
+  .estado-confianza { display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; color: var(--oro-claro);
+                       background: rgba(231, 183, 58, .12); border: 1px solid rgba(231, 183, 58, .28); font-size: .72rem; font-weight: 700; }
+  .estado-confianza::before { content: "✓"; width: 15px; height: 15px; display: grid; place-items: center; border-radius: 50%;
+                              color: var(--vino-oscuro); background: var(--oro); font-size: .65rem; }
   #reloj { text-align: right; line-height: 1.1; }
   #reloj b { font-size: 1.25rem; font-variant-numeric: tabular-nums; }
   #reloj small { display: block; color: var(--tenue); font-size: .75rem; text-transform: capitalize; }
   #nueva { border: 1px solid var(--borde); background: rgba(255, 255, 255, .08); border-radius: 12px; padding: 8px 12px; font-size: .85rem; }
   #nueva:hover { background: rgba(255, 255, 255, .16); }
-  .punto { width: 9px; height: 9px; border-radius: 50%; background: var(--verde); box-shadow: 0 0 10px var(--verde); }
+  .punto { width: 9px; height: 9px; border-radius: 50%; background: var(--verde); }
 
   /* ---------- paneles laterales ---------- */
   .panel { position: fixed; top: var(--arriba); bottom: var(--margen); width: var(--panel); border-radius: 22px; padding: 16px;
@@ -60,7 +64,7 @@
   @keyframes girar { to { transform: rotateX(60deg) rotateZ(318deg) translateZ(-60px); } }
   .capa { position: absolute; inset: 0; border-radius: 10px; transform: translateZ(calc(var(--i) * 20px));
           background: rgba(255, 255, 255, .07); border: 1.5px solid rgba(255, 255, 255, .28); transition: all .35s; }
-  .capa.con { background: rgba(231, 183, 58, .35); border-color: var(--oro); box-shadow: 0 0 22px rgba(231, 183, 58, .7); }
+  .capa.con { background: rgba(231, 183, 58, .35); border-color: var(--oro); }
   .capa.activa { background: rgba(255, 217, 119, .85); border-color: #fff; transform: translateZ(calc(var(--i) * 20px + 8px)); }
   .nombres { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; font-size: .8rem; }
   .nombres li { display: flex; justify-content: space-between; padding: 3px 8px; border-radius: 8px; color: var(--tenue); transition: all .3s; }
@@ -73,21 +77,43 @@
   .tarjeta { position: relative; display: grid; grid-template-columns: 46px 1fr; gap: 12px; padding: 12px; border-radius: 16px;
              background: linear-gradient(135deg, rgba(255, 255, 255, .13), rgba(255, 255, 255, .04)); border: 1px solid var(--borde);
              transform-style: preserve-3d; transition: transform .15s ease-out, box-shadow .2s; cursor: pointer;
-             animation: entra .55s cubic-bezier(.2, .9, .3, 1.2) both; animation-delay: calc(var(--n) * 70ms); }
+             animation: entra .55s cubic-bezier(.22, 1, .36, 1) both; animation-delay: calc(var(--n) * 70ms); }
   .tarjeta:hover { box-shadow: 0 14px 30px rgba(0, 0, 0, .35), 0 0 0 1px var(--oro) inset; }
   @keyframes entra { from { opacity: 0; transform: rotateY(-55deg) translateX(40px); } }
   .icono { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; font-size: 1.45rem;
            background: linear-gradient(135deg, var(--vino), var(--vino-oscuro)); border: 1px solid rgba(231, 183, 58, .5);
            transform: translateZ(24px); box-shadow: 0 6px 14px rgba(0, 0, 0, .3); }
   .info { transform: translateZ(14px); min-width: 0; }
-  .info b { display: block; font-size: .98rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .info b { display: block; font-size: .98rem; overflow-wrap: anywhere; }
   .info small { display: block; color: var(--tenue); font-size: .8rem; margin-top: 2px; }
   .chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; }
   .chip { font-size: .7rem; font-weight: 700; padding: 3px 8px; border-radius: 999px; background: rgba(255, 255, 255, .12); }
   .chip.piso { background: var(--oro); color: var(--vino-oscuro); }
   .chip.abierto { background: var(--verde); }
   .chip.cerrado { background: #c0392b; }
-  .chip.puntos { background: linear-gradient(135deg, #f7d774, #e0a526); color: var(--vino-oscuro); }
+  .guia-btn { margin-top: 8px; width: 100%; border: 1px solid rgba(231, 183, 58, .55); border-radius: 10px; padding: 7px 9px;
+               color: var(--oro-claro); font-size: .76rem; font-weight: 800; background: rgba(231, 183, 58, .12); }
+  .guia-btn:hover { color: var(--vino-oscuro); background: var(--oro); }
+
+  /* ---------- modo acompáñame ---------- */
+  #guia { position: absolute; inset: 12px; z-index: 4; display: none; flex-direction: column; gap: 14px; padding: 16px;
+           overflow: auto; border: 1px solid rgba(231, 183, 58, .52); border-radius: 18px; background: linear-gradient(155deg, rgba(63, 16, 38, .98), rgba(35, 8, 24, .98)); }
+  #guia.activa { display: flex; animation: aparece .28s ease-out; }
+  .guia-superior { display: flex; justify-content: space-between; align-items: center; }
+  .guia-etiqueta { color: var(--oro); font-size: .7rem; letter-spacing: 1.4px; font-weight: 800; }
+  #cerrar-guia { border: 0; border-radius: 50%; width: 30px; height: 30px; background: rgba(255,255,255,.1); font-size: 1.15rem; }
+  #guia-destino { margin: 0; font-size: 1.3rem; line-height: 1.15; }
+  #guia-resumen { color: var(--tenue); margin: -6px 0 0; font-size: .86rem; }
+  .ruta { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+  .ruta li { position: relative; min-height: 50px; padding: 0 0 14px 38px; font-size: .86rem; color: var(--tenue); }
+  .ruta li::before { content: ""; position: absolute; left: 10px; top: 5px; width: 14px; height: 14px; border-radius: 50%; background: var(--vino); border: 2px solid var(--oro); }
+  .ruta li:not(:last-child)::after { content: ""; position: absolute; left: 16px; top: 22px; bottom: -1px; border-left: 2px dashed rgba(231,183,58,.6); }
+  .ruta b { display: block; color: var(--crema); margin-bottom: 2px; }
+  .qr-bloque { display: flex; gap: 12px; align-items: center; padding: 10px; border-radius: 14px; background: rgba(255,255,255,.07); }
+  .qr-bloque[hidden] { display: none; }
+  #qr-guia img { width: 78px; height: 78px; border-radius: 8px; background: #fff; }
+  .qr-bloque p { margin: 0; font-size: .78rem; color: var(--tenue); line-height: 1.4; }
+  #abrir-ficha { display: block; text-align: center; padding: 11px; border-radius: 12px; color: var(--vino-oscuro); background: var(--oro); font-weight: 800; text-decoration: none; font-size: .86rem; }
 
   /* ---------- conversación ---------- */
   .chat { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 4px; }
@@ -96,7 +122,7 @@
   #oyente.visible { display: block; animation: aparece .3s ease-out; }
   @keyframes aparece { from { opacity: 0; transform: translateY(8px); } }
   #subtitulo { align-self: stretch; padding: 12px 16px 14px; border-radius: 4px 18px 18px 18px;
-               background: rgba(255, 255, 255, .08); border: 1px solid var(--borde); border-left: 3px solid var(--oro); }
+               background: rgba(255, 255, 255, .08); border: 1px solid var(--borde); border: 1px solid var(--borde); }
   #subtitulo .quien { font-size: .7rem; letter-spacing: 1.4px; color: var(--oro); font-weight: 700; margin-bottom: 6px; }
   #texto-respuesta { font-size: clamp(.98rem, .55vw + 1.1vh, 1.3rem); line-height: 1.5; }
   #texto-respuesta .p { opacity: .4; transition: opacity .2s, color .2s; }
@@ -111,13 +137,17 @@
   #sugerencias button { border: 1px solid var(--borde); background: rgba(255, 255, 255, .07); border-radius: 999px;
                         padding: 7px 11px; font-size: .84rem; transition: transform .15s, background .2s; }
   #sugerencias button:hover { background: var(--vino); transform: translateY(-2px); }
+  #contexto { display: flex; flex-wrap: wrap; gap: 6px; }
+  #contexto:empty { display: none; }
+  .contexto-chip { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 6px 9px; border-radius: 10px;
+                   background: rgba(255,255,255,.08); color: var(--tenue); font-size: .72rem; }
 
   /* ---------- barra del micrófono (bajo Paseito) ---------- */
   #controles { position: fixed; bottom: var(--margen); left: calc(var(--panel) + var(--margen) * 2); right: calc(var(--panel) + var(--margen) * 2);
                max-width: 600px; margin: 0 auto; display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 999px; z-index: 2; }
   #microfono { position: relative; flex: none; width: 60px; height: 60px; border-radius: 50%; border: none; font-size: 1.6rem;
                background: radial-gradient(circle at 35% 30%, var(--oro-claro), var(--oro) 60%, #b8860b);
-               box-shadow: 0 8px 22px rgba(231, 183, 58, .55), inset 0 -4px 8px rgba(0, 0, 0, .2); transition: transform .15s; }
+               box-shadow: 0 8px 22px rgba(0, 0, 0, .3), inset 0 -4px 8px rgba(0, 0, 0, .2); transition: transform .15s; }
   #microfono:hover { transform: scale(1.05); }
   #microfono:disabled { filter: grayscale(1); opacity: .6; }
   #microfono .onda { position: absolute; inset: 0; border-radius: 50%; border: 3px solid var(--rojo); opacity: 0; pointer-events: none; }
@@ -139,14 +169,14 @@
   #inicio { position: fixed; inset: 0; z-index: 5; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
             padding-bottom: 9vh; cursor: pointer; transition: opacity .6s;
             background: linear-gradient(to top, rgba(40, 8, 24, .82), rgba(40, 8, 24, .25) 45%, transparent 70%); }
-  #inicio.fuera { opacity: 0; pointer-events: none; }
+  #inicio.fuera { opacity: 0; visibility: hidden; pointer-events: none; }
   #inicio h1 { margin: 0; font-size: clamp(2.2rem, 6vh, 4rem); text-shadow: 0 6px 24px rgba(0, 0, 0, .4); }
   #inicio h1 span { color: var(--oro-claro); }
   #inicio p { margin: 8px 0 26px; font-size: clamp(1rem, 2.3vh, 1.35rem); color: var(--tenue); }
   #inicio .boton { padding: 16px 34px; border-radius: 999px; font-weight: 700; font-size: 1.15rem; color: var(--vino-oscuro);
-                   background: linear-gradient(135deg, var(--oro-claro), var(--oro)); box-shadow: 0 10px 30px rgba(231, 183, 58, .55);
+                   background: linear-gradient(135deg, var(--oro-claro), var(--oro)); box-shadow: 0 10px 30px rgba(0, 0, 0, .3);
                    animation: latido 1.6s infinite; }
-  @keyframes latido { 50% { transform: scale(1.06); box-shadow: 0 14px 40px rgba(231, 183, 58, .75); } }
+  @keyframes latido { 50% { transform: scale(1.06); box-shadow: 0 14px 40px rgba(0, 0, 0, .35); } }
 
   #aviso { position: fixed; top: calc(var(--arriba) + 6px); left: 50%; transform: translate(-50%, -20px); padding: 10px 18px; border-radius: 14px;
            z-index: 6; opacity: 0; transition: all .3s; pointer-events: none; }
@@ -162,21 +192,49 @@
     #sugerencias button:nth-child(n+5) { display: none; }
   }
 
-  /* vertical o angosta: resultados arriba, conversación y micrófono abajo */
-  @media (max-width: 900px) {
-    :root { --panel: 0px; }
-    #reloj small, .marca small { display: none; }
-    #resultados { left: var(--margen); right: var(--margen); bottom: auto; width: auto; height: 116px; padding: 10px; }
-    #resultados h2, .torre { display: none; }
-    #tarjetas { flex-direction: row; overflow-x: auto; overflow-y: hidden; }
-    .tarjeta { min-width: 240px; }
-    #conversacion { top: auto; left: var(--margen); right: var(--margen); bottom: calc(var(--margen) + 86px); width: auto; height: clamp(170px, 25vh, 300px); }
-    #conversacion h2 { display: none; }
-    #sugerencias { flex-wrap: nowrap; overflow-x: auto; }
-    #sugerencias button { flex: none; }
-    #controles { left: var(--margen); right: var(--margen); max-width: none; }
-    body.modo-2d #avatar2d { left: 0; right: 0; top: 140px; bottom: calc(clamp(170px, 25vh, 300px) + 110px); }
+  a.chip { color: var(--oro-claro); }
+  #vistas-movil { display: none; }
+  button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid var(--oro-claro); outline-offset: 3px; }
+  .panel, .chat, #tarjetas { min-height: 0; }
+  @media (max-width: 1100px) and (min-width: 901px) {
+    :root { --panel: 30vw; }
+    .marca small, #reloj { display: none; }
+    #controles { left: 32vw; right: 32vw; flex-wrap: wrap; border-radius: 20px; }
+    #estado { width: 100%; text-align: center; }
   }
+  @media (max-width: 900px) {
+    :root { --panel: 0px; --margen: 10px; --arriba: 276px; --teclado: 0px; }
+    html, body { background: #28101f; }
+    #escena3d { top: 126px; bottom: auto; height: 140px; }
+    header { padding: 0 10px; gap: 8px; }
+    .marca { gap: 8px; } .marca small, #reloj, .punto { display: none; }
+    .derecha { gap: 6px; } .estado-confianza { font-size: .65rem; padding: 5px; max-width: 118px; }
+    #nueva { font-size: .75rem; padding: 6px; min-height: 44px; max-width: 110px; }
+    #vistas-movil { position: fixed; z-index: 3; top: 76px; left: 10px; right: 10px; display: flex; gap: 8px; }
+    #vistas-movil button { flex: 1; min-height: 44px; background: #3f1a30; border: 1px solid var(--borde); border-radius: 12px; }
+    #vistas-movil button[aria-pressed="true"] { background: var(--oro); color: var(--vino-oscuro); font-weight: 700; }
+    #conversacion, #resultados { top: var(--arriba); left: 10px; right: 10px; bottom: calc(110px + env(safe-area-inset-bottom) + var(--teclado)); width: auto; height: auto; padding: 14px; background: rgba(35, 12, 28, .97); }
+    #resultados { display: none; } body[data-vista="resultados"] #resultados { display: flex; }
+    body[data-vista="resultados"] #conversacion { display: none; }
+    #tarjetas { flex-direction: column; overflow-x: hidden; overflow-y: auto; }
+    .tarjeta { min-width: 0; transform: none !important; animation: none; }
+    .torre, .titulo-torre { display: none; }
+    #controles { left: 10px; right: 10px; bottom: calc(10px + env(safe-area-inset-bottom) + var(--teclado)); max-width: none; border-radius: 18px; gap: 6px; flex-wrap: wrap; background: #3f1a30; }
+    #microfono, #enviar { width: 44px; height: 44px; } #texto { font-size: 16px; }
+    #estado { width: 100%; text-align: center; white-space: normal; }
+    #sugerencias { flex-wrap: nowrap; overflow-x: auto; } #sugerencias button { flex: none; min-height: 44px; }
+    .guia-btn { min-height: 44px; } a.chip { min-height: 44px; display: inline-flex; align-items: center; }
+    .info small { font-size: .86rem; line-height: 1.4; } #guia { inset: 6px; }
+    body.modo-2d #avatar2d { left: 0; right: 0; top: 126px; bottom: auto; height: 140px; }
+    #inicio { padding: 24px 20px 14vh; text-align: center; } #inicio p { line-height: 1.5; }
+  }
+  @media (max-width: 360px) { .estado-confianza { max-width: 70px; font-size: .65rem; } }
+  @media (max-height: 540px) and (max-width: 900px) {
+    :root { --arriba: 136px; }
+    #escena3d, body.modo-2d #avatar2d, .torre, #contexto { display: none; }
+    #sugerencias { max-height: 48px; }
+  }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
 </head>
 <body>
@@ -189,21 +247,24 @@
     <div><b>Paseito</b><small>Asistente del Paseo Aranjuez · Cochabamba</small></div>
   </div>
   <div class="derecha">
+    <a class="estado-confianza" href="/catalog/demo" style="color:var(--oro-claro);text-decoration:none">Respuestas con fuentes</a>
     <button id="nueva" title="Empezar de nuevo">↺ Nueva conversación</button>
     <div id="reloj"><b>--:--</b><small></small></div>
     <div class="punto" title="En línea"></div>
   </div>
 </header>
+<nav id="vistas-movil" aria-label="Vista del asistente"><button id="vista-chat" type="button" aria-pressed="true" aria-controls="conversacion">Conversación</button><button id="vista-resultados" type="button" aria-pressed="false" aria-controls="resultados">Resultados <span id="cuenta-resultados"></span></button></nav>
 
 <aside id="conversacion" class="vidrio panel">
-  <h2>CONVERSACIÓN</h2>
+  <h2>CONVERSACIÓN CON PASEITO</h2>
   <div class="chat" id="chat">
     <div id="oyente"></div>
-    <div id="subtitulo">
+    <div id="subtitulo" role="status" aria-live="polite">
       <div class="quien">✦ PASEITO</div>
-      <div id="texto-respuesta">¡Hola! Pregúntame lo que quieras del Paseo: tiendas, comida, eventos o servicios.</div>
+      <div id="texto-respuesta">¡Hola! Pregúntame por tiendas, comida, eventos o servicios del Paseo.</div>
     </div>
   </div>
+  <div id="contexto" aria-live="polite"></div>
   <h2>PUEDES PREGUNTARME</h2>
   <div id="sugerencias"></div>
 </aside>
@@ -214,13 +275,21 @@
     <div class="escenario"><div class="pisos" id="capas"></div></div>
     <ul class="nombres" id="nombres-pisos"></ul>
   </div>
-  <h2>LO QUE ENCONTRÉ</h2>
+  <h2>RESULTADOS CON FUENTES</h2>
   <div id="tarjetas"></div>
+  <section id="guia" aria-live="polite">
+    <div class="guia-superior"><span class="guia-etiqueta">MODO ACOMPAÑAME</span><button id="cerrar-guia" title="Cerrar guía">×</button></div>
+    <h3 id="guia-destino"></h3>
+    <p id="guia-resumen"></p>
+    <ol class="ruta" id="pasos-guia"></ol>
+    <div class="qr-bloque" hidden><div id="qr-guia"></div><p>Escanea para abrir la fuente de este destino en tu teléfono.</p></div>
+    <a id="abrir-ficha" target="_blank" rel="noopener noreferrer">Abrir fuente publicada</a>
+  </section>
 </aside>
 
 <div id="controles" class="vidrio">
   <button id="microfono" title="Hablar (barra espaciadora)"><span class="onda"></span><span class="onda"></span><span class="onda"></span>🎤</button>
-  <input id="texto" placeholder="Escribe o toca el micrófono…" autocomplete="off">
+  <input id="texto" aria-label="Tu consulta para Paseito" placeholder="Escribe o toca el micrófono…" autocomplete="off">
   <span id="estado"></span>
   <button id="enviar" title="Enviar">➤</button>
 </div>
@@ -228,34 +297,36 @@
 <div id="inicio">
   <h1>¡Hola! Soy <span>Paseito</span></h1>
   <p>Tu asistente del Paseo Aranjuez. Pregúntame lo que necesites.</p>
-  <div class="boton">Toca para empezar 👆</div>
+  <button class="boton" type="button">Toca para empezar 👆</button>
+  <button id="demo-mirada" type="button" hidden style="margin-top:16px;padding:12px;border-radius:16px">Demo: activar saludo por mirada</button>
 </div>
 <div id="aviso" class="vidrio"></div>
 
 <script type="module">
-const SALUDO = "¡Hola! Soy Paseito, y conozco el Paseo Aranjuez de punta a punta. ¿Qué andas buscando hoy?";
-const DESPEDIDA = "Bueno, me quedo por aquí. ¡Gracias por visitarnos, vuelve prontito!";
-// Lo que dice mientras Gemini piensa (3-5 s): [ms desde la pregunta, frases posibles].
-const ESPERAS = [
-  [400, ["Mmm, a ver.", "A ver, déjame ver.", "Un segundito.", "Ya, déjame revisar.", "A ver, a ver.", "Dame un ratito."]],
-  [4200, ["Ya casi.", "Ya casi lo tengo.", "Un ratito más."]],
-];
-const INICIAL = "¡Hola! Pregúntame lo que quieras del Paseo: tiendas, comida, eventos o servicios.";
+const SALUDO = "¡Hola! Soy Paseito, tu asistente del Paseo Aranjuez. ¿En qué te puedo ayudar hoy?";
 const SUGERENCIAS = [
   ["🍽️", "¿Dónde puedo comer?"], ["☕", "Quiero tomar un café"], ["🎁", "Busco un regalo"],
-  ["🅿️", "¿Dónde estaciono?"], ["📅", "¿Qué eventos hay hoy?"], ["⭐", "¿Cuántos puntos tengo?"],
-  ["🕒", "¿Qué está abierto ahora?"],
+  ["⭐", "¿Qué recompensas hay en Paseo Points?"], ["🅿️", "¿Dónde estaciono?"], ["📅", "¿Qué eventos hay hoy?"], ["🕒", "¿Qué está abierto ahora?"],
 ];
 const PISOS = [
   ["5", "Quinto y más"], ["4", "Cuarto piso"], ["3", "Tercer piso"], ["2", "Segundo piso"],
   ["1", "Primer piso"], ["PB", "Planta baja"], ["S", "Semisótanos"],
 ];
 const INACTIVIDAD_MS = 90_000;
-const API = window.PASEITO_API;
+const API = "";
+const { StreamPlayer } = await import("/kiosk/js/stream-player.js");
+const streamPlayer = new StreamPlayer();
+let voiceConfig = {};
+let voiceAbort = null;
+let chatAbort = null;
+let sttAbort = null;
+let inputGeneration = 0;
+let cancelCapture = () => {};
+let recognitionGeneration = 0;
 
 const $ = (id) => document.getElementById(id);
 let avatar;
-let sessionId = null;
+let sessionId = crypto.randomUUID();
 let turno = 0;
 let ultimaActividad = Date.now();
 let hablando = false;
@@ -263,12 +334,12 @@ let enBienvenida = true;
 
 // ---------- Avatar: 3D si hay WebGL, si no el 2D ----------
 try {
-  const { Avatar3D } = await import("./js/avatar3d.js");
+  const { Avatar3D } = await import("/kiosk/js/avatar3d.js");
   avatar = new Avatar3D($("escena3d"), { calidadAdaptativa: new URLSearchParams(location.search).get("calidad") !== "fija" });
   document.body.classList.add("modo-3d");
 } catch (error) {
   console.warn("Sin WebGL; uso el avatar 2D", error);
-  const { Avatar } = await import("./js/avatar.js");
+  const { Avatar } = await import("/kiosk/js/avatar.js");
   avatar = new Avatar($("avatar2d"));
   document.body.classList.add("modo-2d");
 }
@@ -285,7 +356,8 @@ function encuadrar() {
       derecha: innerWidth - caja("resultados").left + holgura,
     });
   } else {
-    avatar.encuadre({ arriba: caja("resultados").bottom + holgura, abajo: innerHeight - caja("conversacion").top + holgura });
+    // The mobile avatar has its own strip; panel positions must not offset its camera.
+    avatar.encuadre();
   }
 }
 const observador = new ResizeObserver(encuadrar);
@@ -329,21 +401,8 @@ $("sugerencias").onclick = (e) => { const b = e.target.closest("button"); if (b)
 $("capas").innerHTML = PISOS.map(([clave], i) => `<div class="capa" data-piso="${clave}" style="--i:${PISOS.length - 1 - i}"></div>`).join("");
 $("nombres-pisos").innerHTML = PISOS.map(([clave, nombre]) => `<li data-piso="${clave}">${nombre}<span></span></li>`).join("");
 
-function clavePiso(texto = "") {
-  const t = String(texto ?? "").toLowerCase().trim();
-  if (/^[1-5]$/.test(t)) return t;
-  if (t === "pb" || t.includes("planta baja")) return "PB";
-  if (t.includes("primer")) return "1";
-  if (t.includes("segundo")) return "2";
-  if (t.includes("tercer")) return "3";
-  if (t.includes("cuarto")) return "4";
-  if (t.includes("quinto")) return "5";
-  if (/s[oó]tano|parqueo/.test(t)) return "S";
-  return null;
-}
-
 function marcarPisos(cuentas, activo = null) {
-  for (const el of document.querySelectorAll("#capas [data-piso], #nombres-pisos [data-piso]")) {
+  for (const el of document.querySelectorAll(".capa[data-piso], #nombres-pisos [data-piso]")) {
     const n = cuentas[el.dataset.piso] || 0;
     el.classList.toggle("con", n > 0);
     el.classList.toggle("activa", el.dataset.piso === activo);
@@ -361,12 +420,11 @@ const ICONOS = [
   [/perfum|cosmét|cuidado|maquill/, "💄"], [/artesan|madera|boliv/, "🧶"], [/lencer|interior/, "🩱"],
   [/mochila|accesorio/, "👜"], [/ropa|jeans|moda/, "👗"], [/oficina|cowork/, "🏢"], [/arte|galer/, "🖼️"],
 ];
-const ICONOS_TIPO = { recompensa: "🎁", mision: "🎯", nivel: "🏅", puntos: "⭐" };
-const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
-const miles = (n) => Number(n).toLocaleString("es-BO");
-
 function icono(t) {
-  if (ICONOS_TIPO[t.tipo]) return ICONOS_TIPO[t.tipo];
+  if (t.tipo === "recompensa") return "🎁";
+  if (t.tipo === "mision") return "🎯";
+  if (t.tipo === "nivel") return "🏅";
+  if (t.tipo === "puntos") return "⭐";
   if (t.tipo === "evento") return "🎤";
   if (t.tipo === "promocion") return "🏷️";
   if (t.tipo === "producto") return "🛍️";
@@ -375,42 +433,72 @@ function icono(t) {
   return (ICONOS.find(([re]) => re.test(texto)) || [null, "🏬"])[1];
 }
 
+function escapar(valor) {
+  return String(valor || "").replace(/[&<>"']/g, (caracter) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  })[caracter]);
+}
+
+const { tarjetasDeEvidencia, clavePiso } = await import("/kiosk/js/evidence.mjs");
+function cambiarVista(vista) {
+  document.body.dataset.vista = vista;
+  $("vista-chat").setAttribute("aria-pressed", String(vista === "chat"));
+  $("vista-resultados").setAttribute("aria-pressed", String(vista === "resultados"));
+}
+$("vista-chat").onclick = () => cambiarVista("chat");
+$("vista-resultados").onclick = () => cambiarVista("resultados");
+if (window.visualViewport) {
+  const ajustarTeclado = () => document.documentElement.style.setProperty("--teclado", `${Math.max(0, innerHeight - visualViewport.height - visualViewport.offsetTop)}px`);
+  visualViewport.addEventListener("resize", ajustarTeclado);
+  visualViewport.addEventListener("scroll", ajustarTeclado);
+}
+let puntoKiosco = "Punto del kiosco pendiente de configurar";
+let baseMovil = "";
+fetch("/kiosk/config").then(r => r.json()).then(c => { puntoKiosco = c.origin; baseMovil = c.public_base_url || ""; if (c.demo_catalog) { $("demo-mirada").hidden = false; const label = document.querySelector(".estado-confianza"); label.textContent = "Modo demo"; label.title = "Catálogo, promociones y algunos horarios son datos de prueba. Consulta /catalog/demo para conocer su alcance."; } }).catch(() => {});
+
 function tarjetaHtml(t, n) {
+  if (t.vigente_hasta || t.termina) t.vence = t.vigente_hasta || t.termina;
   const u = t.ubicacion || t.tienda || {};
   const piso = clavePiso(u.piso);
   const chips = [];
   if (piso) chips.push(`<span class="chip piso">${piso === "PB" ? "Planta baja" : piso === "S" ? "Semisótano" : "Piso " + piso}</span>`);
-  if (u.local) chips.push(`<span class="chip">Local ${esc(u.local)}</span>`);
+  if (u.local) chips.push(`<span class="chip">Local ${escapar(u.local)}</span>`);
   if (t.abierto_ahora != null) chips.push(`<span class="chip ${t.abierto_ahora ? "abierto" : "cerrado"}">${t.abierto_ahora ? "Abierto" : "Cerrado"}</span>`);
   let titulo = t.nombre, detalle = t.categoria || u.sector || "";
-  if (t.tipo === "producto") detalle = `Bs ${t.precio_bs} · ${t.tienda?.nombre || ""}`;
-  if (t.tipo === "promocion") { titulo = t.titulo; detalle = t.tienda?.nombre || t.descripcion || ""; }
-  if (t.tipo === "evento") detalle = `${t.fecha} · ${t.hora_inicio || ""} · ${t.lugar || ""}`;
+  if (t.tipo === "producto") detalle = `${t.precio_bs != null ? "Bs " + t.precio_bs : "Consulta el precio"} · ${t.tienda?.nombre || ""}`;
+  if (t.tipo === "promocion") { titulo = t.titulo; detalle = `${t.descripcion} · ${t.tienda?.nombre || ""} · ${t.condiciones}`; }
+  if (t.tipo === "evento") detalle = `${t.fecha} · ${t.lugar || ""} · ${t.descripcion_evento}`;
   if (t.tipo === "info") { titulo = t.pregunta; detalle = t.respuesta || ""; }
-  if (t.tipo === "recompensa") {
-    titulo = t.titulo;
-    detalle = t.nombre || "";
-    chips.unshift(`<span class="chip puntos">${miles(t.costo_puntos)} pts</span>`);
-    if (t.nivel_minimo) chips.push(`<span class="chip">Nivel ${esc(t.nivel_minimo)}</span>`);
-  }
-  if (t.tipo === "mision") { detalle = t.descripcion || ""; chips.push(`<span class="chip puntos">+${miles(t.puntos)} pts</span>`); }
-  if (t.tipo === "nivel") detalle = `Desde ${miles(t.estatus_minimo)} de estatus · puntos x${t.multiplicador}`;
-  if (t.tipo === "puntos") {
-    titulo = `${t.nombre} · Nivel ${t.nivel || ""}`;
-    detalle = "Paseo Points";
-    chips.push(`<span class="chip puntos">${miles(t.saldo)} pts</span>`);
-  }
-  if (t.puntos && t.tipo === "evento") chips.push(`<span class="chip puntos">+${miles(t.puntos)} pts</span>`);
-  const extra = t.horario ? `<small>🕒 ${esc(t.horario)}</small>` : "";
-  return `<div class="tarjeta" style="--n:${n}" data-piso="${piso || ""}" data-nombre="${esc(t.nombre || titulo)}" data-tipo="${esc(t.tipo)}">
+  if (t.tipo === "recompensa") { titulo = t.titulo; detalle = t.detalle || t.nombre || ""; chips.push(`<span class="chip">${escapar(t.costo_puntos)} puntos</span>`); if (t.nivel_minimo) chips.push(`<span class="chip">Desde ${escapar(t.nivel_minimo)}</span>`); }
+  if (t.tipo === "mision") { detalle = t.descripcion || ""; chips.push(`<span class="chip">+${escapar(t.puntos)} puntos</span>`); }
+  if (t.tipo === "nivel") detalle = `Multiplicador ×${t.multiplicador} · desde ${t.estatus_minimo} de estatus`;
+  if (t.tipo === "evento" && t.puntos) chips.push(`<span class="chip">+${escapar(t.puntos)} puntos</span>`);
+  if (t.tipo === "promocion" && t.vigente_hasta) detalle = t.descripcion || "";
+  const extra = (u.sector ? `<small>Sector: ${escapar(u.sector)}</small>` : "") +
+    (t.torre ? `<small>Torre: ${escapar(t.torre)}</small>` : "") +
+    (u.referencia ? `<small>${escapar(u.referencia)}</small>` : "") +
+    (t.horario ? `<small>🕒 ${escapar(t.horario)}</small>` : "") +
+    (t.demo ? "" : `<small>${escapar(t.verificacion)}${t.verificado_en ? " · " + escapar(t.verificado_en.slice(0, 10)) : ""}</small>`) +
+    (t.vence ? `<small>Vigencia: ${escapar(t.vence)}</small>` : "");
+  const nombre = escapar(t.nombre || titulo || "");
+  const fuente = t.fuente_url && !t.demo
+    ? `<a class="chip" href="${escapar(t.fuente_url)}" target="_blank" rel="noopener noreferrer">${t.demo ? "Sobre la demo" : "Fuente"}</a>`
+    : "";
+  const guia = piso && t.fuente_url
+    ? `<button class="guia-btn" type="button" data-guia="${n}">✦ Guíame hasta aquí</button>`
+    : "";
+  return `<div class="tarjeta" style="--n:${n}" data-piso="${piso || ""}" data-nombre="${nombre}" data-tipo="${escapar(t.tipo)}">
     <div class="icono">${icono(t)}</div>
-    <div class="info"><b>${esc(titulo)}</b><small>${esc(detalle)}</small>${extra}<div class="chips">${chips.join("")}</div></div>
+    <div class="info"><b>${escapar(titulo)}</b><small>${escapar(detalle)}</small>${extra}<div class="chips">${chips.join("")}${fuente}</div>${guia}</div>
   </div>`;
 }
 
 let cuentasPisos = {};
+let tarjetasActuales = [];
 function mostrarTarjetas(tarjetas) {
   const lista = tarjetas.slice(0, 8);
+  tarjetasActuales = lista;
+  $("cuenta-resultados").textContent = lista.length ? `(${lista.length})` : "";
   $("tarjetas").innerHTML = lista.map(tarjetaHtml).join("");
   cuentasPisos = {};
   for (const t of lista) {
@@ -434,16 +522,73 @@ $("tarjetas").addEventListener("pointerout", (e) => {
   if (tarjeta && !tarjeta.contains(e.relatedTarget)) { tarjeta.style.transform = ""; marcarPisos(cuentasPisos); }
 });
 $("tarjetas").addEventListener("click", (e) => {
+  const botonGuia = e.target.closest("[data-guia]");
+  if (botonGuia) {
+    e.preventDefault();
+    abrirGuia(tarjetasActuales[Number(botonGuia.dataset.guia)]);
+    return;
+  }
   const tarjeta = e.target.closest(".tarjeta");
-  if (tarjeta?.dataset.tipo === "lugar") preguntar(`¿Cómo llego a ${tarjeta.dataset.nombre}?`);
+  if (tarjeta?.dataset.tipo === "lugar") preguntar(`Muéstrame el catálogo de ${tarjeta.dataset.nombre}`);
 });
+
+function abrirGuia(destino) {
+  if (!destino) return;
+  cambiarVista("resultados");
+  const ubicacion = destino.ubicacion || {};
+  const piso = clavePiso(ubicacion.piso);
+  const pisoTexto = piso === "PB" ? "planta baja" : piso === "S" ? "semisótano" : `piso ${piso || ubicacion.piso}`;
+  const local = ubicacion.local ? `local ${ubicacion.local}` : "el destino señalado";
+  const pasos = [
+    ["Punto de partida", puntoKiosco],
+    ["Ubicación publicada", `Destino en ${pisoTexto}. No tengo un recorrido interior validado.`],
+    ["Referencia", `${ubicacion.local ? "Busca " + local : "Número de local pendiente"}: ${destino.nombre}.${ubicacion.referencia ? " " + ubicacion.referencia : ""}`],
+  ];
+  $("guia-destino").textContent = destino.nombre;
+  $("guia-resumen").textContent = `${pisoTexto}${ubicacion.local ? ` · local ${ubicacion.local}` : ""}`;
+  $("pasos-guia").innerHTML = pasos.map(([titulo, detalle]) => `<li><b>${escapar(titulo)}</b>${escapar(detalle)}</li>`).join("");
+  const fichaLocal = `${location.origin}/destination/${encodeURIComponent(destino.id)}`;
+  $("abrir-ficha").href = fichaLocal;
+  $("abrir-ficha").textContent = "Abrir ficha del destino";
+  const qrHolder = $("qr-guia");
+  qrHolder.replaceChildren();
+  const qr = new Image();
+  qr.alt = baseMovil ? "Código QR de la ficha del destino" : "Código QR de la fuente del destino";
+  const bloqueQr = $("guia").querySelector(".qr-bloque");
+  bloqueQr.hidden = true;
+  qr.onload = () => { qrHolder.replaceChildren(qr); bloqueQr.hidden = false; };
+  qr.onerror = () => { bloqueQr.hidden = true; };
+  bloqueQr.querySelector("p").textContent = baseMovil ? "Escanea para llevar la ficha del destino a tu teléfono." : "Escanea para abrir la fuente publicada. La ficha móvil necesita una URL accesible desde tu teléfono.";
+  qr.src = `/qr/destination/${encodeURIComponent(destino.id)}`;
+  $("guia").classList.add("activa");
+  marcarPisos(cuentasPisos, piso);
+  avatar.gesto("presentar", 2400);
+  hablar(`Te acompaño a ${destino.nombre}. Ve al ${pisoTexto}${ubicacion.local ? `, local ${ubicacion.local}` : ""}.`);
+}
+
+$("cerrar-guia").onclick = () => { $("guia").classList.remove("activa"); marcarPisos(cuentasPisos); };
+
+function actualizarContexto(datos) {
+  const fuentes = datos.sources || [];
+  const chips = [];
+  if (datos.intent === "weather" && fuentes[0]) {
+    const clima = fuentes[0].attributes || {};
+    chips.push(`☀ ${clima.condition || "Clima actualizado"} · ${Math.round(clima.temperature_c || 0)} °C`);
+  }
+  if (datos.intent === "hours") {
+    const abiertos = fuentes.filter((fuente) => fuente.attributes?.open_now).length;
+    chips.push(`◷ ${abiertos}/${fuentes.length} áreas publicadas abiertas`);
+  }
+  if (datos.preferences?.budget_bs != null) chips.push(`Presupuesto: Bs ${datos.preferences.budget_bs}`);
+  if (datos.preferences?.recipient === "infantil") chips.push("Regalo para niño/a");
+  $("contexto").innerHTML = chips.map((chip) => `<span class="contexto-chip">${escapar(chip)}</span>`).join("");
+}
 
 // ---------- Subtítulos sincronizados ----------
 function dividirFrases(texto) {
   const unidas = [];
   for (const f of texto.split(/(?<=[.!?…])\s+/).map((s) => s.trim()).filter(Boolean)) {
-    // La primera frase va sola: la voz tarda lo mismo con 3 que con 30 palabras, y así empieza a hablar antes.
-    if (unidas.length > 1 && unidas[unidas.length - 1].length < 40) unidas[unidas.length - 1] += " " + f;
+    if (unidas.length && unidas[unidas.length - 1].length < 40) unidas[unidas.length - 1] += " " + f;
     else unidas.push(f);
   }
   return unidas;
@@ -451,7 +596,7 @@ function dividirFrases(texto) {
 
 function pintarSubtitulo(frases) {
   $("texto-respuesta").innerHTML = frases
-    .map((f, i) => f.split(/\s+/).map((p) => `<span class="p" data-f="${i}">${p}</span>`).join(" "))
+    .map((f, i) => f.split(/\s+/).map((p) => `<span class="p" data-f="${i}">${escapar(p)}</span>`).join(" "))
     .join(" ");
 }
 
@@ -469,100 +614,116 @@ function pensando() {
 }
 
 // ---------- Voz ----------
-async function pedirAudioRed(texto) {
-  const r = await fetch(`${API}/voz`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ texto }) });
+function textoParaVoz(texto) {
+  return texto.replace(/\bBs\.?\s*(\d+(?:[.,]\d+)?)/gi, "$1 bolivianos").replace(/(\d{1,2}:\d{2})[–—](\d{1,2}:\d{2})/g, "$1 a $2");
+}
+
+async function pedirAudio(texto, signal) {
+  const r = await fetch(`${API}/voice/synthesize`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: textoParaVoz(texto) }), signal });
   if (!r.ok) throw new Error(r.status);
   return URL.createObjectURL(await r.blob());
 }
 
-// frase -> Promise<url> ya pedida; vocesListas guarda las que ya llegaron.
-const vocesPedidas = new Map();
-const vocesListas = new Map();
-function precargarVoz(texto) {
-  for (const frase of dividirFrases(texto)) {
-    if (vocesPedidas.has(frase)) continue;
-    const pedido = pedirAudioRed(frase);
-    vocesPedidas.set(frase, pedido);
-    pedido.then((url) => vocesListas.set(frase, url), () => vocesPedidas.delete(frase));
-  }
-}
-const pedirAudio = (texto) => vocesPedidas.get(texto) ?? pedirAudioRed(texto);
-
-setTimeout(() => {
-  precargarVoz(SALUDO);
-  precargarVoz(DESPEDIDA);
-  for (const [, frases] of ESPERAS) frases.forEach(precargarVoz);
-}, 1500);
-
-const dormir = (ms) => new Promise((ok) => setTimeout(ok, Math.max(0, ms)));
-const ultimaEspera = new Map();
-
-/** Muletillas mientras llega la respuesta; solo usa audios ya descargados para no sumar demora. */
-async function acompañarEspera(respuesta, miTurno) {
-  let llego = false;
-  respuesta.then(() => {}, () => {}).finally(() => { llego = true; });
-  const inicio = performance.now();
-  for (const [desde, frases] of ESPERAS) {
-    await dormir(desde - (performance.now() - inicio));
-    if (llego || miTurno !== turno) return;
-    const opciones = frases.filter((f) => vocesListas.has(f) && f !== ultimaEspera.get(frases));
-    const frase = opciones[Math.floor(Math.random() * opciones.length)];
-    if (!frase) continue;
-    ultimaEspera.set(frases, frase);
-    await avatar.hablarAudio(vocesListas.get(frase), { texto: frase }).catch(() => {});
-  }
-}
-
 function vozNavegador(texto, alProgresar) {
   return new Promise((resolve) => {
-    const u = new SpeechSynthesisUtterance(texto);
+    const hablado = textoParaVoz(texto);
+    const u = new SpeechSynthesisUtterance(hablado);
     const voces = speechSynthesis.getVoices().filter((v) => v.lang.startsWith("es"));
     u.voice = voces.find((v) => /BO|419|MX|US/.test(v.lang)) || voces[0] || null;
     u.lang = u.voice?.lang || "es-419";
     u.onstart = () => avatar.hablarSimulado(true);
     u.onboundary = (e) => {
-      alProgresar(e.charIndex / texto.length);
-      avatar.decirPalabra?.(texto.slice(e.charIndex).match(/^\S+/)?.[0]);
+      alProgresar(e.charIndex / hablado.length);
+      avatar.decirPalabra?.(hablado.slice(e.charIndex).match(/^\S+/)?.[0]);
     };
     u.onend = u.onerror = () => { avatar.hablarSimulado(false); alProgresar(1); resolve(); };
     speechSynthesis.speak(u);
   });
 }
 
-async function hablar(texto, { presentar = false, audios } = {}) {
+async function hablar(texto, { presentar = false } = {}) {
+  callar();
   const miTurno = ++turno;
+  const controller = new AbortController();
+  voiceAbort = controller;
+  const audioUrls = new Set();
   const frases = dividirFrases(texto);
   pintarSubtitulo(frases);
-  audios ??= frases.map((f) => pedirAudio(f));
   hablando = true;
   try {
+    if (voiceConfig.streaming) {
+      let audioStarted = false;
+      estado("");
+      if (presentar) señalarTarjetas();
+      try {
+        await streamPlayer.play(`${API}/voice/stream`, textoParaVoz(texto), {
+          signal: controller.signal,
+          onAnalyser: (analyser) => {
+            if (miTurno !== turno) return;
+            avatar.analizador = analyser;
+            avatar.buffer = analyser ? new Uint8Array(analyser.fftSize) : null;
+          },
+          onFirstAudio: (ms) => { audioStarted = true; console.info("Paseito TTS primer audio: %d ms", Math.round(ms)); },
+        });
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        // Keep the verified text; do not repeat a partially played reply in another voice.
+        if (!audioStarted) await vozNavegador(texto, () => {});
+        else aviso("La voz se interrumpió; puedes leer la respuesta");
+        console.warn("Streaming de voz", error);
+      }
+      if (miTurno === turno) {
+        frases.forEach((_, i) => progresoFrase(i, 1));
+        avatar.sonreir?.(0.8, 2200);
+      }
+      return;
+    }
+    const prepararAudio = (frase) => pedirAudio(frase, controller.signal).then(url => {
+      if (miTurno !== turno) { URL.revokeObjectURL(url); return null; }
+      audioUrls.add(url);
+      return url;
+    }).catch(() => null);
+    let siguienteAudio = prepararAudio(frases[0]);
     for (let i = 0; i < frases.length; i++) {
-      let url = null;
-      try { url = await audios[i]; } catch { /* esa frase va con la voz del navegador */ }
+      const url = await siguienteAudio;
       if (miTurno !== turno) return;
+      // Prepare only the next sentence while this one plays; keep requests bounded.
+      if (i + 1 < frases.length) siguienteAudio = prepararAudio(frases[i + 1]);
       estado("");
       if (i === 0 && presentar) señalarTarjetas();
       const alProgresar = (f) => progresoFrase(i, f);
-      if (url) await avatar.hablarAudio(url, { alProgresar, texto: frases[i] });
+      if (url) {
+        try { await avatar.hablarAudio(url, { alProgresar, texto: textoParaVoz(frases[i]) }); }
+        finally { URL.revokeObjectURL(url); audioUrls.delete(url); }
+      }
       else await vozNavegador(frases[i], alProgresar);
     }
-    if (miTurno === turno) avatar.sonreir?.(1, 2500);
+    if (miTurno === turno) avatar.sonreir?.(0.8, 2200);
   } finally {
+    controller.abort();
+    for (const url of audioUrls) URL.revokeObjectURL(url);
     if (miTurno === turno) { hablando = false; ultimaActividad = Date.now(); }
-    for (const a of audios) a.then((url) => [...vocesListas.values()].includes(url) || URL.revokeObjectURL(url), () => {});
   }
 }
 
-/** Paseito señala y mira la primera tarjeta mientras empieza a responder. */
 function señalarTarjetas() {
   const tarjeta = $("tarjetas").querySelector(".tarjeta");
   if (!avatar.señalar || !tarjeta) return avatar.gesto("presentar", 2600);
   const r = tarjeta.getBoundingClientRect();
-  avatar.señalar(r.left + r.width * 0.25, r.top + r.height / 2, 2600);
+  if (!r.width || !r.height) return avatar.gesto("presentar", 2600);
+  avatar.señalar(r.left + r.width / 2, r.top + r.height / 2, 2600);
 }
 
 function callar() {
   turno++;
+  inputGeneration++;
+  cancelCapture();
+  cancelCapture = () => {};
+  sttAbort?.abort();
+  sttAbort = null;
+  voiceAbort?.abort();
+  chatAbort?.abort();
+  avatar.analizador = null;
   hablando = false;
   speechSynthesis.cancel();
   avatar.callar();
@@ -575,37 +736,65 @@ async function preguntar(texto) {
   if (enBienvenida) salirBienvenida(false);
   ultimaActividad = Date.now();
   callar();
-  const miTurno = turno;
+  const controller = new AbortController();
+  chatAbort = controller;
   oyente(texto);
   pensando();
   estado("Pensando…", "pensando");
   avatar.gesto("pensar");
-  const respuesta = fetch(`${API}/chat`, {
-    method: "POST", headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ mensaje: texto, session_id: sessionId }),
-  }).then(async (r) => {
-    const datos = await r.json();
-    if (!r.ok) throw new Error(datos.detail || r.status);
-    return datos;
-  });
-  const espera = acompañarEspera(respuesta, miTurno);
+  // One waiting phrase after 1.5 s, stopped immediately when the answer arrives.
+  // Browser speech avoids a competing GPU job and never holds the response.
+  const waitTimer = setTimeout(() => {
+    if (controller.signal.aborted || chatAbort !== controller || hablando) return;
+    const phrase = new SpeechSynthesisUtterance(["Un momentito, estoy revisando.","Déjame buscar las opciones."][Math.floor(Math.random()*2)]);
+    phrase.lang = "es-BO";
+    phrase.onstart = () => avatar.hablarSimulado(true);
+    phrase.onend = phrase.onerror = () => avatar.hablarSimulado(false);
+    speechSynthesis.speak(phrase);
+  },1500);
+  controller.signal.addEventListener("abort",() => clearTimeout(waitTimer),{once:true});
   try {
-    const datos = await respuesta;
+    const r = await fetch(`${API}/chat`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: texto, session_id: sessionId }),
+      signal: controller.signal,
+    });
+    const datos = await r.json();
+    clearTimeout(waitTimer);
+    speechSynthesis.cancel();
+    avatar.hablarSimulado(false);
+    if (controller.signal.aborted) return;
+    if (!r.ok) throw new Error(datos.error || r.status);
+    chatAbort = null;
     sessionId = datos.session_id;
-    // la voz de la respuesta se pide ya, mientras termina la muletilla
-    const audios = dividirFrases(datos.respuesta).map(pedirAudio);
-    await espera;
-    if (miTurno !== turno) return;
     avatar.gesto("normal");
+    avatar.asentir?.();
     estado("", "normal");
-    if (datos.tarjetas.length) mostrarTarjetas(datos.tarjetas);
-    await hablar(datos.respuesta, { presentar: datos.tarjetas.length > 0, audios });
+    const tarjetas = [...tarjetasDeEvidencia(datos.sources), ...(datos.tarjetas || [])];
+    $("guia").classList.remove("activa");
+    mostrarTarjetas(tarjetas);
+    actualizarContexto(datos);
+    if (datos.points_freshness) {
+      const freshness = datos.points_freshness;
+      const note = document.createElement('span');
+      note.className = 'chip';
+      note.textContent = freshness.source === 'synthetic_demo' ? 'Points · programa de demostración' :
+        `Points · actualización hace ${freshness.age_seconds} s${freshness.stale ? ' · última copia disponible' : ''}`;
+      $("contexto").append(note);
+    }
+    if (datos.suggestions?.length) {
+      $("sugerencias").innerHTML = datos.suggestions.slice(0, 5).map(text => `<button data-p="${escapar(text)}">${escapar(text)}</button>`).join("");
+    }
+    if (datos.intent === "navigation" && tarjetas[0]?.ubicacion?.piso) abrirGuia(tarjetas[0]);
+    else await hablar(datos.answer, { presentar: tarjetas.length > 0 });
   } catch (error) {
-    await espera;
-    if (miTurno !== turno) return;
+    clearTimeout(waitTimer);
+    if (controller.signal.aborted) return;
+    speechSynthesis.cancel();
+    avatar.hablarSimulado(false);
     avatar.gesto("normal");
     estado("", "normal");
-    pintarSubtitulo(["Uy, se me cortó la conexión. ¿Me lo repites?"]);
+    pintarSubtitulo(["Disculpa, tuve un problema. ¿Puedes repetirlo?"]);
     progresoFrase(0, 1);
     aviso("No pude conectar con el asistente");
   }
@@ -617,16 +806,20 @@ $("texto").onkeydown = (e) => { if (e.key === "Enter") $("enviar").click(); };
 async function reiniciar() {
   callar();
   if (sessionId) fetch(`${API}/chat/${sessionId}`, { method: "DELETE" }).catch(() => {});
-  sessionId = null;
+  sessionId = crypto.randomUUID();
   $("tarjetas").innerHTML = "";
+  $("cuenta-resultados").textContent = "";
+  tarjetasActuales = [];
+  $("guia").classList.remove("activa");
+  $("contexto").innerHTML = "";
   cuentasPisos = {};
   marcarPisos({});
   oyente("");
-  pintarSubtitulo([INICIAL]);
+  pintarSubtitulo(["¡Hola! Pregúntame por tiendas, comida, eventos o servicios del Paseo."]);
   progresoFrase(0, 1);
   estado("", "normal");
 }
-$("nueva").onclick = () => { reiniciar(); avatar.gesto("despedir", 1800); aviso("Conversación nueva"); };
+$("nueva").onclick = () => { reiniciar(); aviso("Conversación nueva"); };
 
 // ---------- Bienvenida e inactividad ----------
 let saludoPeriodico = setInterval(() => enBienvenida && avatar.gesto("saludar", 2400), 7000);
@@ -636,6 +829,7 @@ function salirBienvenida(saludar = true) {
   enBienvenida = false;
   $("inicio").classList.add("fuera");
   avatar.desbloquear();
+  streamPlayer.unlock().catch(() => {});
   ultimaActividad = Date.now();
   if (saludar) {
     avatar.gesto("saludar", 2600);
@@ -643,34 +837,28 @@ function salirBienvenida(saludar = true) {
   }
 }
 $("inicio").onclick = () => salirBienvenida(true);
+$("demo-mirada").onclick = async (event) => {
+  event.stopPropagation();
+  if (!enBienvenida || hablando || chatAbort) return;
+  try {
+    const response = await fetch("/stimulus/gaze", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({session_id:sessionId,target_id:"gaze_at_kiosk",dwell_ms:1000,welcome:true,busy:false,manual:true})});
+    const data = await response.json();
+    if (data.triggered && enBienvenida && !hablando && !chatAbort) { salirBienvenida(false); avatar.gesto("saludar",2400); await hablar(data.chat.answer); }
+  } catch { aviso("No se pudo activar la demo de saludo"); }
+};
 
-let toques = 0;
-for (const evento of ["pointerdown", "keydown"]) addEventListener(evento, () => { ultimaActividad = Date.now(); toques++; });
-
-// Al quedar sola se despide con la mano y la voz; si alguien vuelve mientras tanto, la conversación sigue.
-let despidiendo = false;
-async function despedirse() {
-  despidiendo = true;
-  const toquesAntes = toques, turnoAntes = turno;
-  avatar.gesto("despedir", 3200);
-  try { await hablar(DESPEDIDA); } finally { despidiendo = false; }
-  if (enBienvenida || toques !== toquesAntes || turno !== turnoAntes + 1) return;
-  reiniciar();
-  enBienvenida = true;
-  $("inicio").classList.remove("fuera");
-}
+for (const evento of ["pointerdown", "keydown"]) addEventListener(evento, () => { ultimaActividad = Date.now(); });
 setInterval(() => {
-  if (!enBienvenida && !hablando && !despidiendo && Date.now() - ultimaActividad > INACTIVIDAD_MS) despedirse();
+  if (!enBienvenida && !hablando && Date.now() - ultimaActividad > INACTIVIDAD_MS) {
+    reiniciar();
+    enBienvenida = true;
+    $("inicio").classList.remove("fuera");
+  }
 }, 5000);
-
-// Tocar a Paseito mientras habla la interrumpe y se pone a escuchar.
-for (const id of ["escena3d", "avatar2d"]) {
-  $(id).addEventListener("pointerdown", () => { if (hablando && !enBienvenida) alternar(); });
-}
 
 // ---------- Micrófono ----------
 // Primero el reconocimiento del navegador (Chrome/Edge, con texto en vivo). Si no existe o no tiene servicio
-// (p. ej. navegadores embebidos sin acceso a los servidores de Google), se graba aquí y Gemini transcribe en /voz/escuchar.
+// (p. ej. navegadores embebidos sin acceso a los servidores de Google), se graba aquí y el backend local transcribe.
 const Reconocimiento = window.SpeechRecognition || window.webkitSpeechRecognition;
 const SIN_SERVICIO = ["network", "service-not-allowed", "language-not-supported"];
 const ERRORES_MICROFONO = {
@@ -681,23 +869,19 @@ const ERRORES_MICROFONO = {
   NotReadableError: "Otro programa está usando el micrófono",
 };
 const UMBRAL_VOZ = 0.02;
-const SILENCIO_FIN_MS = 1300;
+let SILENCIO_FIN_MS = 1300;
 const ESPERA_SIN_VOZ_MS = 7000;
 const MAX_GRABACION_MS = 15000;
 
 let modoMicrofono = Reconocimiento ? "navegador" : "servidor";
+const voiceConfigReady = fetch(`${API}/voice/status`).then(r => r.json()).then(config => {
+  voiceConfig = config;
+  if (config.prefer_server_stt) modoMicrofono = "servidor";
+  if (config.silence_ms) SILENCIO_FIN_MS = Math.max(450, Math.min(1500, config.silence_ms));
+}).catch(() => {});
 let escuchando = false;
 let preparando = false;
 let detenerGrabacion = null;
-
-// Mientras la persona habla, Paseito asiente cada tanto (no en cada sílaba).
-let ultimoAsentir = 0;
-function asentirDeVezEnCuando() {
-  const ahora = performance.now();
-  if (ahora - ultimoAsentir < 2600 + Math.random() * 1500) return;
-  ultimoAsentir = ahora;
-  avatar.asentir?.();
-}
 
 function marcarEscucha(activo) {
   escuchando = activo;
@@ -711,11 +895,12 @@ if (Reconocimiento) {
   rec = new Reconocimiento();
   rec.lang = "es-BO";
   rec.interimResults = true;
-  rec.onstart = () => marcarEscucha(true);
-  rec.onend = () => { if (modoMicrofono === "navegador") marcarEscucha(false); };
+  rec.onstart = () => { if (recognitionGeneration === inputGeneration) marcarEscucha(true); };
+  rec.onend = () => { if (recognitionGeneration !== inputGeneration) return; if (modoMicrofono === "navegador") marcarEscucha(false); };
   rec.onerror = (e) => {
+    if (recognitionGeneration !== inputGeneration) return;
     if (SIN_SERVICIO.includes(e.error)) {
-      console.info("Reconocimiento del navegador sin servicio (%s); uso Gemini en el servidor", e.error);
+      console.info("Reconocimiento del navegador sin servicio (%s); uso la transcripción local", e.error);
       modoMicrofono = "servidor";
       marcarEscucha(false);
       escucharConServidor();
@@ -724,10 +909,10 @@ if (Reconocimiento) {
     }
   };
   rec.onresult = (e) => {
+    if (recognitionGeneration !== inputGeneration) return;
     ultimaActividad = Date.now();
     const r = e.results[e.results.length - 1];
     oyente(r[0].transcript);
-    asentirDeVezEnCuando();
     if (r.isFinal) preguntar(r[0].transcript);
   };
 }
@@ -752,19 +937,28 @@ async function aWav(blob, ctx) {
 }
 
 async function transcribir(trozos, tipo, ctx) {
+  sttAbort?.abort();
+  const controller = new AbortController();
+  sttAbort = controller;
+  const generation = inputGeneration;
   estado("Entendiendo…", "pensando");
   try {
     const wav = await aWav(new Blob(trozos, { type: tipo }), ctx);
-    const r = await fetch(`${API}/voz/escuchar`, { method: "POST", headers: { "Content-Type": "audio/wav" }, body: wav });
+    if (controller.signal.aborted || generation !== inputGeneration) return;
+    const r = await fetch(`${API}/voice/transcribe`, { method: "POST", headers: { "Content-Type": "audio/wav" }, body: wav, signal:controller.signal });
     const datos = await r.json();
-    if (!r.ok) throw new Error(datos.detail || r.status);
-    if (!datos.texto) { estado(""); aviso("No te alcancé a entender, ¿me lo repites?"); return; }
-    preguntar(datos.texto);
+    if (controller.signal.aborted || generation !== inputGeneration) return;
+    if (!r.ok) throw new Error(datos.error || r.status);
+    if (!datos.text) { estado(""); aviso("No te entendí, ¿puedes repetirlo?"); return; }
+    sttAbort = null;
+    preguntar(datos.text);
   } catch (error) {
+    if (controller.signal.aborted || generation !== inputGeneration) return;
     console.warn("Transcripción falló", error);
     estado("");
     aviso("No pude entender el audio, intenta de nuevo");
   } finally {
+    if (sttAbort === controller) sttAbort = null;
     ctx.close();
   }
 }
@@ -772,18 +966,22 @@ async function transcribir(trozos, tipo, ctx) {
 async function escucharConServidor() {
   if (preparando || escuchando) return;
   preparando = true;
+  const generation = inputGeneration;
   let stream;
   try {
     stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
   } catch (e) {
+    if (generation !== inputGeneration) return;
     aviso(ERRORES_MICROFONO[e.name] || "No pude abrir el micrófono");
     return;
   } finally {
     preparando = false;
   }
 
+  if (generation !== inputGeneration) { stream.getTracks().forEach((t) => t.stop()); return; }
   const ctx = new AudioContext();
   await ctx.resume();
+  if (generation !== inputGeneration) { stream.getTracks().forEach((t) => t.stop()); ctx.close(); return; }
   const analizador = ctx.createAnalyser();
   analizador.fftSize = 1024;
   ctx.createMediaStreamSource(stream).connect(analizador);
@@ -803,9 +1001,12 @@ async function escucharConServidor() {
     grabadora.stop();
   };
   detenerGrabacion = terminar;
+  cancelCapture = terminar;
 
   grabadora.onstop = () => {
     stream.getTracks().forEach((t) => t.stop());
+    if (cancelCapture === terminar) cancelCapture = () => {};
+    if (generation !== inputGeneration) { ctx.close(); marcarEscucha(false); return; }
     $("microfono").style.setProperty("--nivel", 0);
     marcarEscucha(false);
     if (!hablo) {
@@ -826,7 +1027,7 @@ async function escucharConServidor() {
     const nivel = Math.sqrt(suma / muestras.length);
     $("microfono").style.setProperty("--nivel", Math.min(1, nivel * 10).toFixed(2));
     const ahora = performance.now();
-    if (nivel > UMBRAL_VOZ) { hablo = true; ultimaVoz = ahora; ultimaActividad = Date.now(); asentirDeVezEnCuando(); }
+    if (nivel > UMBRAL_VOZ) { hablo = true; ultimaVoz = ahora; ultimaActividad = Date.now(); }
     const callado = hablo && ahora - ultimaVoz > SILENCIO_FIN_MS;
     if (callado || (!hablo && ahora - inicio > ESPERA_SIN_VOZ_MS) || ahora - inicio > MAX_GRABACION_MS) return terminar();
     requestAnimationFrame(medir);
@@ -834,9 +1035,11 @@ async function escucharConServidor() {
   medir();
 }
 
-function alternar() {
+async function alternar() {
   if (enBienvenida) salirBienvenida(false);
   avatar.desbloquear();
+  streamPlayer.unlock().catch(() => {});
+  await voiceConfigReady;
   if (escuchando) {
     if (detenerGrabacion) detenerGrabacion();
     else rec?.stop();
@@ -844,6 +1047,8 @@ function alternar() {
   }
   callar();
   if (modoMicrofono === "servidor") return escucharConServidor();
+  recognitionGeneration = inputGeneration;
+  cancelCapture = () => { rec?.abort(); marcarEscucha(false); };
   try { rec.start(); } catch { /* ya estaba escuchando */ }
 }
 

@@ -1,0 +1,11 @@
+# Optional TLS certificate mount for either base profile. Public CA certificate only.
+# docker compose -f compose.yaml -f compose.points.yaml up -d jarvis
+services:
+  jarvis:
+    environment:
+      PUNTOS_DB_CA: /run/points-ca.pem
+    volumes:
+      - type: bind
+        source: ${PUNTOS_CA_HOST_PATH:?Set the absolute host path of the public Points CA certificate}
+        target: /run/points-ca.pem
+        read_only: true

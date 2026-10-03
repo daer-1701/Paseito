@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Jarvis · Respaldo del canal de mensajes</title>
+<title>Paseito · Respaldo del canal de mensajes</title>
 <style>
 :root { color-scheme: light; --ink:#22372f; --green:#165b45; --line:#d3ddd5; }
 * { box-sizing:border-box; }
@@ -32,11 +32,11 @@ input { min-width:0; flex:1; padding:12px; border:1px solid var(--line); border-
 </head>
 <body>
 <main>
-  <header><div class="avatar" aria-hidden="true">J</div><div><h1>Jarvis</h1><p>Conversación del Paseo Aranjuez</p></div><button id="restart" type="button">Reiniciar</button></header>
+  <header><div class="avatar" aria-hidden="true">J</div><div><h1>Paseito</h1><p>Conversación del Paseo Aranjuez</p></div><button id="restart" type="button">Reiniciar</button></header>
   <div class="notice">Modo demo · Vista local de respaldo. No envía mensajes a WhatsApp. <a href="/catalog/demo">Acerca de los datos</a> · <a href="/kiosk/">Abrir kiosco</a></div>
-  <section id="messages" role="log" aria-live="polite" aria-label="Conversación con Jarvis"><div class="bubble">¡Hola! Soy Jarvis. ¿Qué te gustaría encontrar hoy: una tienda, algo para comer o un regalo?</div></section>
+  <section id="messages" role="log" aria-live="polite" aria-label="Conversación con Paseito"><div class="bubble">¡Hola! Soy Paseito. ¿Qué te gustaría encontrar hoy: una tienda, algo para comer o un regalo?</div></section>
   <div id="choices" aria-label="Opciones de conversación"></div>
-  <form><input id="message" aria-label="Mensaje para Jarvis" placeholder="Escribe un mensaje…" maxlength="2000" autocomplete="off"><button id="send" type="submit">Enviar</button></form>
+  <form><input id="message" aria-label="Mensaje para Paseito" placeholder="Escribe un mensaje…" maxlength="2000" autocomplete="off"><button id="send" type="submit">Enviar</button></form>
   <div id="status" role="status">Respaldo local listo</div>
 </main>
 <script>
@@ -49,7 +49,7 @@ async function send(text,retry=false) {
   if(busy || !text.trim())return;
   setBusy(true);
   if(!retry) { pending={message:text.trim(),message_id:crypto.randomUUID(),session_id:session}; bubble(text,'user'); input.value=''; }
-  status.textContent='Jarvis está respondiendo…';
+  status.textContent='Paseito está respondiendo…';
   const controller=new AbortController(), timer=setTimeout(()=>controller.abort(),12000);
   try {
     const response=await fetch('/whatsapp/demo/message',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(pending),signal:controller.signal});

@@ -1,3 +1,5 @@
+> Documento histórico. El arranque vigente y la aplicación única están en [docs/arranque-equipo.md](arranque-equipo.md). El backend Gemini y las APIs duplicadas se retiraron en `feat/version-unica-openai`.
+
 # Integración de Paseito y Jarvis
 
 ## Origen

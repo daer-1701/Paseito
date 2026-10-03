@@ -5,13 +5,30 @@ import json
 import os
 import re
 import threading
+from contextlib import closing, contextmanager
 from datetime import datetime, timedelta, timezone
 from urllib.parse import parse_qs, urlparse
 from xml.etree.ElementTree import Element, SubElement, tostring
-from .agent import chat
+from .orchestrator import chat
 from .store import connect
 
-_INCOMING_LOCK = threading.Lock()
+_MESSAGE_LOCKS = {}
+_LOCKS_GUARD = threading.Lock()
+
+
+@contextmanager
+def message_lock(key):
+    with _LOCKS_GUARD:
+        lock, users = _MESSAGE_LOCKS.get(key,(threading.Lock(),0))
+        _MESSAGE_LOCKS[key] = (lock,users+1)
+    try:
+        with lock:
+            yield
+    finally:
+        with _LOCKS_GUARD:
+            lock,users = _MESSAGE_LOCKS[key]
+            if users==1: del _MESSAGE_LOCKS[key]
+            else: _MESSAGE_LOCKS[key]=(lock,users-1)
 
 
 def config_status():
@@ -68,8 +85,8 @@ def incoming(identity, sid, message, channel='twilio'):
         raise ValueError('message must contain 1 to 2000 characters')
     session = opaque_session(identity, channel)
     fingerprint = hashlib.sha256((session + ':' + (message or '<media>')).encode()).hexdigest()
-    # A single adapter process serializes incoming work, preventing concurrent retry replies.
-    with _INCOMING_LOCK, connect() as db:
+    # Serialize retries of one message; different visitors proceed independently.
+    with message_lock(channel+':'+sid), closing(connect()) as db:
         db.execute('CREATE TABLE IF NOT EXISTS whatsapp_inbox (message_id TEXT PRIMARY KEY, fingerprint TEXT NOT NULL, result TEXT NOT NULL, created_at TEXT NOT NULL)')
         cutoff = (datetime.now(timezone.utc) - timedelta(hours=48)).isoformat()
         db.execute('DELETE FROM whatsapp_inbox WHERE created_at < ?', (cutoff,))
@@ -90,14 +107,14 @@ def incoming(identity, sid, message, channel='twilio'):
             result = {'answer': 'Empecemos de nuevo. ¿Qué tienda, producto o promoción quieres encontrar?', 'sources': [], 'suggestions': [], 'session_id': session}
         else:
             try:
-                result = chat(db, message, session, allow_external=False)
+                result = chat(db, message, session, allow_external=False, channel=channel)
             except Exception as exc:
                 db.rollback()
                 print(f'WhatsApp response fallback: {type(exc).__name__}', flush=True)
-                result = {'answer': 'Tuve un problema al consultar esa información. Puedes escribirme de nuevo o usar el kiosco de Jarvis.', 'sources': [], 'suggestions': [], 'session_id': session, 'fallback': True}
+                result = {'answer': 'Tuve un problema al consultar esa información. Puedes escribirme de nuevo o usar el kiosco de Paseito.', 'sources': [], 'suggestions': [], 'session_id': session, 'fallback': True}
         text = result['answer']
         if first and channel == 'twilio' and os.getenv('JARVIS_DEMO_CATALOG') == '1':
-            text = 'Jarvis · modo demo\n\n' + text
+            text = 'Paseito · modo demo\n\n' + text
         choices = result.get('suggestions', [])[:3]
         if result.get('dialogue_stage') == 'shops' and choices:
             text += '\n\n' + '\n'.join(f'{i}. {name}' for i, name in enumerate(choices, 1))
