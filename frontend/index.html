@@ -94,6 +94,32 @@
   .guia-btn { margin-top: 8px; width: 100%; border: 1px solid rgba(231, 183, 58, .55); border-radius: 10px; padding: 7px 9px;
                color: var(--oro-claro); font-size: .76rem; font-weight: 800; background: rgba(231, 183, 58, .12); }
   .guia-btn:hover { color: var(--vino-oscuro); background: var(--oro); }
+  .chip.puntos { background: linear-gradient(135deg, #f7d774, #e0a526); color: var(--vino-oscuro); }
+
+  /* ---------- lector del QR de Paseo Points ---------- */
+  #lector { position: fixed; inset: 0; z-index: 7; display: grid; place-items: center; padding: var(--margen);
+            background: rgba(20, 5, 15, .55); animation: aparece .25s ease-out; }
+  #lector[hidden] { display: none; }
+  #lector article { position: relative; width: min(620px, 100%); max-height: 100%; overflow-y: auto; padding: 22px; border-radius: 24px;
+                    display: flex; flex-direction: column; gap: 14px; background: rgba(24, 10, 20, .9); }
+  #lector h3 { margin: 0 44px 0 0; font-size: 1.4rem; }
+  #lector .camara { position: relative; aspect-ratio: 4 / 3; border-radius: 18px; overflow: hidden; background: #000; }
+  #lector.sin-camara .camara { display: none; }
+  #lector video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+  #lector .marco { position: absolute; inset: 14% 24%; border: 3px solid var(--oro); border-radius: 18px;
+                   box-shadow: 0 0 0 999px rgba(0, 0, 0, .35); overflow: hidden; }
+  #lector .marco::after { content: ""; position: absolute; left: 0; right: 0; height: 3px; background: var(--oro-claro);
+                          box-shadow: 0 0 12px var(--oro-claro); animation: escaneo 2s infinite ease-in-out; }
+  @keyframes escaneo { 0%, 100% { top: 6%; } 50% { top: 92%; } }
+  #lector-estado { margin: 0; color: var(--oro-claro); font-weight: 700; text-align: center; }
+  #lector form { display: flex; flex-wrap: wrap; gap: 8px; }
+  #lector form label { flex-basis: 100%; color: var(--tenue); font-size: .85rem; }
+  #lector-codigo { flex: 1; min-width: 0; padding: 11px 14px; border-radius: 12px; border: 1px solid var(--borde); background: rgba(255, 255, 255, .08);
+                   color: var(--crema); font: inherit; letter-spacing: 2px; text-transform: uppercase; }
+  #lector form button { padding: 11px 16px; border-radius: 12px; border: none; font-weight: 700; color: var(--vino-oscuro);
+                        background: linear-gradient(135deg, var(--oro-claro), var(--oro)); }
+  #lector form button:disabled { opacity: .45; cursor: default; }
+  #lector .cerrar { position: absolute; top: 14px; right: 14px; width: 42px; height: 42px; border-radius: 50%; border: none; font-size: 1.1rem; background: rgba(0, 0, 0, .45); }
 
   /* ---------- modo acompáñame ---------- */
   #guia { position: absolute; inset: 12px; z-index: 4; display: none; flex-direction: column; gap: 14px; padding: 16px;
@@ -301,11 +327,24 @@
   <button id="demo-mirada" type="button" hidden style="margin-top:16px;padding:12px;border-radius:16px">Demo: activar saludo por mirada</button>
 </div>
 <div id="aviso" class="vidrio"></div>
+<div id="lector" hidden>
+  <article class="vidrio" role="dialog" aria-modal="true" aria-labelledby="lector-titulo">
+    <button class="cerrar" type="button" title="Cancelar (Esc)" aria-label="Cancelar">✕</button>
+    <h3 id="lector-titulo">🎟️ Mis cupones</h3>
+    <div class="camara"><video id="lector-video" playsinline muted></video><div class="marco"></div></div>
+    <p id="lector-estado" role="status"></p>
+    <form id="lector-manual" autocomplete="off">
+      <label for="lector-codigo">¿Sin cámara? Escribe el código que aparece bajo el QR del cupón:</label>
+      <input id="lector-codigo" maxlength="11" placeholder="ABCDE-12345" spellcheck="false">
+      <button type="submit" disabled>Verificar</button>
+    </form>
+  </article>
+</div>
 
 <script type="module">
 const SALUDO = "¡Hola! Soy Paseito, tu asistente del Paseo Aranjuez. ¿En qué te puedo ayudar hoy?";
 const SUGERENCIAS = [
-  ["🍽️", "¿Dónde puedo comer?"], ["☕", "Quiero tomar un café"], ["🎁", "Busco un regalo"],
+  ["🍽️", "¿Dónde puedo comer?"], ["📷", "Lee mi QR"], ["☕", "Quiero tomar un café"], ["🎁", "Busco un regalo"],
   ["⭐", "¿Qué recompensas hay en Paseo Points?"], ["🅿️", "¿Dónde estaciono?"], ["📅", "¿Qué eventos hay hoy?"], ["🕒", "¿Qué está abierto ahora?"],
 ];
 const PISOS = [
@@ -425,6 +464,7 @@ function icono(t) {
   if (t.tipo === "mision") return "🎯";
   if (t.tipo === "nivel") return "🏅";
   if (t.tipo === "puntos") return "⭐";
+  if (t.tipo === "cupon") return "🎟️";
   if (t.tipo === "evento") return "🎤";
   if (t.tipo === "promocion") return "🏷️";
   if (t.tipo === "producto") return "🛍️";
@@ -456,6 +496,11 @@ let puntoKiosco = "Punto del kiosco pendiente de configurar";
 let baseMovil = "";
 fetch("/kiosk/config").then(r => r.json()).then(c => { puntoKiosco = c.origin; baseMovil = c.public_base_url || ""; if (c.demo_catalog) { $("demo-mirada").hidden = false; const label = document.querySelector(".estado-confianza"); label.textContent = "Modo demo"; label.title = "Catálogo, promociones y algunos horarios son datos de prueba. Consulta /catalog/demo para conocer su alcance."; } }).catch(() => {});
 
+const ESTADOS_CUPON = { vigente: ["abierto", "Vigente"], canjeado: ["", "Ya usado"], vencido: ["cerrado", "Vencido"], cancelado: ["cerrado", "Cancelado"] };
+const fechaLarga = (s) => new Date(s.replace(" ", "T")).toLocaleDateString("es-BO", { day: "numeric", month: "long" });
+const miles = (n) => Number(n).toLocaleString("es-BO");
+const nombrePiso = (clave) => ({ 5: "Quinto piso", S: "Semisótano" }[clave] ?? PISOS.find(([c]) => c === clave)?.[1] ?? "");
+
 function tarjetaHtml(t, n) {
   if (t.vigente_hasta || t.termina) t.vence = t.vigente_hasta || t.termina;
   const u = t.ubicacion || t.tienda || {};
@@ -474,7 +519,18 @@ function tarjetaHtml(t, n) {
   if (t.tipo === "nivel") detalle = `Multiplicador ×${t.multiplicador} · desde ${t.estatus_minimo} de estatus`;
   if (t.tipo === "evento" && t.puntos) chips.push(`<span class="chip">+${escapar(t.puntos)} puntos</span>`);
   if (t.tipo === "promocion" && t.vigente_hasta) detalle = t.descripcion || "";
-  const extra = (u.sector ? `<small>Sector: ${escapar(u.sector)}</small>` : "") +
+  if (t.tipo === "puntos") {
+    titulo = t.nivel ? `${t.nombre} · Nivel ${t.nivel}` : t.nombre;
+    detalle = "Paseo Points";
+    chips.push(`<span class="chip puntos">${miles(t.saldo)} pts</span>`);
+  }
+  if (t.tipo === "cupon") {
+    titulo = t.titulo;
+    detalle = t.nombre || "Paseo Points";
+    const [clase, texto] = ESTADOS_CUPON[t.estado] || ["", t.estado];
+    chips.unshift(`<span class="chip ${clase}">${escapar(texto)}</span>`);
+    if (t.canjeado_el) chips.push(`<span class="chip">Usado el ${escapar(fechaLarga(t.canjeado_el))}</span>`);
+  }  const extra = (u.sector ? `<small>Sector: ${escapar(u.sector)}</small>` : "") +
     (t.torre ? `<small>Torre: ${escapar(t.torre)}</small>` : "") +
     (u.referencia ? `<small>${escapar(u.referencia)}</small>` : "") +
     (t.horario ? `<small>🕒 ${escapar(t.horario)}</small>` : "") +
@@ -729,10 +785,202 @@ function callar() {
   avatar.callar();
 }
 
+// ---------- Cupones: lector del QR que muestra la app de Paseo Points ----------
+// Chrome en Windows no trae BarcodeDetector; jsQR lee el QR de los cuadros del video.
+const LECTOR_MAX_MS = 45_000;
+const LECTOR_CADA_MS = 150;
+const LECTOR_ANCHO = 640;
+let camara = null;
+let jsQRListo = null;
+let focoPrevio = null;
+
+function cargarJsQR() {
+  jsQRListo ??= new Promise((ok, falla) => {
+    const s = document.createElement("script");
+    s.src = "/kiosk/vendor/jsqr/jsQR.js";
+    s.onload = ok;
+    s.onerror = () => { jsQRListo = null; falla(new Error("jsQR")); };
+    document.head.append(s);
+  });
+  return jsQRListo;
+}
+
+function detenerCamara() {
+  camara?.getTracks().forEach((t) => t.stop());
+  camara = null;
+  $("lector-video").srcObject = null;
+}
+
+function cerrarLector() {
+  detenerCamara();
+  if ($("lector").hidden) return;
+  $("lector").hidden = true;
+  if (focoPrevio?.isConnected && focoPrevio !== $("texto")) focoPrevio.focus({ preventScroll: true });
+  focoPrevio = null;
+}
+
+async function abrirLector() {
+  if (enBienvenida) salirBienvenida(false);
+  ultimaActividad = Date.now();
+  if ($("lector").hidden) focoPrevio = document.activeElement;
+  $("lector").classList.remove("sin-camara");
+  $("lector-codigo").value = "";
+  $("lector-manual").querySelector("button").disabled = true;
+  $("lector-estado").textContent = "Abriendo la cámara… si el navegador pregunta, toca Permitir.";
+  $("lector").hidden = false;
+  $("lector").querySelector(".cerrar").focus({ preventScroll: true });
+  try {
+    await cargarJsQR();
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
+    if ($("lector").hidden) { stream.getTracks().forEach((t) => t.stop()); return; }
+    camara = stream;
+    $("lector-video").srcObject = stream;
+    await $("lector-video").play();
+    $("lector-estado").textContent = "Muestra tu QR de cliente (o el de un cupón) dentro del recuadro";
+    buscarQR(stream);
+  } catch (e) {
+    console.warn("Lector QR sin cámara", e);
+    $("lector").classList.add("sin-camara");
+    $("lector-estado").textContent = e.name === "NotAllowedError"
+      ? "No tengo permiso para usar la cámara. Escribe el código del cupón."
+      : "No pude abrir la cámara. Escribe el código del cupón.";
+    $("lector-codigo").focus();
+  }
+}
+
+function buscarQR(stream) {
+  const video = $("lector-video");
+  const lienzo = document.createElement("canvas");
+  const ctx = lienzo.getContext("2d", { willReadFrequently: true });
+  const inicio = performance.now();
+  let ultimo = 0;
+  const paso = (ahora) => {
+    if (camara !== stream) return;
+    if (ahora - inicio > LECTOR_MAX_MS) {
+      cerrarLector();
+      aviso("No alcancé a ver un QR. Toca \"Lee mi QR\" para intentar otra vez.");
+      return;
+    }
+    if (ahora - ultimo > LECTOR_CADA_MS && video.videoWidth) {
+      ultimo = ahora;
+      const escala = Math.min(1, LECTOR_ANCHO / video.videoWidth);
+      lienzo.width = Math.round(video.videoWidth * escala);
+      lienzo.height = Math.round(video.videoHeight * escala);
+      ctx.drawImage(video, 0, 0, lienzo.width, lienzo.height);
+      const qr = window.jsQR(ctx.getImageData(0, 0, lienzo.width, lienzo.height).data, lienzo.width, lienzo.height);
+      if (qr?.data) {
+        cerrarLector();
+        verificarCupon(qr.data);
+        return;
+      }
+    }
+    requestAnimationFrame(paso);
+  };
+  requestAnimationFrame(paso);
+}
+
+$("lector").addEventListener("click", (e) => {
+  if (e.target === $("lector") || e.target.closest(".cerrar")) cerrarLector();
+  ultimaActividad = Date.now();
+});
+$("lector-codigo").addEventListener("input", (e) => {
+  e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, "");
+  $("lector-manual").querySelector("button").disabled = !/^[A-Z0-9]{5}-[A-Z0-9]{5}$/.test(e.target.value);
+});
+$("lector-manual").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const codigo = $("lector-codigo").value;
+  cerrarLector();
+  verificarCupon(codigo);
+});
+
+// "Descuento de Bs 20" va en minúscula dentro de la frase; "Classic Roll gratis" es un nombre y se queda igual.
+const beneficioHablado = (titulo) => (/^Descuento\b/.test(titulo) ? titulo.charAt(0).toLowerCase() + titulo.slice(1) : titulo);
+
+/** Lo que dice Paseito del cupón leído: estado, dónde se usa y si tiene más cupones vigentes. */
+function resumenCupon({ cliente, cupon: c, otros_cupones: otros = [] }) {
+  const beneficio = beneficioHablado(c.titulo);
+  const donde = c.nombre ? ` en ${c.nombre}` : "";
+  const piso = clavePiso((c.ubicacion || {}).piso);
+  const frases = [cliente ? `¡Listo, ${cliente}!` : "¡Listo!"];
+  if (c.estado === "vigente") {
+    frases.push(`Tu cupón de ${beneficio}${donde} está vigente.`);
+    const enPiso = piso === "PB" ? "en planta baja" : piso ? `en el ${nombrePiso(piso).toLowerCase()}` : "";
+    frases.push(`Para usarlo, muestra este mismo QR al pagar${enPiso ? `; el local está ${enPiso}` : ""}.`);
+  } else if (c.estado === "canjeado") {
+    frases.push(`Ese cupón de ${beneficio}${donde} ya fue usado${c.canjeado_el ? ` el ${fechaLarga(c.canjeado_el)}` : ""}.`);
+  } else if (c.estado === "vencido") {
+    frases.push(`Uy, ese cupón de ${beneficio}${donde} ya venció.`);
+  } else {
+    frases.push(`Ese cupón${donde} fue cancelado.`);
+  }
+  if (otros.length) frases.push(otros.length === 1 ? "Además tienes otro cupón vigente." : `Además tienes ${otros.length} cupones vigentes más.`);
+  return frases.join(" ");
+}
+
+/** Con el QR de cliente: cuántos cupones vigentes tiene, cuáles y su saldo de puntos. */
+function resumenCliente({ cliente, saldo_puntos: saldo, vigentes }) {
+  const frases = [cliente ? `¡Hola, ${cliente}!` : "¡Hola!"];
+  const cupon = (c) => `${beneficioHablado(c.titulo)}${c.nombre ? ` en ${c.nombre}` : ""}`;
+  if (!vigentes.length) {
+    frases.push("Ahora no tienes cupones vigentes.");
+    if (saldo > 0) frases.push(`Tienes ${miles(saldo)} puntos para canjear por recompensas en la app de Paseo Points.`);
+  } else {
+    if (vigentes.length === 1) frases.push(`Tienes un cupón vigente: ${cupon(vigentes[0])}.`);
+    else {
+      const nombres = vigentes.slice(0, 3).map(cupon);
+      const lista = nombres.length > 1 ? `${nombres.slice(0, -1).join(", ")} y ${nombres.at(-1)}` : nombres[0];
+      frases.push(`Tienes ${vigentes.length} cupones vigentes${vigentes.length > 3 ? "; los más nuevos son" : ":"} ${lista}.`);
+    }
+    frases.push("Para usarlos, abre el cupón en la app y muestra su QR al pagar.");
+    if (saldo > 0) frases.push(`Y te quedan ${miles(saldo)} puntos.`);
+  }
+  return frases.join(" ");
+}
+
+async function verificarCupon(codigo) {
+  ultimaActividad = Date.now();
+  callar();
+  oyente("🎟️ Mis cupones");
+  pensando();
+  estado("Revisando tus cupones…", "pensando");
+  try {
+    const r = await fetch(`${API}/cupones/verificar`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ codigo }),
+    });
+    const datos = await r.json();
+    if (!r.ok) throw new Error(datos.error || r.status);
+    estado("", "normal");
+    if (datos.error) {
+      await hablar(datos.error);
+      return;
+    }
+    $("guia").classList.remove("activa");
+    mostrarTarjetas(datos.resultados);
+    await hablar(datos.modo === "cliente" ? resumenCliente(datos) : resumenCupon(datos), { presentar: true });
+  } catch (error) {
+    console.warn("Verificación de cupón falló", error);
+    estado("", "normal");
+    pintarSubtitulo(["Uy, no pude revisar tus cupones ahora."]);
+    progresoFrase(0, 1);
+    aviso("No pude conectar con Paseo Points. Toca \"Lee mi QR\" para intentar otra vez.");
+  }
+}
+
 // ---------- Conversación ----------
+// "Lee mi QR", "verificar mis cupones"…: abre el lector en vez de preguntarle al agente.
+const PIDE_LECTOR = /\b(mis?|verificar|validar|revisar|leer|lee|escanear)\b.*\b(cup[oó]n(es)?|qr)\b|\bqr\b/i;
+
 async function preguntar(texto) {
   texto = (texto || "").trim();
   if (!texto) return;
+  if (PIDE_LECTOR.test(texto)) {
+    callar();
+    oyente(texto);
+    abrirLector();
+    hablar("¡Claro! Muéstrame tu QR de cliente de la app frente a la cámara.");
+    return;
+  }
   if (enBienvenida) salirBienvenida(false);
   ultimaActividad = Date.now();
   callar();
@@ -805,6 +1053,7 @@ $("texto").onkeydown = (e) => { if (e.key === "Enter") $("enviar").click(); };
 
 async function reiniciar() {
   callar();
+  cerrarLector();
   if (sessionId) fetch(`${API}/chat/${sessionId}`, { method: "DELETE" }).catch(() => {});
   sessionId = crypto.randomUUID();
   $("tarjetas").innerHTML = "";
@@ -1058,6 +1307,8 @@ if (!navigator.mediaDevices?.getUserMedia && !Reconocimiento) {
 }
 $("microfono").onclick = alternar;
 addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && !$("lector").hidden) { cerrarLector(); return; }
+  if (e.code === "Space" && !$("lector").hidden) return;
   if (e.code === "Space" && document.activeElement !== $("texto")) { e.preventDefault(); alternar(); }
 });
 </script>

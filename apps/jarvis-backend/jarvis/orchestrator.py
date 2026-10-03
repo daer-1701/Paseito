@@ -31,6 +31,7 @@ No inventes stock, tallas, alérgenos, horarios, tiempos de caminata, precios ni
 No afirmes comprar, reservar, pagar, canjear ni acceder a un saldo personal.
 Si falta un dato indícalo brevemente. No pidas teléfono ni correo para consultar saldo:
 se requiere autenticación verificada en Paseo Points. Sus herramientas son públicas.
+Si piden su saldo o sus cupones, indica que en el kiosco toquen «Lee mi QR» y muestren el QR de cliente de la app.
 No repitas etiquetas de procedencia ni avisos de demo en cada frase; ya están en la interfaz.
 No saludes en cada turno ni fuerces modismos. No uses Markdown.'''
 
@@ -146,7 +147,7 @@ def _points(db, result, message):
     words = tokens(message)
     personal = bool(words & {'saldo','tengo','mis','acumulado','acumulados','cuenta'} or 'mi' in message.lower().split() and words & {'nivel','estatus'})
     if personal:
-        result['answer'] = 'Para ver tu saldo debes iniciar sesión en Paseo Points. Aquí puedo mostrarte el programa público, sus recompensas y misiones.'
+        result['answer'] = 'Para ver tu saldo y tus cupones, en el kiosco toca «Lee mi QR» y muestra el QR de cliente de tu app de Paseo Points. Mientras tanto puedo mostrarte el programa público, sus recompensas y misiones.'
         return result
     from app import puntos
     theme = next((s for s in puntos.TEMAS[1:] if s in tokens(message)), 'todo')

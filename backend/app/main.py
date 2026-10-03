@@ -1,6 +1,7 @@
 """Canonical FastAPI server for Paseito. All channels share one catalogue and agent."""
 import hmac
 import json
+import mimetypes
 import os
 import re
 import sys
@@ -13,6 +14,8 @@ from fastapi.responses import Response, HTMLResponse, FileResponse, StreamingRes
 from fastapi.staticfiles import StaticFiles
 from starlette.concurrency import run_in_threadpool
 
+# El registro de Windows puede asociar .mjs a text/plain y el navegador rechaza el módulo.
+mimetypes.add_type('text/javascript', '.mjs')
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'backend'))
 sys.path.insert(0, str(ROOT / 'apps' / 'jarvis-backend'))
@@ -252,6 +255,15 @@ def points_program(tema: str='todo'):
 @app.get('/points/personal')
 def points_personal():
     raise HTTPException(403,'Identidad verificada pendiente. Consulta personal deshabilitada.')
+
+
+@app.post('/cupones/verificar')
+async def verify_coupons(request: Request):
+    """Read-only: the customer QR (verified by Paseo Points) or a coupon QR; Paseito never redeems."""
+    data = await payload(request)
+    texto = data.get('codigo')
+    if not isinstance(texto,str) or not 1 <= len(texto) <= 500: raise ValueError('codigo must be a string of 1-500 characters')
+    return await run_in_threadpool(puntos.verificar_cupon,texto)
 
 
 @app.get('/admin/quality',dependencies=[Depends(admin)])
