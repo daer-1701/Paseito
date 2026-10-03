@@ -1,5 +1,8 @@
 # Cobertura del reto Jarvis — 3 de octubre de 2026
 
+> Estado vigente: [auditoría del reto 2, requisitos y avance](auditoria-reto-jarvis.md). Este documento conserva información de entregas anteriores; sus conteos y pendientes pueden ser históricos.
+
+
 Alcance autorizado: completar primero 1–5, luego 6–10, y documentar adicionales. El enunciado fuente es `docs/retos/Hackathon_By_Paseo_Aranjuez_Documento_Oficial_de_Retos.pdf`, sección Jarvis y entregables generales. Elegimos Jarvis; Points y PaseoYa son integraciones adicionales.
 
 ## Restricciones y arquitectura

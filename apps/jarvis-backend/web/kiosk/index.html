@@ -203,8 +203,9 @@
     #estado { width: 100%; text-align: center; }
   }
   @media (max-width: 900px) {
-    :root { --panel: 0px; --margen: 10px; --arriba: 136px; --teclado: 0px; }
+    :root { --panel: 0px; --margen: 10px; --arriba: 276px; --teclado: 0px; }
     html, body { background: #28101f; }
+    #escena3d { top: 126px; bottom: auto; height: 140px; }
     header { padding: 0 10px; gap: 8px; }
     .marca { gap: 8px; } .marca small, #reloj, .punto { display: none; }
     .derecha { gap: 6px; } .estado-confianza { font-size: .65rem; padding: 5px; max-width: 118px; }
@@ -224,11 +225,15 @@
     #sugerencias { flex-wrap: nowrap; overflow-x: auto; } #sugerencias button { flex: none; min-height: 44px; }
     .guia-btn { min-height: 44px; } a.chip { min-height: 44px; display: inline-flex; align-items: center; }
     .info small { font-size: .86rem; line-height: 1.4; } #guia { inset: 6px; }
-    body.modo-2d #avatar2d { left: 0; right: 0; top: 70px; bottom: 100px; }
+    body.modo-2d #avatar2d { left: 0; right: 0; top: 126px; bottom: auto; height: 140px; }
     #inicio { padding: 24px 20px 14vh; text-align: center; } #inicio p { line-height: 1.5; }
   }
   @media (max-width: 360px) { .estado-confianza { max-width: 70px; font-size: .65rem; } }
-  @media (max-height: 540px) and (max-width: 900px) { .torre, #contexto { display: none; } #sugerencias { max-height: 48px; } }
+  @media (max-height: 540px) and (max-width: 900px) {
+    :root { --arriba: 136px; }
+    #escena3d, body.modo-2d #avatar2d, .torre, #contexto { display: none; }
+    #sugerencias { max-height: 48px; }
+  }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
 </head>
@@ -325,7 +330,7 @@ let enBienvenida = true;
 // ---------- Avatar: 3D si hay WebGL, si no el 2D ----------
 try {
   const { Avatar3D } = await import("/kiosk/js/avatar3d.js");
-  avatar = new Avatar3D($("escena3d"));
+  avatar = new Avatar3D($("escena3d"), { calidadAdaptativa: new URLSearchParams(location.search).get("calidad") !== "fija" });
   document.body.classList.add("modo-3d");
 } catch (error) {
   console.warn("Sin WebGL; uso el avatar 2D", error);
@@ -346,7 +351,8 @@ function encuadrar() {
       derecha: innerWidth - caja("resultados").left + holgura,
     });
   } else {
-    avatar.encuadre({ arriba: caja("resultados").bottom + holgura, abajo: innerHeight - caja("conversacion").top + holgura });
+    // The mobile avatar has its own strip; panel positions must not offset its camera.
+    avatar.encuadre();
   }
 }
 const observador = new ResizeObserver(encuadrar);
@@ -611,7 +617,10 @@ function vozNavegador(texto, alProgresar) {
     u.voice = voces.find((v) => /BO|419|MX|US/.test(v.lang)) || voces[0] || null;
     u.lang = u.voice?.lang || "es-419";
     u.onstart = () => avatar.hablarSimulado(true);
-    u.onboundary = (e) => alProgresar(e.charIndex / hablado.length);
+    u.onboundary = (e) => {
+      alProgresar(e.charIndex / hablado.length);
+      avatar.decirPalabra?.(hablado.slice(e.charIndex).match(/^\S+/)?.[0]);
+    };
     u.onend = u.onerror = () => { avatar.hablarSimulado(false); alProgresar(1); resolve(); };
     speechSynthesis.speak(u);
   });
@@ -629,7 +638,7 @@ async function hablar(texto, { presentar = false } = {}) {
   try {
     if (voiceConfig.streaming) {
       estado("");
-      if (presentar) avatar.gesto("presentar", 2600);
+      if (presentar) señalarTarjetas();
       try {
         await streamPlayer.play(`${API}/voice/stream`, textoParaVoz(texto), {
           signal: controller.signal,
@@ -646,7 +655,10 @@ async function hablar(texto, { presentar = false } = {}) {
         aviso("La voz no está disponible; puedes leer la respuesta");
         console.warn("Streaming de voz", error);
       }
-      if (miTurno === turno) frases.forEach((_, i) => progresoFrase(i, 1));
+      if (miTurno === turno) {
+        frases.forEach((_, i) => progresoFrase(i, 1));
+        avatar.sonreir?.(0.8, 2200);
+      }
       return;
     }
     const prepararAudio = (frase) => pedirAudio(frase, controller.signal).then(url => {
@@ -661,19 +673,28 @@ async function hablar(texto, { presentar = false } = {}) {
       // Prepare only the next sentence while this one plays; keep requests bounded.
       if (i + 1 < frases.length) siguienteAudio = prepararAudio(frases[i + 1]);
       estado("");
-      if (i === 0 && presentar) avatar.gesto("presentar", 2600);
+      if (i === 0 && presentar) señalarTarjetas();
       const alProgresar = (f) => progresoFrase(i, f);
       if (url) {
-        try { await avatar.hablarAudio(url, { alProgresar }); }
+        try { await avatar.hablarAudio(url, { alProgresar, texto: textoParaVoz(frases[i]) }); }
         finally { URL.revokeObjectURL(url); audioUrls.delete(url); }
       }
       else await vozNavegador(frases[i], alProgresar);
     }
+    if (miTurno === turno) avatar.sonreir?.(0.8, 2200);
   } finally {
     controller.abort();
     for (const url of audioUrls) URL.revokeObjectURL(url);
     if (miTurno === turno) { hablando = false; ultimaActividad = Date.now(); }
   }
+}
+
+function señalarTarjetas() {
+  const tarjeta = $("tarjetas").querySelector(".tarjeta");
+  if (!avatar.señalar || !tarjeta) return avatar.gesto("presentar", 2600);
+  const r = tarjeta.getBoundingClientRect();
+  if (!r.width || !r.height) return avatar.gesto("presentar", 2600);
+  avatar.señalar(r.left + r.width / 2, r.top + r.height / 2, 2600);
 }
 
 function callar() {
@@ -711,6 +732,7 @@ async function preguntar(texto) {
     chatAbort = null;
     sessionId = datos.session_id;
     avatar.gesto("normal");
+    avatar.asentir?.();
     estado("", "normal");
     const tarjetas = tarjetasDeEvidencia(datos.sources);
     $("guia").classList.remove("activa");

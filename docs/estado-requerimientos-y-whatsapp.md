@@ -1,6 +1,9 @@
 # Estado de Jarvis, catálogo de demostración y WhatsApp
 
-Actualizado: 3 de octubre de 2026. Alcance: reto 1, Jarvis. Basado en el PDF oficial, secciones 4.6–4.10 y entregables de las páginas 12–13. No declarar completos los otros dos retos: PaseoYa y Points solo tienen propuestas y contratos iniciales.
+> Estado vigente: [auditoría del reto 2, requisitos y avance](auditoria-reto-jarvis.md). Este documento conserva información de entregas anteriores; sus conteos y pendientes pueden ser históricos.
+
+
+Actualizado: 3 de octubre de 2026. Alcance: reto 2, Jarvis. Basado en el PDF oficial, secciones 4.6–4.10 y entregables de las páginas 12–13. No declarar completos los otros dos retos: PaseoYa y Points solo tienen propuestas y contratos iniciales.
 
 ## Actualización: demo conversacional
 
