@@ -1,5 +1,8 @@
 # Etapa 1: aportes del compañero sobre la aplicación unificada
 
+> Informe histórico. El estado vigente está en [versión única](version-unica-estado.md) y el alcance del PDF en [fase 3](fase3-limpieza-y-alcance.md). Conteos, porcentajes, arquitectura y pendientes de este informe corresponden a su entrega original.
+
+
 Base: `985b72f`. Fuente de aportes: `6a28f76` (main observado el 3 de octubre de 2026).
 
 ## Alcance aprobado

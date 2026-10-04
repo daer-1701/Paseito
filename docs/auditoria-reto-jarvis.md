@@ -1,5 +1,8 @@
 # Auditoría del reto 2: Jarvis Paseo
 
+> Informe histórico. El estado vigente está en [versión única](version-unica-estado.md) y el alcance del PDF en [fase 3](fase3-limpieza-y-alcance.md). Conteos, porcentajes, arquitectura y pendientes de este informe corresponden a su entrega original.
+
+
 Fecha: 3 de octubre de 2026. Fuente: `docs/retos/Hackathon_By_Paseo_Aranjuez_Documento_Oficial_de_Retos.pdf`, 13 páginas. Se leyó el documento completo; esta matriz desarrolla el reto seleccionado (sección 4), la integración (6), requisitos generales (7), tecnologías (8) y entregables (9). Las secciones 3 y 5 describen otros retos y no se cuentan como obligaciones de Jarvis.
 
 ## Resultado y método

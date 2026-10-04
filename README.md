@@ -10,7 +10,7 @@ promociones, eventos, WhatsApp y analítica consultan el mismo servicio.
 [Estado y pendientes](docs/version-unica-estado.md)
 
 ```bash
-git clone --branch feat/version-unica-openai https://github.com/daer-1701/Paseito.git
+git clone --branch feat/etapa3-limpieza https://github.com/daer-1701/Paseito.git
 cd Paseito
 # Preparar .env siguiendo la guía; requiere un token administrativo local.
 docker compose -f compose.portable.yaml up -d --build
@@ -32,7 +32,7 @@ Sin Docker: instalar `apps/jarvis-backend/requirements.txt` y ejecutar
 | Voz de torre | `services/voice/`, Whisper y Kokoro con streaming y cancelación |
 | WhatsApp | Twilio firmado e idempotente; demo local del mismo agente |
 | Analítica y administración | `/admin.html`, API con credencial obligatoria |
-| Points | Programa público, MySQL de solo lectura con TLS y caché limitada; demo pública de respaldo |
+| Points | Programa público y consulta personal temporal por QR; MySQL de solo lectura, TLS y demo de respaldo |
 | Mirada | Evento `gaze_at_kiosk` para saludar en bienvenida, con demo manual |
 
 El backend Gemini, su SQLite independiente, el servidor HTTP anterior y las
@@ -47,11 +47,14 @@ con Git. `python -m jarvis.bootstrap` redirige al mismo FastAPI por compatibilid
   programa público Points de demostración. El modo aparece en la interfaz,
   sin repetir advertencias en cada respuesta. `0` excluye esos datos.
 - WhatsApp real requiere Twilio y HTTPS. La demo está en `/whatsapp/demo`.
-- No se consultan saldos personales, ni se realizan compras, reservas o canjes.
-  Inventario real, PaseoYa, identidad Points, navegación paso a paso y hardware
-  eye tracker siguen sujetos a sus integraciones externas.
+- Saldo personal: QR validado, conversación y cookie temporal; vence tras 90 s sin consultas,
+  máximo 10 minutos. Sin credenciales externas se demuestra únicamente un saldo de ejemplo.
+- Compras, reservas, pagos, canjes y stock real son integraciones adicionales con
+  PaseoYa/Points, no capacidades mínimas del reto Jarvis. No se realizan operaciones.
+- La ubicación por piso/sector/local funciona; mapa interior validado y hardware
+  eye tracker siguen pendientes.
 - Nunca subir `.env`, claves, bases locales o certificados privados al repositorio.
 
 [Definición acordada](docs/definicion-version-unica.md) ·
 [Conflictos de datos conservados para revisión](docs/conflictos-catalogo.json) ·
-[Auditoría del enunciado](docs/auditoria-reto-jarvis.md)
+[Alcance vigente según el PDF y limpieza fase 3](docs/fase3-limpieza-y-alcance.md)

@@ -3,7 +3,7 @@
 ## 1. Clonar la rama
 
 ```powershell
-git clone --branch feat/version-unica-openai https://github.com/daer-1701/Paseito.git
+git clone --branch feat/etapa3-limpieza https://github.com/daer-1701/Paseito.git
 cd Paseito
 Copy-Item .env.example .env
 ```
@@ -76,7 +76,8 @@ También funciona `uvicorn app.main:app --app-dir backend --port 8000`.
 2. Ver catálogo, promociones, horario del domingo y ubicación/ficha móvil.
 3. Pedir camisa, café y una reunión: las tres necesidades aparecen en la respuesta.
 4. Preguntar por recompensas Points. Sin conexión externa, el modo demo devuelve
-   programa público y tarjetas; pedir saldo remite a iniciar sesión en Points.
+   programa público y tarjetas. Lee mi QR → Probar identidad de demo permite preguntar
+   por saldo de ejemplo. Cerrar, reiniciar o dejar 90 s sin consultas limpia los datos.
 5. `/whatsapp/demo`: buscar, elegir tienda y reenviar el último mensaje para mostrar deduplicación.
 6. Volver a bienvenida y pulsar «Demo: activar saludo por mirada». Solo saluda;
    no identifica personas ni mide mirada real. El adaptador físico está pendiente.
@@ -96,6 +97,8 @@ También funciona `uvicorn app.main:app --app-dir backend --port 8000`.
   El certificado se monta solo lectura en `/run/points-ca.pem`. Nunca copiar una clave privada.
   La caché normal dura 300 s y se descarta a los 600 s; se filtran las vigencias.
   Si falla y el modo demo está activo, se usa el programa público de demostración.
+  Para identidad personal configurar API QR o HMAC dedicado según [etapa 2](entregables/etapa2-points-sesion.md).
+  La demo personal no sustituye una validación del proveedor real.
 - Fichas móviles: `JARVIS_MOBILE_BASE_URL` debe ser accesible desde el teléfono.
   El gateway `compose.mobile.yaml` publica solamente fichas y QR, no chat ni administración.
 - Mirada real: `JARVIS_STIMULUS_ENABLED=1` únicamente después de integrar el dispositivo.

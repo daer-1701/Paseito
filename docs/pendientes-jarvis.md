@@ -1,6 +1,9 @@
 # Pendientes de Jarvis: estado al 2026-10-03
 
-> Estado vigente: [auditoría del reto 2, requisitos y avance](auditoria-reto-jarvis.md). Este documento conserva información de entregas anteriores; sus conteos y pendientes pueden ser históricos.
+> Informe histórico. El estado vigente está en [versión única](version-unica-estado.md) y el alcance del PDF en [fase 3](fase3-limpieza-y-alcance.md). Conteos, porcentajes, arquitectura y pendientes de este informe corresponden a su entrega original.
+
+
+> Referencia de aquella entrega: [auditoría histórica del reto 2](auditoria-reto-jarvis.md). El estado vigente está en [versión única](version-unica-estado.md).
 
 
 ## Actualización tras investigar fuentes públicas

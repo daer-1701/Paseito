@@ -29,7 +29,7 @@ def intent(message: str) -> str:
     words = tokens(message)
     if words & {"puntos", "saldo", "recompensa", "recompensas", "canje"}:
         return "loyalty"
-    if words & {"pedido", "orden", "retiro", "reserva", "reservar", "reservame", "pagar", "paga", "compra", "comprame", "canjear"}:
+    if words & {"pedido", "orden", "retiro", "reserva", "reservar", "reservame", "pagar", "paga", "compra", "comprame", "canjear", "cancelar", "cancelacion", "devolucion", "devolver", "pago", "pagos", "recoger", "recogerlo", "recogerla", "recogerlos", "recogerlas", "reservas", "reservacion", "reservaciones"}:
         return "order"
     if (words & {"guiame", "guia", "llegar", "llego", "ruta", "direccion", "direcciones", "ubicacion", "ubicado", "ubicada", "queda", "quedan"}
             or re.search(r'\bdonde\s+(?:esta|estan|se encuentra|se encuentran|queda|quedan)\b',raw)):
@@ -51,6 +51,19 @@ def intent(message: str) -> str:
 
 def local_answer(records: list[dict]) -> str:
     return typed_answer(records, "discovery", "") or FALLBACK
+
+
+def operation_answer(message: str) -> str:
+    words=tokens(message)
+    if words & {'cancelar','cancelacion','devolucion','devolver'}:
+        return 'Para cancelar o solicitar una devolución, contacta al comercio o usa la plataforma donde hiciste la compra o reserva. Puedo ayudarte a encontrar el negocio y su información.'
+    if words & {'reserva','reservar','reservame','reservas','reservacion','reservaciones'}:
+        return 'Las reservas se confirman directamente con el negocio. Puedo mostrarte opciones, horarios y ubicación; aquí todavía no consulto disponibilidad de mesas o salas ni registro reservas.'
+    if words & {'pagar','paga','pago','pagos'}:
+        return 'El pago se realiza con el comercio o desde su plataforma de compra. Aquí puedo ayudarte a revisar productos, precios y ubicación.'
+    if words & {'retiro','recoger','recogerlo','recogerla','recogerlos','recogerlas'}:
+        return 'El comercio o PaseoYa deben confirmar el estado y horario de retiro de tu pedido. Aquí puedo ayudarte a ubicar el negocio, pero todavía no consulto pedidos ni valido entregas.'
+    return 'La creación y el seguimiento de pedidos requieren la integración con PaseoYa. Por ahora puedo ayudarte a elegir productos y encontrar el negocio; aquí no se confirma ninguna compra.'
 
 
 def navigation_answer(record: dict | None) -> str:
@@ -128,7 +141,7 @@ def chat(db, message: str, session_id: str | None = None,
                 "sources": [], "suggestions": [], "grounded": True, "answer_mode": STRICT_RESPONSE_MODE}
     elif mode == "order":
         result = {"session_id": session_id, "intent": mode,
-                "answer": "Para consultar un pedido necesito conectarme a PaseoYa con tu sesión autenticada. Mientras tanto puedo ayudarte a encontrar productos o negocios.",
+                "answer": operation_answer(message),
                 "sources": [], "suggestions": [], "grounded": True, "answer_mode": STRICT_RESPONSE_MODE}
     elif mode == "hours":
         venues = matching_venues(db, message)

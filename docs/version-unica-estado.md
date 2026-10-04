@@ -1,103 +1,59 @@
-# Versión única: estado y pendientes
+# Versión única: estado vigente tras fases 1–3
 
-Base del compañero: `paseito/main` **28b9729**, incluida en
-`feat/version-unica-openai`. Producto: **Paseito**, para el reto Jarvis.
+Fecha: 2026-10-03. Producto Paseito para el reto Jarvis. Rama de entrega:
+`feat/etapa3-limpieza`, basada en etapa 2 (`f972a5f`) y aportes de etapa 1 (`114c0c5`).
 
-## Decisiones implementadas
+## Arquitectura y aportes conservados
 
-| Parte | Versión conservada e integración |
+| Parte | Implementación |
 |---|---|
-| API | FastAPI del compañero, con rutas para el catálogo versionado, voz y canales comunes |
-| RAG/datos | SQLite y filtros de Jarvis; herramientas de lectura y descripción/FAQ/agenda del compañero |
-| Proveedor | OpenAI Responses principal; respuesta local si falta clave, se excede el plazo o falla la API |
-| Prompt | Español boliviano cálido; pocas opciones, elección de tienda y contexto; sin hechos inventados |
-| UX/UI | Nuestro kiosco responsive, último avatar y visemas del compañero; tarjetas públicas Points |
-| Voz | Whisper/Kokoro GPU con streaming, cancelación y respaldo del navegador antes de iniciar audio; Edge opcional portable |
-| WhatsApp | Demo local y conector Twilio del mismo agente, firma y deduplicación por mensaje |
-| Analítica | Métricas del compañero adaptadas al SQLite común y a todos los canales; datos de contacto redactados |
-| Administración | Panel responsive para métricas, calidad y CRUD de registros; token obligatorio |
-| Points | Conector público MySQL de solo lectura con TLS; caché normal 300 s, máximo 600 s y filtro de vigencias; demo pública opcional |
-| Estímulos | Mirada saluda solamente en bienvenida sin conversación activa; repetición bloqueada, cooldown y demo manual |
+| API | FastAPI único en backend/app/main.py |
+| Datos | SQLite versionado, 1801 registros cargados; catálogo, precios y promociones de demo con procedencia |
+| IA | OpenAI Responses y respaldo local; clave ausente en la torre actual |
+| UX | Kiosco web responsive, avatar del compañero, visemas, 20 imágenes y 120 productos incorporados |
+| Voz | Whisper/Kokoro GPU con streaming, cancelación y respaldo del navegador; GPU lista |
+| WhatsApp | Demo local y conector Twilio con firma y deduplicación; entrega real pendiente |
+| Administración | CRUD, calidad y analytics con token obligatorio |
+| Points | Programa público con caché 300 s, antigüedad máxima 600 s; TLS verificado |
+| Identidad Points | QR validado por API/HMAC, cookie HttpOnly ligada a conversación, 90 s sin consultas y máximo 10 min |
+| Orientación | Piso, sector, torre, local y referencia; ficha y QR públicos |
+| Estímulos | Saludo por mirada en bienvenida y demo manual; dispositivo físico pendiente |
 
-Eliminadas las implementaciones activas duplicadas: agente Gemini, modelos SQLModel,
-SQLite independiente, servidor HTTP anterior y copias del frontend. Sus fuentes
-siguen recuperables en el historial Git. Se verificó además un respaldo completo
-del frontend anterior antes de retirarlo.
+No hay agente Gemini, base alternativa ni segundo servidor activo. Avatar 2D y 3D
+son implementaciones usadas: el 2D es respaldo si el navegador no permite el 3D.
+`habla.js` es compartido por ambos y se conserva.
 
-## Catálogo consolidado
+## Requisitos e integraciones
 
-En el arranque de torre: **1.681 registros**: 82 lugares, 1.569 productos/servicios,
-8 promociones, 15 FAQ (3 borradores excluidos) y 7 eventos (se filtran los terminados).
-Los 74 lugares del compañero están representados: 71 enriquecen IDs existentes y
-3 espacios públicos se incorporan. No se sobrescribieron horarios reales existentes.
+El PDF exige para Jarvis informar sobre negocios, horarios, productos, servicios,
+promociones, eventos, ubicación y recomendaciones (4.6, p. 6). Integración con
+Points/PaseoYa y navegación interna figuran como adicionales (4.10, p. 7).
+Inventario, pedidos, pago y retiro pertenecen al reto PaseoYa. No se contabilizan
+como carencias mínimas de Jarvis. [Matriz y evidencia del PDF](fase3-limpieza-y-alcance.md).
 
-El catálogo demo mantiene 10 productos por negocio gastronómico y 25 por tienda
-comercial, precios en bolivianos y promociones con vencimiento. No crea existencias
-reales. Los metadatos conservan procedencia, fechas, revisión y condición demo;
-la interfaz identifica el modo y el agente no repite esas etiquetas en cada frase.
-
-Las FAQ divergentes de horarios, estacionamiento y acceso 24/7 se mantienen como
-borradores para revisión: [conflictos](conflictos-catalogo.json). Los seis eventos
-del cronograma heredado conservan procedencia; falta revisión editorial de su fuente.
-
-## Recorrido observado en esta torre
-
-- Arranque Docker de la API unificada; `/health` correcto y voz GPU `ready` con streaming.
-- Arranque de la misma imagen sin GPU con base vacía: 1.681 registros y voz de navegador disponible como respaldo.
-- Camisas hasta Bs 150 → tres tiendas → primera tienda → catálogo filtrado → horario del domingo.
-- Camisa + café + reunión de cinco: respuesta cubre las tres necesidades y conserva pendientes;
-  la capacidad/disponibilidad de una sala requiere confirmación.
-- Pizza por WhatsApp local → elección por número → catálogo con familiar a Bs 59;
-  repetir ID devuelve `duplicate: true` sin una segunda consulta analítica.
-- Programa público Points y tarjetas de recompensas en modo demo; saldo personal bloqueado.
-- Saludo manual por mirada en la interfaz; el segundo evento de la sesión no vuelve a saludar.
-- Analítica y calidad rechazan acceso sin token (401); consulta personal Points bloqueada (403).
-- Consulta administrativa autenticada devuelve métricas de web y WhatsApp sobre el mismo almacén.
-- Interfaz revisada en escritorio y viewport móvil de 390 × 844.
-
-Se realizó revisión de código y recorridos manuales, sin agregar ni ejecutar suites.
-La suite histórica del servidor HTTP anterior necesita adaptación a FastAPI;
-por ejemplo, `test_voice_http.py` aún importa el handler que se retiró. Esa suite
-no se presenta como validación de esta versión.
-La revisión corrigió coherencia de opciones con el estado, cancelación de STT,
-concurrencia entre visitantes WhatsApp, visibilidad de frescura Points y reinicio
-tras eliminaciones administrativas. El servicio se configura con un único worker;
-una futura réplica necesita coordinación distribuida de mensajes y sesiones.
-
-## Qué falta para responder o actuar de verdad
-
-| Solicitud del visitante | Estado y paso pendiente |
+| Solicitud | Capacidad actual y límite |
 |---|---|
-| «¿Queda una camisa talla M?» | Falta inventario de la tienda: stock, tallas y colores sincronizados |
-| «Compra/reserva y confirma mi pedido» | Falta API PaseoYa, autorización, pago, idempotencia y confirmación del proveedor |
-| «¿Cuántos puntos tengo?, canjea mi recompensa» | Bloqueado hasta sesión externa verificada; después integrar saldo y transacciones |
-| Recompensas reales Points | Faltan URL, cuenta MySQL de solo lectura, CA y validación del esquema/permisos; existe demo pública identificada |
-| «Escríbeme en mi WhatsApp real» | Faltan cuenta Twilio, credenciales, HTTPS y comprobación de entrega; la demo es local |
-| «Guíame paso a paso desde donde estoy» | Hay piso/local y ficha/QR; falta mapa, posición real del kiosco y rutas validadas accesibles |
-| Activación automática al mirar el kiosco | Endpoint y saludo listos; falta dispositivo, productor de eventos y calibración física |
-| Conversación OpenAI en esta torre | Conector implementado; no se encontró `OPENAI_API_KEY` configurada. No se acredita una llamada real al proveedor |
-| Datos comerciales oficiales | Precios/promociones/horarios demo requieren validación comercial antes de usarlos fuera de la presentación |
+| Producto, precio y tienda | Catálogo y conversación con elección, presupuesto y seguimiento; precios demo no son ofertas comerciales aprobadas |
+| Stock/talla/color actual | No se consulta inventario real; informa el límite y ofrece catálogo |
+| Reserva, compra, pago, pedido o devolución | Explica la alternativa concreta y no confirma operaciones |
+| Saldo Points | Flujo temporal listo, demo de ejemplo; proveedor real pendiente |
+| Dónde queda | Ubicación publicada y piso destacado; mapa/ruta interior validada pendiente |
+| WhatsApp | Demo funciona; proveedor y entrega real pendientes |
 
-También faltan despliegue público y comprobación en un teléfono físico/PC ajeno,
-medición de carga y revisión de los entregables finales/presentación con esta arquitectura.
-La aplicación web responsive no equivale a una app nativa publicada en tiendas.
+Datos comerciales, horarios conflictivos, ubicación exacta del kiosco, móvil en
+red y ensayo presencial siguen requiriendo revisión. Los conflictos de horario de
+Cayenna y FAQ heredadas no sobrescriben información vigente.
 
-## Relación con la auditoría del reto
+## Privacidad y evidencia
 
-La auditoría detallada sigue en [auditoria-reto-jarvis.md](auditoria-reto-jarvis.md),
-con el enunciado oficial del reto 2. Su **84 %** era una estimación del MVP y sus
-entregables antes de esta consolidación; no se presenta como porcentaje de producción
-ni se eleva automáticamente por tener conectores sin credenciales. Esta entrega
-unifica la arquitectura y amplía la demo, con los pendientes externos explícitos.
+Respuestas personales solo en pantalla; no se envían a voz externa, LLM, turns ni
+analytics. Cierre, reinicio, abandono de página y caducidad limpian pantalla y revocan
+acceso. Analytics conserva evento genérico. Un código de cupón consulta solo ese cupón.
 
-## Referencia de implementación OpenAI
+Build y recorridos manuales documentados en [etapa 1](etapa1-aportes-companero.md),
+[etapa 2](entregables/etapa2-points-sesion.md) y [fase 3](fase3-limpieza-y-alcance.md).
+No se han ejecutado suites automatizadas. Informes anteriores se conservan como
+históricos; sus porcentajes y conteos no describen esta rama.
 
-Se usa el flujo de llamadas a funciones de Responses, `function_call_output`,
-esquemas estrictos y `store: false`, según la
-[documentación oficial](https://developers.openai.com/api/docs/guides/function-calling).
-El [modelo por defecto](https://developers.openai.com/api/docs/models/gpt-4.1-mini)
-es configurable; no se atribuye una calidad o latencia medida sin una llamada real.
-
-## Primera etapa posterior a la reversión de main
-
-Rama `feat/aportes-companero-etapa1`, sobre `985b72f`, incorpora selectivamente aportes de `6a28f76`. Catálogo de demo: 1.801 registros después de sumar 120 productos (Cayenna 71, Patanegra 47, Chipotle 2). Imágenes de 20 locales y avatar cochabambino conservados. API única con lector QR/códigos de cupones y ejemplo local. El conector real requiere MySQL con CA y validación de QR de cliente configurada; no se acredita conexión externa, lectura física de cámara o transacción de canje. El cambio de apertura de Cayenna sigue pendiente. Ver [detalle y límites de etapa 1](etapa1-aportes-companero.md).
+Una instancia/worker. Múltiples replicas requieren revocación y sesiones compartidas.
+No borrar volúmenes Docker para arrancar.

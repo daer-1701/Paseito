@@ -1,5 +1,8 @@
 > Documento histórico. El arranque vigente y la aplicación única están en [docs/arranque-equipo.md](arranque-equipo.md). El backend Gemini y las APIs duplicadas se retiraron en `feat/version-unica-openai`.
 
+> Informe histórico. El estado vigente está en [versión única](version-unica-estado.md) y el alcance del PDF en [fase 3](fase3-limpieza-y-alcance.md). Conteos, porcentajes, arquitectura y pendientes de este informe corresponden a su entrega original.
+
+
 # Paseito
 
 Asistente inteligente del **Paseo Aranjuez** (Cochabamba, Bolivia), creado para la Hackathon By Paseo 2026.
