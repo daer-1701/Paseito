@@ -7,11 +7,13 @@ promociones, eventos, WhatsApp y analítica consultan el mismo servicio.
 
 [Guía única para el equipo](docs/arranque-equipo.md) ·
 [Windows, WSL y NVIDIA](docs/arranque-torre-windows.md) ·
-[Estado y pendientes](docs/version-unica-estado.md)
+[Estado y pendientes](docs/version-unica-estado.md) ·
+[Despliegue HTTPS](docs/despliegue-presentacion.md)
 
 ```bash
-git clone --branch feat/etapa3-limpieza https://github.com/daer-1701/Paseito.git
-cd Paseito
+git clone --branch main https://github.com/daer-1701/Hackathon-By-Paseo.git
+cd Hackathon-By-Paseo/jarvis
+cp .env.example .env
 # Preparar .env siguiendo la guía; requiere un token administrativo local.
 docker compose -f compose.portable.yaml up -d --build
 ```
@@ -21,12 +23,28 @@ la torre usa Whisper y Kokoro en GPU mediante `docker compose up -d --build`.
 Sin Docker: instalar `apps/jarvis-backend/requirements.txt` y ejecutar
 `python scripts/serve.py` desde la raíz. Se carga únicamente el `.env` raíz.
 
+## Entrega y presentación
+
+Demo pública: [jarvis.timosboy.win](https://jarvis.timosboy.win).
+La torre sirve la aplicación por Cloudflare y conserva la voz GPU local;
+requiere Docker, Internet y el túnel activos. Respaldo presencial: localhost.
+
+[Presentación PowerPoint](docs/entregables/jarvis-reto-actualizado.pptx) ·
+[Guion de demo](docs/presentacion-y-demo-jarvis.md) ·
+[Evidencia de cierre](docs/entregables/cierre-verificado.md)
+
+La carpeta `jarvis/` del repositorio de entrega contiene el proyecto completo.
+El repositorio de desarrollo es [Paseito](https://github.com/daer-1701/Paseito).
+Validación del cierre: 42 pruebas backend y 6 frontend; interfaz y conversación
+verificadas por HTTPS. La carga móvil y el funcionamiento fueron confirmados por
+el usuario. Esto no certifica integraciones externas ni rendimiento concurrente.
+
 ## Una sola arquitectura
 
 | Parte | Implementación |
 |---|---|
 | Servidor | `backend/app/main.py`, FastAPI |
-| Datos y sesiones | SQLite versionado en `jarvis.store` |
+| Datos | SQLite con migraciones en `jarvis.store`; sesiones personales temporales en memoria |
 | Agente común | `jarvis.orchestrator`, OpenAI Responses con herramientas y respaldo local |
 | Interfaz | `frontend/`, responsive con el último avatar del compañero |
 | Voz de torre | `services/voice/`, Whisper y Kokoro con streaming y cancelación |
@@ -44,8 +62,10 @@ con Git. `python -m jarvis.bootstrap` redirige al mismo FastAPI por compatibilid
 - OpenAI: `OPENAI_API_KEY`, `OPENAI_TEXT_MODEL` (por defecto `gpt-4.1-mini`).
   La clave queda en el servidor; si falta o falla, responde el respaldo local.
 - `JARVIS_DEMO_CATALOG=1` activa precios, promociones, horarios faltantes y
-  programa público Points de demostración. El modo aparece en la interfaz,
-  sin repetir advertencias en cada respuesta. `0` excluye esos datos.
+  programa público Points de demostración. El enlace «Información del catálogo»
+  explica el origen de los datos, sin repetir advertencias en cada respuesta.
+  `0` excluye registros sintéticos y deshabilita las demos de WhatsApp, Points
+  y mirada manual que dependen de esa bandera.
 - WhatsApp real requiere Twilio y HTTPS. La demo está en `/whatsapp/demo`.
 - Saldo personal: QR validado, conversación y cookie temporal; vence tras 90 s sin consultas,
   máximo 10 minutos. Sin credenciales externas se demuestra únicamente un saldo de ejemplo.

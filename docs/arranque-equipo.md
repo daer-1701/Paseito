@@ -3,8 +3,8 @@
 ## 1. Clonar la rama
 
 ```powershell
-git clone --branch main https://github.com/daer-1701/Paseito.git
-cd Paseito
+git clone --branch main https://github.com/daer-1701/Hackathon-By-Paseo.git
+cd Hackathon-By-Paseo/jarvis
 Copy-Item .env.example .env
 ```
 
