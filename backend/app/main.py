@@ -1,4 +1,5 @@
 import logging
+import mimetypes
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -12,6 +13,8 @@ from .config import CORS_ORIGINS, FRONTEND_DIR, GEMINI_MODEL
 from .db import crear_tablas, engine
 from .rutas import admin, analitica, catalogo, chat, cupones, voz
 from .seed import sembrar, sembrar_productos
+
+mimetypes.add_type("model/gltf-binary", ".glb")
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
