@@ -408,6 +408,7 @@ export class Avatar3D {
   constructor(contenedor, { calidadAdaptativa = true } = {}) {
     this.contenedor = contenedor;
     this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+    this.tInicio = performance.now();
     this.renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     // Si el equipo no llega a ~40 cuadros por segundo se baja la resolución interna (y se recupera si sobra).
     this.calidad = {
@@ -1438,6 +1439,13 @@ export class Avatar3D {
     if (dx || dy) cam.setViewOffset(w, h, dx, dy, w, h);
     else cam.clearViewOffset();
     cam.updateProjectionMatrix();
+     if (this.desenfoque) {
+    const esCelular = w < 768;
+
+    this.desenfoque.uniforms.focus.value = 3.5;
+    this.desenfoque.uniforms.aperture.value = esCelular ? 0.009 : 0.006;
+    this.desenfoque.uniforms.maxblur.value = esCelular ? 0.012 : 0.006;
+  }
   }
 
   // ---------- Animación ----------
@@ -1704,7 +1712,8 @@ export class Avatar3D {
     this.renderer.render(this.escena, cam);
     cam.layers.enable(0);
     this.renderer.autoClear = true;
-    this._ajustarCalidad(real, ahora);
+    //this._ajustarCalidad(real, ahora);
+    //if (ahora - this.tInicio > 8000) this._ajustarCalidad(real, ahora);
   }
 
   /** Pollera y trenzas con resortes: se quedan atrás al girar o mover la cadera y se mecen un poco al hablar. */

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js';
+import { GLTFLoader } from '../vendor/three/addons/loaders/GLTFLoader.js';
 
 export function crearCristoGLB(alturaDeseada = 12) {
   const grupo = new THREE.Group();
