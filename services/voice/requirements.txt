@@ -1,7 +1,0 @@
-kokoro==0.9.4
-faster-whisper==1.1.1
-ctranslate2==4.6.0
-transformers==4.51.3
-numpy==1.26.4
-fastapi==0.115.12
-uvicorn==0.34.2
