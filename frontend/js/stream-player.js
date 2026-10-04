@@ -1,10 +1,12 @@
 // PCM16 mono, framed as NDJSON. Playback begins with the first generated segment.
-export async function* readFrames(body) {
+export async function* readFrames(body, contentType = 'application/x-ndjson') {
   const reader = body.getReader();
   const decoder = new TextDecoder();
   let pending = "";
   let done = false;
   let total = 0;
+  const sse = contentType.startsWith('text/event-stream');
+  let eventData = [];
   try {
     while (true) {
       const result = await reader.read();
@@ -14,11 +16,22 @@ export async function* readFrames(body) {
       pending += decoder.decode(result.value, { stream: true });
       let newline;
       while ((newline = pending.indexOf("\n")) >= 0) {
-        const line = pending.slice(0, newline);
+        const line = pending.slice(0, newline).replace(/\r$/, '');
         pending = pending.slice(newline + 1);
-        if (!line.trim()) continue;
+        let encoded = line;
+        if (sse) {
+          if (line.startsWith('data:')) {
+            eventData.push(line.slice(5).replace(/^ /, ''));
+            continue;
+          }
+          if (line.startsWith(':') || /^(event|id|retry):/.test(line)) continue;
+          if (line !== '') throw new Error('Evento de audio inválido');
+          if (!eventData.length) continue;
+          encoded = eventData.join('\n');
+          eventData = [];
+        } else if (!line.trim()) continue;
         if (done) throw new Error("Datos después del cierre de audio");
-        const event = JSON.parse(line);
+        const event = JSON.parse(encoded);
         if (event.error) throw new Error("Audio interrumpido");
         if (event.done === true) done = true;
         else if (typeof event.pcm !== "string" || event.sample_rate !== 24000) {
@@ -27,7 +40,7 @@ export async function* readFrames(body) {
         yield event;
       }
     }
-    if (!done || pending.trim()) throw new Error("Audio incompleto");
+    if (!done || pending.trim() || eventData.length) throw new Error("Audio incompleto");
   } finally {
     await reader.cancel().catch(() => {});
     reader.releaseLock();
@@ -60,7 +73,7 @@ export class StreamPlayer {
       for (let attempt=0; attempt<3; attempt++) {
         signal?.throwIfAborted();
         response = await fetch(url, {
-          method: "POST", headers: { "Content-Type": "application/json" },
+          method: "POST", headers: { "Content-Type": "application/json", "Accept": "text/event-stream" },
           body: JSON.stringify({ text }), signal,
         });
         if (response.status !== 503 || attempt === 2) break;
@@ -73,7 +86,7 @@ export class StreamPlayer {
         });
       }
       if (!response.ok) throw new Error(`Voz no disponible (${response.status})`);
-      for await (const event of readFrames(response.body)) {
+      for await (const event of readFrames(response.body, response.headers.get('content-type') || '')) {
         signal?.throwIfAborted();
         if (event.done) continue;
         const binary = atob(event.pcm);

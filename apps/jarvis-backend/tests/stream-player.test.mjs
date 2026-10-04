@@ -43,7 +43,7 @@ test('starts playback before final frame and abort stops scheduled sound', async
     controller = c;
     options.signal.addEventListener('abort', () => c.error(options.signal.reason));
     c.enqueue(encoder.encode(pcm));
-  } }) });
+  } }), headers: { get: () => 'application/x-ndjson' } });
   try {
     const abort = new AbortController();
     const playing = new StreamPlayer().play('/voice/stream', 'Hola', { signal: abort.signal });
@@ -57,4 +57,16 @@ test('starts playback before final frame and abort stops scheduled sound', async
     globalThis.fetch = originalFetch;
     delete globalThis.AudioContext;
   }
+});
+
+
+test('decodes real SSE events across chunks and rejects missing event terminators', async () => {
+  const stream = 'data: '+pcm.trim()+'\n\ndata: '+done.trim()+'\n\n';
+  const frames=[];
+  for await (const frame of readFrames(body([stream.slice(0,13),stream.slice(13)]),'text/event-stream')) frames.push(frame);
+  assert.equal(frames.length,2);
+  assert.equal(frames[1].done,true);
+  await assert.rejects(async () => {
+    for await (const _ of readFrames(body(['data: '+done.trim()+'\n']),'text/event-stream')) {}
+  }, /Audio incompleto/);
 });

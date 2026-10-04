@@ -294,6 +294,10 @@ async def synthesize(request: Request):
 async def stream(request: Request):
     data = await payload(request)
     generator = voice.stream_speech(data.get('text'))
+    use_sse = 'text/event-stream' in request.headers.get('accept', '')
+    if use_sse:
+        from jarvis.stream_transport import sse_frames
+        generator = sse_frames(generator)
     try:
         first = await run_in_threadpool(lambda: next(generator,None))
         if not first: raise voice.VoiceUnavailable('empty speech stream')
@@ -308,8 +312,8 @@ async def stream(request: Request):
                 current = await run_in_threadpool(lambda: next(generator,None))
         finally:
             generator.close()
-    return StreamingResponse(chunks(),media_type='application/x-ndjson',
-                             headers={'Cache-Control':'no-store','X-Accel-Buffering':'no'})
+    return StreamingResponse(chunks(),media_type='text/event-stream' if use_sse else 'application/x-ndjson',
+                             headers={'Cache-Control':'no-store, no-transform','X-Accel-Buffering':'no','Vary':'Accept'})
 
 
 @app.get('/whatsapp/status')

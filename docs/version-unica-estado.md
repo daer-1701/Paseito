@@ -33,6 +33,8 @@ controles de ensayo no configura proveedores ni valida los precios de ejemplo.
 
 Evidencia reciente y límites: [Cierre comprobado en la torre](entregables/cierre-verificado.md).
 
+Despliegue público y comandos: [Presentación por HTTPS](despliegue-presentacion.md).
+
 El PDF exige para Jarvis informar sobre negocios, horarios, productos, servicios,
 promociones, eventos, ubicación y recomendaciones (4.6, p. 6). Integración con
 Points/PaseoYa y navegación interna figuran como adicionales (4.10, p. 7).
