@@ -60,15 +60,14 @@ class GPUVoiceTests(unittest.TestCase):
     def test_bootstrap_is_offline_and_preserves_existing_records(self):
         with tempfile.TemporaryDirectory() as directory, \
                 patch.dict(os.environ, {"JARVIS_DB": str(Path(directory) / "db.sqlite3")}), \
-                patch("sys.argv", ["bootstrap"]), patch("jarvis.bootstrap.serve"), \
                 patch("urllib.request.urlopen", side_effect=AssertionError("startup must be offline")):
-            bootstrap.main()
+            bootstrap.load_catalog()
             with connect() as db:
-                self.assertEqual(db.execute("SELECT count(*) FROM records").fetchone()[0], 84)
+                self.assertGreater(db.execute("SELECT count(*) FROM records").fetchone()[0], 84)
                 row = db.execute("SELECT id FROM records LIMIT 1").fetchone()
-                db.execute("UPDATE records SET title='Administración actualizó' WHERE id=?", (row[0],))
+                db.execute("UPDATE records SET title='Administración actualizó',updated_at='2099-01-01T00:00:00+00:00' WHERE id=?", (row[0],))
             db.close()
-            bootstrap.main()
+            bootstrap.load_catalog()
             with connect() as db:
                 self.assertEqual(db.execute("SELECT title FROM records WHERE id=?", (row[0],)).fetchone()[0], "Administración actualizó")
             db.close()

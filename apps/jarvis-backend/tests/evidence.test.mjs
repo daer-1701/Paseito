@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { tarjetasDeEvidencia, clavePiso } from '../web/kiosk/js/evidence.mjs';
+import { tarjetasDeEvidencia, clavePiso } from '../../../frontend/js/evidence.mjs';
 
 test('maps every knowledge type and preserves unknown/zero prices', () => {
   const cards = tarjetasDeEvidencia(['venue', 'product', 'promotion', 'event', 'faq'].map(kind => ({

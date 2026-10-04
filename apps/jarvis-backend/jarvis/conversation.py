@@ -189,13 +189,16 @@ def shopping_dialogue(db, message, mode, preferences, previous_ids):
     if not prepared:
         return response('¿Qué te gustaría encontrar: ropa, juguetes, comida o tecnología?', stage='clarify')
     products = catalog_prices(db, search(db, prepared, kinds={'product'}, limit=10000), budget)
-    if 'comida' in useful:
+    cuisine = useful & {'mexicana', 'japonesa', 'criolla', 'espanola', 'turca'}
+    if 'comida' in useful and not cuisine:
         products = [r for r in catalog_prices(db, search(db, '', kinds={'product'}, browse=True, limit=10000), budget)
                     if r['attributes'].get('category') in FOOD]
     else:
         exact = [r for r in products if useful & tokens(product_name(r))]
         if exact:
             products = exact
+    if cuisine:
+        products = [r for r in products if cuisine & tokens(r['text'] + ' ' + str(r['attributes']))]
     excluded = set()
     for match in re.finditer(r'\b(?:sin|no quiero|excepto)\s+(\w+)', raw):
         excluded.add(ALIASES.get(match.group(1), match.group(1)))
@@ -209,6 +212,14 @@ def shopping_dialogue(db, message, mode, preferences, previous_ids):
             grouped.setdefault(vid, []).append(product)
     chosen = list(grouped)[:3]
     if not chosen:
+        # A sourced shop remains useful even when no product menu is available.
+        options = search(db, prepared, kinds={'venue'}, limit=3)
+        if options:
+            preferences.update(offered_venues=[r['id'] for r in options], shop_topic=prepared)
+            from .knowledge import facts
+            return response('Puedes consultar ' + '; '.join(facts(r) for r in options) +
+                            ' No tengo productos con precio ni stock confirmados para esta búsqueda.', options,
+                            suggestions=[r['title'] for r in options])
         return response('No encontré una opción que coincida' + (f' por hasta Bs {budget:g}' if budget is not None else '') + '. ¿Probamos otro producto o cambiamos el presupuesto?', stage='clarify')
     preferences.update(offered_venues=chosen, shop_topic=prepared, catalog_page=0)
     preferences.pop('selected_venue', None)

@@ -3,7 +3,7 @@
 ## 1. Clonar la rama
 
 ```powershell
-git clone --branch feat/etapa3-limpieza https://github.com/daer-1701/Paseito.git
+git clone --branch main https://github.com/daer-1701/Paseito.git
 cd Paseito
 Copy-Item .env.example .env
 ```
@@ -12,6 +12,13 @@ Si ya existe `.env`, conservarlo. La aplicación lee solamente el `.env` de la r
 variables del proceso tienen prioridad. Tras cambiarlo, recrear el contenedor.
 
 ## 2. Preparar token y modo de presentación (PowerShell)
+
+El bloque siguiente habilita el catálogo de ejemplo y los respaldos de ensayo.
+Para usar solo productos documentados, poner `JARVIS_DEMO_CATALOG=0`: las búsquedas
+excluyen los registros sintéticos sin borrarlos y no añaden horarios de ejemplo.
+En ese modo también se deshabilitan los endpoints de demo de WhatsApp y las pruebas
+manuales de Points/mirada que dependen de esa bandera; las integraciones reales
+requieren sus respectivas credenciales.
 
 No imprimir el token ni enviarlo por chat. Este bloque funciona en Windows PowerShell:
 

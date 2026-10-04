@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
-const source = await readFile(new URL('../web/kiosk/js/stream-player.js', import.meta.url), 'utf8');
+const source = await readFile(new URL('../../../frontend/js/stream-player.js', import.meta.url), 'utf8');
 const { readFrames, StreamPlayer } = await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
 const pcm = JSON.stringify({ pcm: 'AAAAAA==', sample_rate: 24000 }) + '\n';
 const done = '{"done":true}\n';

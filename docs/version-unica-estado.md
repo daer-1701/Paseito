@@ -9,7 +9,7 @@ con las fases 1–3 integradas y el diseño definitivo de smm222-cyber activo.
 |---|---|
 | API | FastAPI único en backend/app/main.py |
 | Datos | SQLite versionado, 1801 registros cargados; catálogo, precios y promociones de demo con procedencia |
-| IA | OpenAI Responses y respaldo local; clave ausente en la torre actual |
+| IA | OpenAI Responses y respaldo local; clave cargada en la torre, respuesta real con herramientas comprobada |
 | UX | Kiosco responsive, diseño definitivo de smm222-cyber (PR #4/#5): modelos GLB, árboles, suelo, iluminación horaria y desenfoque; dependencias Three.js locales y resolución adaptativa. Conserva visemas, QR, conversación, 20 imágenes y 120 productos incorporados |
 | Voz | Whisper/Kokoro GPU con streaming, cancelación y respaldo del navegador; GPU lista |
 | WhatsApp | Demo local y conector Twilio con firma y deduplicación; entrega real pendiente |
@@ -30,6 +30,8 @@ OpenAI, Points y WhatsApp requieren sus respectivas conexiones reales: ocultar
 controles de ensayo no configura proveedores ni valida los precios de ejemplo.
 
 ## Requisitos e integraciones
+
+Evidencia reciente y límites: [Cierre comprobado en la torre](entregables/cierre-verificado.md).
 
 El PDF exige para Jarvis informar sobre negocios, horarios, productos, servicios,
 promociones, eventos, ubicación y recomendaciones (4.6, p. 6). Integración con

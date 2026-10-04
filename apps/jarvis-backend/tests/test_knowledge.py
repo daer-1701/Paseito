@@ -3,13 +3,17 @@ import unittest
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from jarvis.store import connect, upsert, search, validate_record
-from jarvis.agent import chat
+from jarvis.orchestrator import chat
+from unittest.mock import patch
 from jarvis.knowledge import schedule_status
 from jarvis.context import opening_status, BOLIVIA
 
 
 class KnowledgeTests(unittest.TestCase):
     def setUp(self):
+        self.provider = patch.dict('os.environ', {'OPENAI_API_KEY': ''})
+        self.provider.start()
+        self.addCleanup(self.provider.stop)
         self.tmp = tempfile.TemporaryDirectory()
         self.db = connect(Path(self.tmp.name) / 'test.sqlite3')
         self.now = datetime.now(timezone.utc)
@@ -59,10 +63,12 @@ class KnowledgeTests(unittest.TestCase):
         self.assertIn('precio ni stock confirmados', result['answer'])
 
     def test_known_zero_price_and_unknown_stock(self):
+        upsert(self.db, self.record())
         upsert(self.db, self.record('product', attributes={'venue_id': 'venue:test', 'price_bs': 0}))
-        result = chat(self.db, 'precio café')
+        result = chat(self.db, 'Muéstrame el catálogo de Café Norte')
         self.assertIn('Bs 0', result['answer'])
-        self.assertIn('Stock no confirmado', result['answer'])
+        stock = chat(self.db, '¿Hay stock?', result['session_id'])
+        self.assertIn('no consulto existencias', stock['answer'])
 
     def test_tenant_without_hours_is_explicit(self):
         upsert(self.db, self.record(title='Crocs'))
@@ -107,12 +113,13 @@ class KnowledgeTests(unittest.TestCase):
         self.assertEqual({r['id'] for r in result['sources']}, {'venue:coffee', 'venue:shirt'})
 
     def test_budget_excludes_unknown_and_expensive_products(self):
+        upsert(self.db, self.record())
         for label, price in [('cheap', 30), ('expensive', 150), ('unknown', None)]:
             attrs = {'venue_id': 'venue:test'}
             if price is not None:
                 attrs['price_bs'] = price
             upsert(self.db, self.record('product', id='product:' + label, attributes=attrs))
-        result = chat(self.db, 'Comprar café hasta 50 Bs')
+        result = chat(self.db, 'Muéstrame el catálogo de Café Norte hasta 50 Bs')
         self.assertEqual([r['id'] for r in result['sources']], ['product:cheap'])
 
     def test_invalid_typed_attributes_fail_validation(self):
@@ -120,6 +127,29 @@ class KnowledgeTests(unittest.TestCase):
                       {'hours': {'special': []}}, {'hours': {'0': [['25:00', '22:00']]}}):
             with self.subTest(attrs=attrs), self.assertRaises(ValueError):
                 validate_record(self.record(attributes=attrs))
+
+    def test_specific_cuisine_is_not_replaced_by_generic_food(self):
+        upsert(self.db, self.record(id='venue:mexican', title='Chipotle', text='comida mexicana'))
+        upsert(self.db, self.record(id='venue:pizza', title='Pizza', text='pizza'))
+        upsert(self.db, self.record('product', id='product:tacos', title='Tacos', text='comida mexicana',
+                                   attributes={'venue_id':'venue:mexican', 'category':'gastronomía', 'price_bs':50}))
+        upsert(self.db, self.record('product', id='product:pizza', title='Pizza', text='pizza comida',
+                                   attributes={'venue_id':'venue:pizza', 'category':'pizza', 'price_bs':40}))
+        result = chat(self.db, 'Busco comida mexicana')
+        self.assertEqual([r['id'] for r in result['sources']], ['venue:mexican'])
+
+    def test_demo_flag_filters_examples_without_removing_sourced_catalogue(self):
+        upsert(self.db, self.record('product', id='product:documented',
+                                   attributes={'venue_id':'venue:test', 'price_bs':50,
+                                               'data_origin':'companion_reported_menu'}))
+        upsert(self.db, self.record('product', id='product:example',
+                                   attributes={'venue_id':'venue:test', 'price_bs':40,
+                                               'data_origin':'synthetic_demo'}))
+        with patch.dict('os.environ', {'JARVIS_DEMO_CATALOG':'0'}):
+            self.assertEqual([r['id'] for r in search(self.db, '', kinds={'product'}, browse=True)],
+                             ['product:documented'])
+        with patch.dict('os.environ', {'JARVIS_DEMO_CATALOG':'1'}):
+            self.assertEqual(len(search(self.db, '', kinds={'product'}, browse=True)), 2)
 
 
 if __name__ == '__main__':
