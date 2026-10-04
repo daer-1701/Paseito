@@ -9,14 +9,21 @@ export function installCouponReader({api, onOpen, onResult, onError, sessionId})
     <p role="status" aria-live="polite" data-status>Elige cámara o escribe el código del cupón.</p>
     <button type="button" data-camera>📷 Abrir cámara</button>
     <form><label for="coupon-code">Código del cupón o texto del QR</label><input id="coupon-code" maxlength="500" autocomplete="off" spellcheck="false" required placeholder="ABCDE-12345"><button type="submit">Consultar cupón</button></form>
-    <button type="button" data-demo hidden>Ver ejemplo local</button><small>El ejemplo no se puede canjear. Tu QR no se envía al modelo de conversación.</small>`;
+    <button type="button" data-demo hidden>Ver ejemplo local</button><button type="button" data-demo-identity hidden>Probar identidad de demo</button><small>El ejemplo no se puede canjear. Tu QR no se envía al modelo. La identidad se cierra tras 90 segundos sin actividad o al reiniciar.</small>`;
   document.body.append(dialog);
   const status=dialog.querySelector('[data-status]'), video=dialog.querySelector('video');
   const camera=dialog.querySelector('[data-camera]'), form=dialog.querySelector('form');
   const input=dialog.querySelector('input'), demo=dialog.querySelector('[data-demo]');
   let generation=0, stream=null, controller=null, frame=0, jsqr=null;
   const stopCamera=()=>{cancelAnimationFrame(frame);stream?.getTracks().forEach(t=>t.stop());stream=null;video.srcObject=null;video.hidden=true;camera.disabled=false;};
-  const close=()=>{generation++;controller?.abort();controller=null;stopCamera();input.value='';form.querySelector('button').disabled=false;if(dialog.open)dialog.close();};
+  const close=()=>{
+    generation++;
+    if(controller){
+      controller.abort();
+      navigator.sendBeacon(`${api}/points/session/end`,new Blob([JSON.stringify({session_id:sessionId()})],{type:'application/json'}));
+    }
+    controller=null;stopCamera();input.value='';form.querySelector('button').disabled=false;if(dialog.open)dialog.close();
+  };
   dialog.querySelector('[data-close]').onclick=close;
   dialog.addEventListener('cancel',e=>{e.preventDefault();close();});
   dialog.addEventListener('close',()=>{if(stream||controller)close();});
@@ -31,14 +38,15 @@ export function installCouponReader({api, onOpen, onResult, onError, sessionId})
       const data=await r.json();
       if(current!==generation || controller!==abort)return;
       if(!r.ok||data.error)throw new Error(data.error||data.detail||'No pude consultar el cupón.');
-      close();await onResult(data);
+      controller=null;close();await onResult(data);
     } catch(e) {
       if(current!==generation || controller!==abort)return;
-      status.textContent=abort.signal.aborted?'Points tardó en responder. Intenta otra vez o abre el ejemplo local.':e.message;
+      status.textContent=abort.signal.aborted?'Points tardó en responder al primer intento. Continúa desde la web de Paseo Points.':e.message;
     } finally {clearTimeout(timeout);if(controller===abort){controller=null;form.querySelector('button').disabled=false;}}
   }
   form.onsubmit=e=>{e.preventDefault();verify(input.value.trim());};
   demo.onclick=()=>verify('DEMO-PASEITO');
+  dialog.querySelector('[data-demo-identity]').onclick=()=>verify('DEMO-PUNTOS');
   camera.onclick=async()=>{
     const current=generation;camera.disabled=true;status.textContent='Abriendo cámara…';
     try {
@@ -69,6 +77,6 @@ export function installCouponReader({api, onOpen, onResult, onError, sessionId})
   };
   return {close,async open(){close();onOpen();dialog.showModal();status.textContent='Elige cámara o escribe el código del cupón.';
     const current=generation;
-    try{const r=await fetch(`${api}/cupones/status`);const data=await r.json();if(current===generation)demo.hidden=!data.demo_enabled;}catch{if(current===generation)onError('No pude consultar el estado del lector.');}
+    try{const r=await fetch(`${api}/cupones/status`);const data=await r.json();if(current===generation){demo.hidden=!data.demo_enabled;dialog.querySelector('[data-demo-identity]').hidden=!data.demo_enabled;}}catch{if(current===generation)onError('No pude consultar el estado del lector.');}
   }};
 }

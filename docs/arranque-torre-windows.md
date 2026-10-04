@@ -184,3 +184,7 @@ de imágenes después de certificar una combinación en la torre.
 Referencias: [Kokoro oficial](https://github.com/hexgrad/kokoro),
 [faster-whisper](https://github.com/SYSTRAN/faster-whisper),
 [GPU en Docker Compose](https://docs.docker.com/compose/how-tos/gpu-support/).
+
+## Points temporal: etapa 2
+
+El flujo de QR, saldo temporal, vencimiento y configuración real está en [etapa2-points-sesion](entregables/etapa2-points-sesion.md). La demo se abre con Lee mi QR → Probar identidad de demo. El acceso vence tras 90 segundos sin consultas y requiere validar otra vez. Mantener un worker. Con proxy HTTPS configurar PASEITO_COOKIE_SECURE=1.

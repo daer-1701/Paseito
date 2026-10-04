@@ -62,20 +62,10 @@ def facts(record):
         details.extend([f"{start:%d/%m/%Y %H:%M}, en {a['location']}.", a["description"]])
     elif record["kind"] == "faq":
         details.append(a.get("answer", "Consulta la fuente publicada para más detalles."))
-    location = []
-    for field, label in (("tower", "torre"), ("floor", "piso"), ("unit", "local"), ("area", "sector")):
-        if a.get(field):
-            value = str(a[field])
-            if field == 'floor' and ('piso' in value.lower() or value.lower() == 'planta baja' or 'sótano' in value.lower()):
-                location.append(value.lower())
-            elif field == 'unit' and value.lower().startswith('oficina '):
-                location.append(value)
-            else:
-                location.append(f"{label} {value}")
-    if location:
-        details.append("Ubicación: " + ", ".join(location) + ".")
-    if a.get("reference") and a.get('data_origin') != 'synthetic_demo':
-        details.append(f"Referencia: {a['reference']}.")
+    from .orientation import location_text
+    orientation=location_text(a)
+    if orientation:
+        details.append('Para ubicarte: '+orientation+'.')
     return f"{record['title']}: " + " ".join(details)
 
 

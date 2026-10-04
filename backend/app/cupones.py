@@ -1,7 +1,7 @@
 """Coupon reader adapted from daer-1701's 6a28f76 to the unified Points reader.
 
 Only queries. Raw QR tokens, customer names and balances never enter the LLM.
-The customer QR validates identity for this request, not for later chat turns.
+The caller binds validated identity to a short-lived conversation capability.
 """
 import base64
 import hashlib
@@ -10,6 +10,7 @@ import json
 import os
 import re
 import time
+import math
 import urllib.error
 import urllib.request
 from urllib.parse import urlparse
@@ -55,7 +56,7 @@ def cliente_del_qr(text):
                 raw = response.read(65537)
                 if len(raw)>65536: return None, QR_NO_VALIDO
                 user = json.loads(raw)['userId']
-                if isinstance(user,bool) or int(user)<=0: return None, QR_NO_VALIDO
+                if isinstance(user,bool) or not str(user).isdigit() or int(user)<=0: return None, QR_NO_VALIDO
                 return int(user), None
         except urllib.error.HTTPError as exc:
             return None, QR_VENCIDO if exc.code==410 else QR_NO_VALIDO
@@ -68,7 +69,7 @@ def cliente_del_qr(text):
             if not hmac.compare_digest(expected, _b64(signature)): return None, QR_NO_VALIDO
             payload = json.loads(_b64(data))
             user, expires = payload['u'], float(payload['exp'])/1000
-            if isinstance(user,bool) or int(user)<=0: return None, QR_NO_VALIDO
+            if isinstance(user,bool) or not str(user).isdigit() or int(user)<=0 or not math.isfinite(expires): return None, QR_NO_VALIDO
             if expires<=time.time(): return None, QR_VENCIDO
             return int(user), None
         except (ValueError,KeyError,TypeError,OverflowError):
@@ -93,6 +94,8 @@ def _respuesta(cards, mode, demo=False):
         c=cards[0]
         answer=f"Tu cupón de {c['titulo']} está {c['estado']}. Se utiliza en {c['nombre']}."
     answer += ' El canje se realiza en Paseo Points o en el comercio.'
+    if mode=='cupon' and not demo:
+        answer += ' Para ver otros cupones, usa tu QR de cliente o la web de Paseo Points.'
     return {'modo':mode,'resultados':cards,'vigentes':valid,'respuesta':answer,'demo':demo,'read_only':True}
 
 
@@ -106,6 +109,9 @@ def verificar(text):
     if not isinstance(text,str) or not 1<=len(text.strip())<=500:
         raise ValueError('El código debe tener entre 1 y 500 caracteres')
     text=text.strip()
+    if text=='DEMO-PUNTOS' and status()['demo_enabled']:
+        return {'modo':'cliente','resultados':[],'respuesta':'Identidad de ejemplo activada para esta conversación. Puedes preguntar cuántos puntos tienes.',
+            'demo':True,'read_only':True,'_verified_demo':True}
     if text=='DEMO-PASEITO' and status()['demo_enabled']:
         card={'id':'cupon-demo','tipo':'cupon','titulo':'10 % de descuento en pizza familiar',
             'detalle':'Ejemplo de lectura; no se puede canjear.','estado':'vigente',
@@ -115,16 +121,16 @@ def verificar(text):
         result['respuesta']='Te muestro un ejemplo de cupón: 10 % de descuento en pizza familiar. Esta lectura es de demostración y no permite canjear.'
         return result
     user, problem=cliente_del_qr(text)
-    if problem: return {'error':problem,'resultados':[],'read_only':True}
+    if problem: return {'error':problem+' Puedes continuar desde la web de Paseo Points.','resultados':[],'read_only':True}
     if not puntos.configurado():
-        return {'error':'Paseo Points no está conectado en este kiosco. Puedes revisar el ejemplo local.','resultados':[],'read_only':True}
+        return {'error':'Paseo Points no está conectado en este kiosco. Consulta desde la web de Paseo Points o revisa el ejemplo local.','resultados':[],'read_only':True}
     code=CODIGO_CUPON.search(text)
     if user is None and not code:
         return {'error':'Ese QR no es de Paseo Points. Usa el QR de cliente o de un cupón de la app.','resultados':[],'read_only':True}
     def read(cursor):
         if user is not None:
-            cursor.execute("SELECT id FROM User WHERE id=%s AND status='ACTIVE' AND deletedAt IS NULL",(user,))
-            if not cursor.fetchone():return []
+            cursor.execute("SELECT id FROM User WHERE id=%s AND role='CUSTOMER' AND status='ACTIVE' AND deletedAt IS NULL",(user,))
+            if not cursor.fetchone():return None
             cursor.execute(CONSULTA+" WHERE r.userId=%s ORDER BY (r.status='PENDING') DESC, r.createdAt DESC LIMIT 20",(user,))
             return cursor.fetchall()
         cursor.execute(CONSULTA+' WHERE r.verificationToken=%s',(code.group(0).upper(),))
@@ -132,7 +138,10 @@ def verificar(text):
         return [row] if row else []
     try: rows=puntos._consultar(read)
     except pymysql.MySQLError:
-        return {'error':puntos.NO_DISPONIBLE,'resultados':[],'read_only':True}
-    if not rows:
+        return {'error':puntos.NO_DISPONIBLE+' Hice un intento; consulta desde la web de Paseo Points.','resultados':[],'read_only':True}
+    if rows is None or not rows and user is None:
         return {'error':'No encuentro cupones para ese QR o código en Paseo Points.','resultados':[],'read_only':True}
-    return _respuesta([_tarjeta(r) for r in rows],'cliente' if user is not None else 'cupon')
+    result=_respuesta([_tarjeta(r) for r in rows],'cliente' if user is not None else 'cupon')
+    if user is not None:result['_verified_user_id']=user
+    result['personal']=True
+    return result

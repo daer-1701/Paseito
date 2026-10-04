@@ -34,6 +34,10 @@ se requiere autenticación verificada en Paseo Points. Sus herramientas son púb
 No repitas etiquetas de procedencia ni avisos de demo en cada frase; ya están en la interfaz.
 No saludes en cada turno ni fuerces modismos. No uses Markdown.'''
 PROMPT += '''
+Al orientar, usa el contexto Para ubicarte de las herramientas: piso, sector,
+torre, local y referencia publicada. Conecta esos datos en una frase natural que
+ayude a imaginar el lugar. No afirmes cercanía, tiempos caminando, giros ni
+ascensores sin un mapa validado. El kiosco destaca pisos y entrega una ficha por QR.
 Trato de tú, cercano y respetuoso, con identidad cochabambina. Reacciona con naturalidad
 solo cuando aporte; evita repetir tu nombre o frases como "Cabe destacar" o "Con gusto".
 Di horas y números como se pronuncian; normaliza las mayúsculas de nombres de tiendas.
@@ -153,9 +157,12 @@ def _multi(db, message, session_id, allow_external):
 def _points(db, result, message):
     # Enforced before LLM. A raw phone/email never proves ownership.
     words = tokens(message)
+    if words & {'canjea','canjear','canjeame','transferir','transfiere','gastar','gasta','pagar','paga'}:
+        result['answer']='Aquí puedo consultar Points. Para canjear, pagar o mover puntos, hazlo desde la web de Paseo Points o en el comercio.'
+        return result
     personal = bool(words & {'saldo','tengo','mis','acumulado','acumulados','cuenta'} or 'mi' in message.lower().split() and words & {'nivel','estatus'})
     if personal:
-        result['answer'] = 'Para ver tu saldo debes iniciar sesión en Paseo Points. Aquí puedo mostrarte el programa público, sus recompensas y misiones.'
+        result['answer'] = 'Para ver tu saldo valida tu QR de cliente con Lee mi QR en el kiosco, o consulta desde la web de Paseo Points. Aquí puedo mostrarte el programa público.'
         return result
     from app import puntos
     theme = next((s for s in puntos.TEMAS[1:] if s in tokens(message)), 'todo')

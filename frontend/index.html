@@ -7,6 +7,8 @@
 <title>Paseito · Paseo Aranjuez</title>
 <script type="importmap">{ "imports": { "three": "/kiosk/vendor/three/three.module.js" } }</script>
 <style>
+  .points-session-state { position:fixed;z-index:4;bottom:100px;left:50%;transform:translateX(-50%);padding:10px 16px;border:1px solid var(--oro);border-radius:20px;background:#2b1223;color:var(--crema);font-size:.8rem; }
+  .points-session-state[hidden] { display:none; }
   .icono img { width:100%;height:100%;object-fit:cover;border-radius:inherit; }
   #leer-qr { flex:none;width:44px;height:44px;border:1px solid var(--borde);border-radius:12px;background:var(--vino-oscuro);font-size:1.25rem; }
   .coupon-reader { width:min(94vw,540px);max-height:90dvh;overflow:auto;background:#2b1223;color:#fffaf0;border:1px solid #e7b73a;border-radius:20px;padding:22px;box-shadow:0 20px 70px #0008; }
@@ -338,6 +340,8 @@ let inputGeneration = 0;
 let cancelCapture = () => {};
 let recognitionGeneration = 0;
 let couponReader = null;
+let pointsSession = null;
+let privateDisplayed = false;
 
 const $ = (id) => document.getElementById(id);
 let avatar;
@@ -487,6 +491,7 @@ function tarjetaHtml(t, n) {
   if (t.tipo === "recompensa") { titulo = t.titulo; detalle = t.detalle || t.nombre || ""; chips.push(`<span class="chip">${escapar(t.costo_puntos)} puntos</span>`); if (t.nivel_minimo) chips.push(`<span class="chip">Desde ${escapar(t.nivel_minimo)}</span>`); }
   if (t.tipo === "mision") { detalle = t.descripcion || ""; chips.push(`<span class="chip">+${escapar(t.puntos)} puntos</span>`); }
   if (t.tipo === "nivel") detalle = `Multiplicador ×${t.multiplicador} · desde ${t.estatus_minimo} de estatus`;
+  if (t.tipo === 'puntos') { titulo=t.demo?'Saldo de ejemplo':'Tu saldo de Points';detalle=`${t.saldo} puntos${t.nivel ? ' · Nivel '+t.nivel : ''}`;chips.push('<span class="chip">Solo durante esta conversación</span>'); }
   if (t.tipo === "cupon") { titulo=t.titulo;detalle=`${t.detalle || ""} · ${t.nombre || "Paseo Points"}`;chips.push(`<span class="chip">${escapar(t.estado)}</span>`);if(t.puntos_usados!=null)chips.push(`<span class="chip">${escapar(t.puntos_usados)} puntos utilizados</span>`); }
   if (t.tipo === "evento" && t.puntos) chips.push(`<span class="chip">+${escapar(t.puntos)} puntos</span>`);
   if (t.tipo === "promocion" && t.vigente_hasta) detalle = t.descripcion || "";
@@ -559,7 +564,7 @@ function abrirGuia(destino) {
   const local = ubicacion.local ? `local ${ubicacion.local}` : "el destino señalado";
   const pasos = [
     ["Punto de partida", puntoKiosco],
-    ["Ubicación publicada", `Destino en ${pisoTexto}. No tengo un recorrido interior validado.`],
+    ["Te ubico en el Paseo", `Está en ${pisoTexto}${ubicacion.sector ? ', sector '+ubicacion.sector : ''}${ubicacion.torre ? ', torre '+ubicacion.torre : ''}. Ese es el piso destacado en la pantalla.`],
     ["Referencia", `${ubicacion.local ? "Busca " + local : "Número de local pendiente"}: ${destino.nombre}.${ubicacion.referencia ? " " + ubicacion.referencia : ""}`],
   ];
   $("guia-destino").textContent = destino.nombre;
@@ -581,7 +586,7 @@ function abrirGuia(destino) {
   $("guia").classList.add("activa");
   marcarPisos(cuentasPisos, piso);
   avatar.gesto("presentar", 2400);
-  hablar(`Te acompaño a ${destino.nombre}. Ve al ${pisoTexto}${ubicacion.local ? `, local ${ubicacion.local}` : ""}.`);
+  hablar(`Te ubico: ${destino.nombre} está en ${pisoTexto}${ubicacion.sector ? ', sector '+ubicacion.sector : ''}${ubicacion.local ? `, local ${ubicacion.local}` : ""}. Puedes llevarte su ficha con el QR. Para llegar desde tu posición, sigue la señalización del Paseo.`);
 }
 
 $("cerrar-guia").onclick = () => { $("guia").classList.remove("activa"); marcarPisos(cuentasPisos); };
@@ -787,6 +792,9 @@ async function preguntar(texto) {
     if (!r.ok) throw new Error(datos.error || r.status);
     chatAbort = null;
     sessionId = datos.session_id;
+    pointsSession?.update(datos.points_session);
+    privateDisplayed=!!datos.personal;
+    if(privateDisplayed)pointsSession?.markPrivate();
     avatar.gesto("normal");
     avatar.asentir?.();
     estado("", "normal");
@@ -806,6 +814,7 @@ async function preguntar(texto) {
       $("sugerencias").innerHTML = datos.suggestions.slice(0, 5).map(text => `<button data-p="${escapar(text)}">${escapar(text)}</button>`).join("");
     }
     if (datos.intent === "navigation" && tarjetas[0]?.ubicacion?.piso) abrirGuia(tarjetas[0]);
+    else if(datos.personal) pintarSubtitulo([datos.answer]);
     else await hablar(datos.answer, { presentar: tarjetas.length > 0 });
   } catch (error) {
     clearTimeout(waitTimer);
@@ -824,6 +833,7 @@ $("enviar").onclick = () => { preguntar($("texto").value); $("texto").value = ""
 $("texto").onkeydown = (e) => { if (e.key === "Enter") $("enviar").click(); };
 
 async function reiniciar() {
+  pointsSession?.clear();privateDisplayed=false;
   callar();
   if (sessionId) fetch(`${API}/chat/${sessionId}`, { method: "DELETE" }).catch(() => {});
   sessionId = crypto.randomUUID();
@@ -1082,12 +1092,24 @@ addEventListener("keydown", (e) => {
   if (e.code === "Space" && document.activeElement !== $("texto")) { e.preventDefault(); alternar(); }
 });
 const {installCouponReader}=await import('/kiosk/js/coupon-reader.js');
+const {installPointsSession}=await import('/kiosk/js/points-session.js');
+pointsSession=installPointsSession({sessionId:()=>sessionId,onExpire:()=>{
+  callar();
+  if(!privateDisplayed)return;
+  privateDisplayed=false;tarjetasActuales=[];cuentasPisos={};
+  $('tarjetas').replaceChildren();$('contexto').replaceChildren();$('cuenta-resultados').textContent='';
+  $('guia').classList.remove('activa');marcarPisos({});oyente('');
+  pintarSubtitulo(['La consulta personal terminó por privacidad. Valida tu QR nuevamente para ver tus puntos.']);
+}});
 couponReader=installCouponReader({api:API,sessionId:()=>sessionId,onOpen:()=>{
-  callar();ultimaActividad=Date.now();if(enBienvenida)salirBienvenida(false);
+  if(privateDisplayed){tarjetasActuales=[];cuentasPisos={};$('tarjetas').replaceChildren();$('contexto').replaceChildren();$('cuenta-resultados').textContent='';$('guia').classList.remove('activa');marcarPisos({});oyente('');pintarSubtitulo(['Valida tu QR para consultar Points.']);privateDisplayed=false;}
+  pointsSession.clear();callar();ultimaActividad=Date.now();if(enBienvenida)salirBienvenida(false);
 },onError:aviso,onResult:async(data)=>{
   callar();ultimaActividad=Date.now();oyente('Mis cupones');
+  pointsSession.update(data.points_session);privateDisplayed=!!data.personal;
+  if(privateDisplayed)pointsSession.markPrivate();
   pintarSubtitulo([data.respuesta]);mostrarTarjetas(data.resultados || []);
-  cambiarVista('resultados');await hablar(data.respuesta,{presentar:true});
+  cambiarVista('resultados');if(!data.personal)await hablar(data.respuesta,{presentar:true});
 }});
 $('leer-qr').onclick=()=>couponReader.open();
 </script>

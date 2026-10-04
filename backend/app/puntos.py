@@ -12,6 +12,8 @@ from pathlib import Path
 import re
 import threading
 import time
+import queue
+from contextlib import contextmanager
 from datetime import datetime, timezone
 from typing import Callable
 from urllib.parse import unquote, urlparse
@@ -34,6 +36,7 @@ _cache: dict[str, tuple[float, dict]] = {}
 # Una sola conexión reutilizada: abrir una nueva hacia Aiven cuesta 1-4 s y a veces se pierde.
 _con = None
 _candado = threading.Lock()
+_reads = threading.BoundedSemaphore(8)
 
 
 def configurado() -> bool:
@@ -54,15 +57,15 @@ def _conectar():
 
 
 def _consultar(funcion: Callable):
-    """Ejecuta funcion(cursor) sobre la conexión compartida; si se cayó, reconecta y reintenta."""
+    """Ejecuta funcion(cursor) sobre la conexión compartida; un intento; si falla, descarta la conexión."""
     global _con
-    with _candado:
+    with _acceso_unico():
         for intento in range(INTENTOS):
             try:
                 if _con is None:
                     _con = _conectar()
                 else:
-                    _con.ping(reconnect=True)
+                    _con.ping(reconnect=False)
                 with _con.cursor() as c:
                     return funcion(c)
             except pymysql.err.OperationalError:
@@ -75,6 +78,31 @@ def _consultar(funcion: Callable):
                 if intento == INTENTOS - 1:
                     raise
                 log.warning("Paseo Points no respondió (intento %s); reintentando", intento + 1)
+
+
+@contextmanager
+def _acceso_unico():
+    if not _candado.acquire(timeout=PUNTOS_TIMEOUT_S):
+        raise pymysql.OperationalError(1205,'Points ocupado')
+    try:yield
+    finally:_candado.release()
+
+
+def consulta_limitada(funcion,*args):
+    """One bounded read, no automatic retries. Worker never touches the local DB or grants."""
+    if not _reads.acquire(blocking=False):
+        return {'error':'Points está ocupado. Continúa desde la web de Paseo Points.','resultados':[]}
+    result=queue.Queue(maxsize=1)
+    def run():
+        try:result.put((True,funcion(*args)))
+        except Exception as exc:result.put((False,exc))
+        finally:_reads.release()
+    threading.Thread(target=run,daemon=True,name='points-read').start()
+    try:ok,value=result.get(timeout=8)
+    except queue.Empty:
+        return {'error':'Points tardó en responder al primer intento. Continúa desde la web de Paseo Points.','resultados':[]}
+    if not ok:raise value
+    return value
 
 
 def _vigente(alias: str) -> str:
@@ -257,3 +285,29 @@ def programa_puntos(db, tema: str = "todo") -> dict:
 def mis_puntos(db, celular: str = "", correo: str = "") -> dict:
     """Disabled: personal data requires a verified external identity, not an identifier."""
     return {"error": "Inicia sesión en Paseo Points para consultar tu saldo. La consulta personal aquí está deshabilitada hasta verificar identidad.", "resultados": []}
+
+
+def perfil_validado(user_id, demo=False):
+    """One fresh read for a server-verified identity. Never lookup by phone/email."""
+    if demo:
+        return {'saldo_puntos':160,'nivel':'Plata','demo':True,'personal':True,
+            'respuesta':'En este ejemplo tienes 160 puntos y nivel Plata. Puedes revisar las recompensas del programa.'}
+    if not configurado():
+        return {'error':'Points no está conectado. Consulta tu saldo desde la web de Paseo Points.','personal':True}
+    def read(cursor):
+        cursor.execute("SELECT id FROM User WHERE id=%s AND role='CUSTOMER' AND status='ACTIVE' AND deletedAt IS NULL",(user_id,))
+        if not cursor.fetchone():return None
+        cursor.execute('SELECT COALESCE(SUM(amount),0) AS n FROM PointMovement WHERE userId=%s',(user_id,))
+        balance=int(cursor.fetchone()['n'])
+        cursor.execute('SELECT COALESCE(SUM(amount),0) AS n FROM StatusMovement WHERE userId=%s',(user_id,))
+        status=int(cursor.fetchone()['n'])
+        cursor.execute('SELECT name FROM Tier WHERE isActive=1 AND minimumStatus<=%s ORDER BY minimumStatus DESC LIMIT 1',(status,))
+        level=cursor.fetchone()
+        return {'saldo_puntos':balance,'nivel':level['name'] if level else None,'personal':True,'demo':False}
+    try:data=_consultar(read)
+    except pymysql.MySQLError:
+        return {'error':'Points no respondió al primer intento. Consulta desde la web de Paseo Points.','personal':True}
+    if data is None:
+        return {'error':'No encuentro una cuenta activa para ese QR. Valídalo de nuevo en Paseo Points.','personal':True}
+    data['respuesta']=f"Tienes {data['saldo_puntos']} puntos"+(f" y nivel {data['nivel']}" if data['nivel'] else '')+'. El canje se realiza en la web de Paseo Points o en el comercio.'
+    return data

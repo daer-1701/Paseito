@@ -18,7 +18,7 @@ export function tarjetasDeEvidencia(sources) {
       id: source.id, tipo: tipos[source.kind] || "info", nombre: source.title, titulo: source.title,
       foto: a.image_url || "",
       categoria: a.category || a.scope || a.condition || "Información del Paseo",
-      ubicacion: { piso: a.floor || "", local: a.unit || "", sector: a.area || "", referencia: a.data_origin === 'synthetic_demo' ? '' : a.reference || "" },
+      ubicacion: { piso: a.floor || "", local: a.unit || "", sector: a.area || "", torre: a.tower || "", referencia: a.data_origin === 'synthetic_demo' ? '' : a.reference || "" },
       fuente_url: a.data_origin === "synthetic_demo" ? "/catalog/demo" : /^https?:\/\//.test(source.source_url || "") ? source.source_url : "",
       precio_bs: a.price_bs, stock: a.stock, tienda: { nombre: a.venue_name || a.venue_id || "" },
       descripcion: a.benefit || a.description || "", condiciones: a.terms || "",

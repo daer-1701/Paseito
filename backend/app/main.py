@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'backend'))
 sys.path.insert(0, str(ROOT / 'apps' / 'jarvis-backend'))
 from .config import FRONTEND_DIR, CORS_ORIGINS
-from . import puntos, cupones
+from . import puntos, cupones, identity
 from jarvis.bootstrap import load_catalog
 from jarvis.store import connect, search, upsert, delete
 from jarvis.orchestrator import chat, configured
@@ -92,13 +92,82 @@ def health():
     return {'status':'ok','ok':True,'records':count,'application':'Paseito','api':'fastapi',
             'openai_configured':configured(),'ia_configurada':configured(),
             'model':os.getenv('OPENAI_TEXT_MODEL','gpt-4.1-mini'),'fallback':'local',
-            'paseo_points':puntos.estado(),'personal_points_enabled':False}
+            'paseo_points':puntos.estado(),'personal_points_enabled':puntos.configurado() and cupones.status()['customer_qr_validation'],
+            'personal_points_policy':'QR validado, conversación y credencial temporal; 90 s de inactividad, máximo 10 min'}
 
 
 @app.post('/chat')
 async def conversation(request: Request):
     data = await payload(request)
-    return await run_in_threadpool(with_db,chat,data.get('message') or data.get('mensaje'),data.get('session_id'),channel='web')
+    message=data.get('message') or data.get('mensaje')
+    if not isinstance(message,str) or not 0<len(message.strip())<=2000:
+        raise ValueError('message debe tener entre 1 y 2000 caracteres')
+    session=data.get('session_id')
+    from jarvis.store import tokens
+    words=tokens(message) if isinstance(message,str) else set()
+    raw_qr=bool(re.search(r'PP1\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+',message,re.I))
+    operation=bool(words & {'canjea','canjear','canjeame','transferir','transfiere','gastar','gasta','pagar','paga'})
+    personal=not raw_qr and not operation and bool(words & {'saldo'} or words & {'puntos','nivel','estatus'} and
+        (words & {'tengo','mis','acumulado','acumulados','cuantos'} or re.search(r'\bmi\b',message,re.I)))
+    if personal:
+        return await personal_answer(request,session)
+    result = await run_in_threadpool(with_db,chat,message,session,channel='web')
+    result['points_session']=identity.public(identity.get(request.cookies.get(identity.COOKIE),result['session_id'],touch=True))
+    return JSONResponse(result,headers={'Cache-Control':'no-store'})
+
+
+def _session(value):
+    if not isinstance(value,str) or not 1<=len(value)<=100:raise ValueError('session_id requerido')
+    return value
+
+
+def _cookie(response, request, token):
+    if token:
+        response.set_cookie(identity.COOKIE,token,max_age=identity.MAX_SECONDS,httponly=True,
+            secure=request.url.scheme=='https' or os.getenv('PASEITO_COOKIE_SECURE')=='1',samesite='strict',path='/')
+    else:response.delete_cookie(identity.COOKIE,path='/')
+    return response
+
+
+async def personal_answer(request,session):
+    _session(session)
+    token=request.cookies.get(identity.COOKIE)
+    grant=identity.get(token,session,touch=True)
+    data=await run_in_threadpool(puntos.consulta_limitada,puntos.perfil_validado,grant['user_id'],grant['demo']) if grant else {}
+    active=identity.get(token,session)
+    if not grant or not active or active['grant_id']!=grant['grant_id']:
+        data={'error':'Para consultar tus puntos, valida tu QR de cliente con Lee mi QR. El acceso termina al reiniciar o tras 90 segundos de inactividad.'}
+    answer=data.get('respuesta') or data.get('error')
+    cards=[] if data.get('error') else [{'id':'points-session','tipo':'puntos','nombre':'Tu saldo de Points',
+        'saldo':data['saldo_puntos'],'nivel':data.get('nivel'),'demo':data.get('demo',False),'personal':True}]
+    result={'session_id':session,'answer':answer,'respuesta':answer,'sources':[],'tarjetas':cards,
+        'intent':'loyalty','answer_mode':'points_private' if cards else 'local','personal':True,
+        'points_session':identity.public(active),'suggestions':['Lee mi QR','¿Qué recompensas hay en Paseo Points?']}
+    # Private answers and identifiers never enter turns or analytics.
+    with closing(connect()) as db:
+        analytics.record(db,'Consulta personal de Points mediante identidad temporal',result,'web',0,
+            [{'nombre':'points_personal','argumentos':{},'resultados':len(cards)}])
+    return JSONResponse(result,headers={'Cache-Control':'no-store'})
+
+
+@app.get('/points/session')
+def points_session(request:Request,session_id:str):
+    return JSONResponse(identity.public(identity.get(request.cookies.get(identity.COOKIE),_session(session_id))),headers={'Cache-Control':'no-store'})
+
+
+@app.post('/points/session/touch')
+async def points_touch(request:Request):
+    data=await payload(request)
+    grant=identity.get(request.cookies.get(identity.COOKIE),_session(data.get('session_id')),touch=True)
+    return JSONResponse(identity.public(grant),headers={'Cache-Control':'no-store'})
+
+
+@app.post('/points/session/end')
+async def points_end(request:Request):
+    data=await payload(request)
+    identity.revoke(request.cookies.get(identity.COOKIE),_session(data.get('session_id')))
+    # Revocation is sufficient. Avoid a late logout response deleting a newer cookie.
+    return JSONResponse({'authenticated':False},headers={'Cache-Control':'no-store'})
 
 
 @app.get('/cupones/status')
@@ -114,7 +183,12 @@ async def verify_coupon(request: Request):
     session = data.get('session_id')
     if not isinstance(session,str) or not 1<=len(session)<=100:
         raise ValueError('session_id requerido')
-    result = await run_in_threadpool(cupones.verificar, data.get('codigo'))
+    ticket=identity.begin(session)
+    result = await run_in_threadpool(puntos.consulta_limitada,cupones.verificar, data.get('codigo'))
+    user=result.pop('_verified_user_id',None)
+    demo=result.pop('_verified_demo',False)
+    token=identity.issue(session,ticket,user,demo) if user is not None or demo else None
+    result['points_session']=identity.public(identity.get(token,session))
     with closing(connect()) as db:
         venues = search(db,'',kinds={'venue'},browse=True,limit=1000)
         from jarvis.store import tokens
@@ -134,19 +208,23 @@ async def verify_coupon(request: Request):
             'web',round((time.monotonic()-start)*1000),
             [{'nombre':'verificar_cupon','argumentos':{},'resultados':len(result.get('resultados',[]))}],
             'points_unavailable' if result.get('error') else None)
-    return JSONResponse(result,headers={'Cache-Control':'no-store'})
+    if not identity.current(session,ticket):
+        return JSONResponse({'error':'La conversación cambió. Valida el QR nuevamente.','resultados':[]},headers={'Cache-Control':'no-store'})
+    response=JSONResponse(result,headers={'Cache-Control':'no-store'})
+    return _cookie(response,request,token) if token else response
 
 
 @app.delete('/chat/{session_id}')
-def reset(session_id: str):
+def reset(session_id: str,request:Request):
     if not 1 <= len(session_id) <= 100: raise ValueError('invalid session_id')
+    identity.revoke_session(session_id)
     with closing(connect()) as db:
         for table in ('turns','session_context','session_preferences'):
             db.execute(f'DELETE FROM {table} WHERE session_id=?',(session_id,))
         if db.execute("SELECT 1 FROM sqlite_master WHERE name='stimulus_welcome'").fetchone():
             db.execute('DELETE FROM stimulus_welcome WHERE session_id=?',(session_id,))
         db.commit()
-    return {'deleted':True}
+    return JSONResponse({'deleted':True},headers={'Cache-Control':'no-store'})
 
 
 @app.get('/catalog')
@@ -286,8 +364,10 @@ def points_program(tema: str='todo'):
 
 
 @app.get('/points/personal')
-def points_personal():
-    raise HTTPException(403,'Identidad verificada pendiente. Consulta personal deshabilitada.')
+async def points_personal(request:Request,session_id:str):
+    if not identity.get(request.cookies.get(identity.COOKIE),_session(session_id)):
+        raise HTTPException(403,'Valida tu QR de cliente en esta conversación.')
+    return await personal_answer(request,session_id)
 
 
 @app.get('/admin/quality',dependencies=[Depends(admin)])

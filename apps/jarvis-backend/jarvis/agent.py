@@ -14,6 +14,7 @@ from .knowledge import matching_venues, schedule_status, typed_answer
 from .context import BOLIVIA
 from .store import tokens
 from .conversation import shopping_dialogue, catalog_prices
+from .orientation import location_text
 import re
 
 
@@ -23,13 +24,15 @@ STRICT_RESPONSE_MODE = "strict"
 
 def intent(message: str) -> str:
     from .store import tokens
+    import unicodedata
+    raw=''.join(c for c in unicodedata.normalize('NFKD',message.lower()) if not unicodedata.combining(c))
     words = tokens(message)
     if words & {"puntos", "saldo", "recompensa", "recompensas", "canje"}:
         return "loyalty"
     if words & {"pedido", "orden", "retiro", "reserva", "reservar", "reservame", "pagar", "paga", "compra", "comprame", "canjear"}:
         return "order"
     if (words & {"guiame", "guia", "llegar", "llego", "ruta", "direccion", "direcciones", "ubicacion", "ubicado", "ubicada", "queda", "quedan"}
-            or 'donde' in words and words & {'esta', 'estan', 'encuentra', 'encuentran'}):
+            or re.search(r'\bdonde\s+(?:esta|estan|se encuentra|se encuentran|queda|quedan)\b',raw)):
         return "navigation"
     if words & {"clima", "tiempo", "lluvia", "llueve", "temperatura"}:
         return "weather"
@@ -58,12 +61,9 @@ def navigation_answer(record: dict | None) -> str:
     unit = attrs.get("unit")
     if not floor:
         return f"Encontré {record['title']}, pero no tengo un piso confirmado para guiarte."
-    floor_text = str(floor).strip().lower()
-    location = "planta baja" if floor_text == "planta baja" else (
-        floor_text if "piso" in floor_text else f"piso {floor}")
-    if isinstance(unit, str) and unit.strip():
-        location += f", local {unit}"
-    return f"Te acompaño a {record['title']}. Dirígete al {location}."
+    return (f"Te ubico: {record['title']} está en {location_text(attrs)}. "
+            "En la torre de la pantalla te señalo su piso; puedes llevarte la ficha al teléfono con el QR. "
+            "Para el recorrido desde tu posición, consulta la señalización del Paseo.")
 
 
 def chat(db, message: str, session_id: str | None = None,
