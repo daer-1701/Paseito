@@ -23,6 +23,12 @@ No hay agente Gemini, base alternativa ni segundo servidor activo. Avatar 2D y 3
 son implementaciones usadas: el 2D es respaldo si el navegador no permite el 3D.
 `habla.js` es compartido por ambos y se conserva.
 
+La vista normal no muestra el botón manual de mirada ni una insignia de demo.
+El catálogo conserva su procedencia en «Información del catálogo». Para ensayar
+el saludo manual, abrir `/?demo=mirada`; no depende del catálogo sintético.
+OpenAI, Points y WhatsApp requieren sus respectivas conexiones reales: ocultar
+controles de ensayo no configura proveedores ni valida los precios de ejemplo.
+
 ## Requisitos e integraciones
 
 El PDF exige para Jarvis informar sobre negocios, horarios, productos, servicios,

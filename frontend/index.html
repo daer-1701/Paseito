@@ -58,6 +58,9 @@
                        background: rgba(231, 183, 58, .12); border: 1px solid rgba(231, 183, 58, .28); font-size: .72rem; font-weight: 700; }
   .estado-confianza::before { content: "✓"; width: 15px; height: 15px; display: grid; place-items: center; border-radius: 50%;
                               color: var(--vino-oscuro); background: var(--oro); font-size: .65rem; }
+  .info-catalogo { color: var(--tenue); text-decoration: none; font-size: .78rem; }
+  .info-catalogo:hover { color: var(--oro-claro); }
+  #demo-mirada { border: 1px solid var(--borde); background: var(--vidrio); color: var(--crema); }
   #reloj { text-align: right; line-height: 1.1; }
   #reloj b { font-size: 1.25rem; font-variant-numeric: tabular-nums; }
   #reloj small { display: block; color: var(--tenue); font-size: .75rem; text-transform: capitalize; }
@@ -188,7 +191,7 @@
   #inicio h1 { margin: 0; font-size: clamp(2.2rem, 6vh, 4rem); text-shadow: 0 6px 24px rgba(0, 0, 0, .4); }
   #inicio h1 span { color: var(--oro-claro); }
   #inicio p { margin: 8px 0 26px; font-size: clamp(1rem, 2.3vh, 1.35rem); color: var(--tenue); }
-  #inicio .boton { padding: 16px 34px; border-radius: 999px; font-weight: 700; font-size: 1.15rem; color: var(--vino-oscuro);
+  #inicio .boton { appearance: none; border: none; padding: 16px 34px; border-radius: 999px; font-weight: 700; font-size: 1.15rem; color: var(--vino-oscuro);
                    background: linear-gradient(135deg, var(--oro-claro), var(--oro)); box-shadow: 0 10px 30px rgba(0, 0, 0, .3);
                    animation: latido 1.6s infinite; }
   @keyframes latido { 50% { transform: scale(1.06); box-shadow: 0 14px 40px rgba(0, 0, 0, .35); } }
@@ -258,7 +261,7 @@
 
 <header id="cabecera" class="vidrio">
   <div class="derecha">
-    <a class="estado-confianza" href="/catalog/demo" style="color:var(--oro-claro);text-decoration:none">Respuestas con fuentes</a>
+    <a class="info-catalogo" href="/catalog/demo" title="Origen y alcance de los datos del catálogo">Información del catálogo</a>
     <button id="nueva" title="Empezar de nuevo">↺ Nueva conversación</button>
     <div id="reloj"><b>--:--</b><small></small></div>
     <div class="punto" title="En línea"></div>
@@ -469,7 +472,12 @@ if (window.visualViewport) {
 }
 let puntoKiosco = "Punto del kiosco pendiente de configurar";
 let baseMovil = "";
-fetch("/kiosk/config").then(r => r.json()).then(c => { puntoKiosco = c.origin; baseMovil = c.public_base_url || ""; if (c.demo_catalog) { $("demo-mirada").hidden = false; const label = document.querySelector(".estado-confianza"); label.textContent = "Modo demo"; label.title = "Catálogo, promociones y algunos horarios son datos de prueba. Consulta /catalog/demo para conocer su alcance."; } }).catch(() => {});
+// Manual gaze rehearsal is opt-in; catalogue provenance does not enable debug controls.
+$("demo-mirada").hidden = new URLSearchParams(location.search).get("demo") !== "mirada";
+fetch("/kiosk/config").then(r => r.json()).then(c => {
+  puntoKiosco = c.origin;
+  baseMovil = c.public_base_url || "";
+}).catch(() => {});
 
 function tarjetaHtml(t, n) {
   if (t.vigente_hasta || t.termina) t.vence = t.vigente_hasta || t.termina;
