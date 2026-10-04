@@ -930,7 +930,48 @@ export class Avatar3D {
     // this.paseo.rotation.y = 0.4;
     // this.paseo.scale.setScalar(0.75);
     // e.add(this.paseo);
+// ==================== CALLE ====================
 
+const materialCalle = new THREE.MeshStandardMaterial({
+  color: 0x383b40,
+  roughness: 1,
+  metalness: 0
+});
+
+const calle = new THREE.Mesh(
+  new THREE.PlaneGeometry(20, 35),
+  materialCalle
+);
+
+calle.rotation.x = -Math.PI / 2;
+
+// La calle va hacia el fondo, donde están las casas y el Tunari
+calle.position.set(0, -0.001, -15);
+
+calle.receiveShadow = true;
+
+e.add(calle);
+
+
+// Líneas blancas del centro
+const materialLinea = new THREE.MeshBasicMaterial({
+  color: 0xf5f1df
+});
+
+for (let z = -2; z > -32; z -= 4) {
+
+  const linea = new THREE.Mesh(
+    new THREE.PlaneGeometry(0.09, 1.8),
+    materialLinea
+  );
+
+  linea.rotation.x = -Math.PI / 2;
+  linea.position.set(0, 0.005, z);
+
+  e.add(linea);
+}
+
+// ==================== FIN CALLE ====================
     // plataforma celeste y blanca con halo que cambia de color según el estado
     const base = new THREE.Mesh(
       new THREE.CylinderGeometry(1.15, 1.25, 0.14, 72),
