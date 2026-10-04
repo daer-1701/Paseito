@@ -1,6 +1,8 @@
 # Presentación: despliegue y revisión de integraciones
 
-Estado: propuesta para revisar; sin cambios de DNS, sin publicación y sin integración de los PR de UX/UI. Consulta realizada el 3 de octubre de 2026, hora de Bolivia.
+Estado del despliegue: propuesta para revisar; sin cambios de DNS ni publicación. Consulta realizada el 3 de octubre de 2026, hora de Bolivia.
+
+Actualización posterior: el usuario aprobó como definitivos los PR de UX/UI. Se activaron en `main` los modelos, suelo, árboles, iluminación horaria, desenfoque y cambios de cabecera. Se alojaron localmente las dependencias de posprocesado y se reactivó la resolución adaptativa, preservando los controles de la aplicación unificada. La revisión siguiente documenta los hallazgos previos a esa activación.
 
 ## Objetivo
 

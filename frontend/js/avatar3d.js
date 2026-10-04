@@ -14,7 +14,14 @@
 //   avatar.encuadre({ arriba, abajo, izquierda, derecha });  // px que tapa la interfaz
 
 import * as THREE from "three";
+import { EffectComposer } from "../vendor/three/addons/postprocessing/EffectComposer.js";
+import { RenderPass } from "../vendor/three/addons/postprocessing/RenderPass.js";
+import { BokehPass } from "../vendor/three/addons/postprocessing/BokehPass.js";
+import { OutputPass } from "../vendor/three/addons/postprocessing/OutputPass.js";
 import { FORMAS, formaEn, formaPorVolumen, palabraEn, planDePalabra, prepararPlan } from "./habla.js";
+import { crearCristoGLB } from './cristoGLB.js';
+import { crearEdificioGLB } from './edificioGLB.js';
+import { crearArboles } from './arbolesGLB.js';
 
 const C = {
   piel: 0xc68a5c, pielOscura: 0xa96f46, cabello: 0x1e1412, sombrero: 0xf7f3ea, cinta: 0x151515,
@@ -23,6 +30,11 @@ const C = {
 };
 const COLOR_ESTADO = { normal: 0xe7b73a, escuchando: 0xff5470, pensando: 0x8f7bff };
 const CLAVES_BOCA = Object.keys(FORMAS.reposo);
+const CIELO = {
+  arriba: { noche: new THREE.Color(0x07132e), dia: new THREE.Color(0x2f6fc4), dorado: new THREE.Color(0x421c4c) },
+  medio: { noche: new THREE.Color(0x20385e), dia: new THREE.Color(0x8cc3ec), dorado: new THREE.Color(0xd06b5d) },
+  horizonte: { noche: new THREE.Color(0x514766), dia: new THREE.Color(0xf7d8ad), dorado: new THREE.Color(0xf2a45e) },
+};
 
 // Proporciones chibi: cabeza grande sobre un cuerpo corto. La pollera se acorta BAJA y el torso baja lo mismo,
 // así todo lo que está en coordenadas del torso (poses, trenzas, cabeza) no cambia.
@@ -148,6 +160,31 @@ const texturaPlataforma = () => lienzo(512, 512, (g, w) => {
     g.restore();
   }
 });
+
+const texturaValle = () => {
+  const textura = lienzo(512, 512, (g, w, h) => {
+    g.fillStyle = "#71894f";
+    g.fillRect(0, 0, w, h);
+    for (let i = 0; i < 1800; i++) {
+      const x = (i * 197) % w;
+      const y = (i * 317) % h;
+      const tono = i % 5 === 0 ? "rgba(46,70,38,.18)" : "rgba(190,170,94,.13)";
+      g.fillStyle = tono;
+      g.fillRect(x, y, 2 + (i % 4), 1 + (i % 3));
+    }
+    g.strokeStyle = "rgba(37,65,38,.18)";
+    g.lineWidth = 2;
+    for (let y = 18; y < h; y += 27) {
+      g.beginPath();
+      g.moveTo(0, y);
+      g.quadraticCurveTo(w * 0.45, y - 8, w, y + 5);
+      g.stroke();
+    }
+  });
+  textura.wrapS = textura.wrapT = THREE.RepeatWrapping;
+  textura.repeat.set(14, 14);
+  return textura;
+};
 
 /**
  * Cristo de la Concordia con sus proporciones reales (1 unidad = 10 m): imagen de 3,42 sobre pedestal de 0,62,
@@ -371,6 +408,7 @@ export class Avatar3D {
   constructor(contenedor, { calidadAdaptativa = true } = {}) {
     this.contenedor = contenedor;
     this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+    this.tInicio = performance.now();
     this.renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     // Si el equipo no llega a ~40 cuadros por segundo se baja la resolución interna (y se recupera si sobra).
     this.calidad = {
@@ -434,9 +472,23 @@ export class Avatar3D {
       giroPrevio: 0, caderaPrevia: 0, cabezaPrevia: 0,
       polleraGiro: { x: 0, v: 0 }, polleraX: { x: 0, v: 0 }, polleraZ: { x: 0, v: 0 },
     };
+    this.ultimaHoraDia = -1;
 
     this._construirEscena();
     this._construirPersonaje();
+    this.personaje.traverse((objeto) => objeto.layers.set(1));
+    this.escena.traverse((objeto) => {
+      if (objeto.isLight) objeto.layers.enable(1);
+    });
+    this.compositor = new EffectComposer(this.renderer);
+    this.compositor.addPass(new RenderPass(this.escena, this.camara));
+    this.desenfoque = new BokehPass(this.escena, this.camara, {
+      focus: 3.5,
+      aperture: 0.006,
+      maxblur: 0.006,
+    });
+    this.compositor.addPass(this.desenfoque);
+    this.compositor.addPass(new OutputPass());
 
     this.reloj = new THREE.Clock();
     this._redimensionar();
@@ -600,18 +652,16 @@ export class Avatar3D {
     const azar = aleatorio(11);
     const horizonte = new THREE.Color(0xf7d8ad);
 
-    const cielo = new THREE.Mesh(
-      new THREE.SphereGeometry(95, 32, 16),
-      new THREE.ShaderMaterial({
-        side: THREE.BackSide, depthWrite: false,
-        uniforms: {
-          cArriba: { value: new THREE.Color(0x2f6fc4) },
-          cMedio: { value: new THREE.Color(0x8cc3ec) },
-          cHorizonte: { value: horizonte },
-        },
-        vertexShader: `varying vec3 vDir;
+    const materialCielo = new THREE.ShaderMaterial({
+      side: THREE.BackSide, depthWrite: false,
+      uniforms: {
+        cArriba: { value: CIELO.arriba.dia.clone() },
+        cMedio: { value: CIELO.medio.dia.clone() },
+        cHorizonte: { value: horizonte },
+      },
+      vertexShader: `varying vec3 vDir;
           void main() { vDir = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
-        fragmentShader: `uniform vec3 cArriba; uniform vec3 cMedio; uniform vec3 cHorizonte; varying vec3 vDir;
+      fragmentShader: `uniform vec3 cArriba; uniform vec3 cMedio; uniform vec3 cHorizonte; varying vec3 vDir;
           void main() {
             float h = vDir.y;
             vec3 c = mix(cMedio, cArriba, smoothstep(0.05, 0.6, h));
@@ -620,8 +670,9 @@ export class Avatar3D {
             #include <tonemapping_fragment>
             #include <colorspace_fragment>
           }`,
-      }),
-    );
+    });
+    this.materialCielo = materialCielo;
+    const cielo = new THREE.Mesh(new THREE.SphereGeometry(95, 32, 16), materialCielo);
     e.add(cielo);
     e.fog = new THREE.Fog(horizonte, 22, 80);
 
@@ -630,17 +681,24 @@ export class Avatar3D {
     }));
     sol.scale.setScalar(16);
     sol.position.set(20, 22, -62);
+    this.sol = sol;
     e.add(sol);
 
-    e.add(new THREE.HemisphereLight(0xcfe3ff, 0x6b4a3a, 1.6));
-    const luz = new THREE.DirectionalLight(0xfff0d8, 2.6);
+    this.luzCielo = new THREE.HemisphereLight(0xcfe3ff, 0x6b4a3a, 1.35);
+    e.add(this.luzCielo);
+    const luz = this.luzPrincipal = new THREE.DirectionalLight(0xffedcf, 2.8);
     luz.position.set(2.2, 4.2, 3.2);
     luz.castShadow = true;
     luz.shadow.mapSize.set(1024, 1024);
     Object.assign(luz.shadow.camera, { left: -1.6, right: 1.6, top: 2.6, bottom: -0.6, near: 0.5, far: 12 });
     luz.shadow.bias = -0.0008;
+    luz.shadow.normalBias = 0.018;
+    luz.shadow.radius = 2;
     e.add(luz);
-    const contraluz = new THREE.DirectionalLight(0xffc27a, 1.8);
+    const relleno = this.luzRelleno = new THREE.DirectionalLight(0x9bc8ff, 0.75);
+    relleno.position.set(-4, 3.2, 4.5);
+    e.add(relleno);
+    const contraluz = this.luzContraluz = new THREE.DirectionalLight(0xffb36b, 1.25);
     contraluz.position.set(-3, 2.5, -2.5);
     e.add(contraluz);
 
@@ -654,7 +712,7 @@ export class Avatar3D {
       p.setZ(i, d > 9 ? loma * Math.min(1, (d - 9) / 25) : 0);
     }
     suelo.computeVertexNormals();
-    const valle = new THREE.Mesh(suelo, new THREE.MeshStandardMaterial({ color: 0x8aa35c, flatShading: true, roughness: 1 }));
+    const valle = new THREE.Mesh(suelo, new THREE.MeshStandardMaterial({ map: texturaValle(), color: 0xb3b878, flatShading: true, roughness: 1 }));
     valle.rotation.x = -Math.PI / 2;
     valle.position.y = -0.02;
     valle.receiveShadow = true;
@@ -766,7 +824,7 @@ export class Avatar3D {
     }
     this.cerro.add(arbustos);
 
-    const cristo = crearCristo();
+    const cristo = crearCristoGLB(4);
     cristo.position.y = 2.5;
     cristo.rotation.y = -0.2;
     cristo.scale.setScalar(1.2);
@@ -801,21 +859,119 @@ export class Avatar3D {
     e.add(this.cerro);
 
     // edificio del Paseo Aranjuez
-    this.paseo = new THREE.Group();
-    const vidrio = new THREE.MeshStandardMaterial({ color: 0x9cc7e0, metalness: 0.35, roughness: 0.2, emissive: 0x1d3a4f });
-    const losa = new THREE.MeshStandardMaterial({ color: 0xf2efe8, roughness: 0.7 });
-    this.paseo.add(colocar(new THREE.Mesh(new THREE.BoxGeometry(5, 2.7, 2.6), vidrio), 0, 1.35, 0));
-    for (const y of [0.05, 0.9, 1.8, 2.7]) {
-      this.paseo.add(colocar(new THREE.Mesh(new THREE.BoxGeometry(5.3, 0.12, 2.9), losa), 0, y, 0));
-    }
-    const letrero = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 0.6), new THREE.MeshBasicMaterial({ map: texturaLetrero() }));
-    letrero.position.set(0, 3.15, 1.0);
-    this.paseo.add(letrero);
-    this.paseo.position.set(-7, 0, -15);
+     this.paseo = crearEdificioGLB(7);
+    this.paseo.position.set(-7, 0.5, -15);
     this.paseo.rotation.y = 0.4;
-    this.paseo.scale.setScalar(0.75);
+    this.paseo.scale.setScalar(1);
     e.add(this.paseo);
+        // árboles de fondo (modelo GLB, se carga una vez y se clona)
+    this.arboles = crearArboles('assets/modelos/arbol1.glb', [
+      [-6.5, -7, 1.3],
+      [6.5, -8, 1.5],
+      [-10, -11, 1.4],
+      [10, -12, 1.6],
+      [-4.5, -13, 1.3],
+      [4.5, -14, 1.5],
+      [-11, -17, 1.7],
+      [11, -18, 1.5],
+      [-3.8, -20, 1.4],
+      [3.8, -21, 1.6],
+      [-13, -24, 1.8],
+      [13, -25, 1.7],
+      [-9, -29, 1.8],
+      [8, -31, 1.9],
+      [-16, -35, 2.0],
+      [15, -37, 2.0],
+      [-6, -41, 2.1],
+      [7, -43, 2.2],
+    ]);
+    e.add(this.arboles);
+      this.arbolGrande = crearArboles('assets/modelos/arbol1.glb', [
+      [1.0, -6.5, 2.5],
+    ]);
+    e.add(this.arbolGrande);
+     this.arbolGrande.position.y = -0.3;
+    this.lucesEdificio = [];
+    const materialFocoEdificio = new THREE.MeshStandardMaterial({
+      color: 0xffb347, emissive: 0xff8a2a, emissiveIntensity: 0.2, roughness: 0.3,
+    });
+    for (let i = 0; i < 7; i++) {
+      const foco = new THREE.Mesh(new THREE.SphereGeometry(0.055, 12, 8), materialFocoEdificio);
+      foco.position.set(-2.7 + i * 0.9, 0.18, 1.35);
+      this.paseo.add(foco);
+      this.lucesEdificio.push({ material: materialFocoEdificio });
+    }
+    for (const x of [-1.8, 0, 1.8]) {
+      const luzEdificio = new THREE.PointLight(0xffa34d, 0, 3.8, 2);
+      luzEdificio.position.set(x, 0.35, 1.1);
+      this.paseo.add(luzEdificio);
+      this.lucesEdificio.push({ luz: luzEdificio });
+    }
+    this.spotsTorre = [];
+    for (const x of [-1.5, 2.1]) {
+      const spot = new THREE.SpotLight(0xffa31a, 70, 18, 0.8, 0.6, 1);
+      spot.position.set(x, 2.0, 3.0);              // antes y = 3.0; más abajo
+      spot.target.position.set(x, 6.0, 0.0);       // antes 7.5; apunta más abajo
+      this.paseo.add(spot);
+      this.paseo.add(spot.target);
+      this.spotsTorre.push(spot);
+    }
+    // this.paseo = new THREE.Group();
+    // const vidrio = new THREE.MeshStandardMaterial({ color: 0x9cc7e0, metalness: 0.35, roughness: 0.2, emissive: 0x1d3a4f });
+    // const losa = new THREE.MeshStandardMaterial({ color: 0xf2efe8, roughness: 0.7 });
+    // this.paseo.add(colocar(new THREE.Mesh(new THREE.BoxGeometry(5, 2.7, 2.6), vidrio), 0, 1.35, 0));
+    // for (const y of [0.05, 0.9, 1.8, 2.7]) {
+    //   this.paseo.add(colocar(new THREE.Mesh(new THREE.BoxGeometry(5.3, 0.12, 2.9), losa), 0, y, 0));
+    // }
+    // const letrero = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 0.6), new THREE.MeshBasicMaterial({ map: texturaLetrero() }));
+    // letrero.position.set(0, 3.15, 1.0);
+    // this.paseo.add(letrero);
+    // this.paseo.position.set(-7, 0, -15);
+    // this.paseo.rotation.y = 0.4;
+    // this.paseo.scale.setScalar(0.75);
+    // e.add(this.paseo);
+// ==================== CALLE ====================
 
+const materialCalle = new THREE.MeshStandardMaterial({
+  color: 0x383b40,
+  roughness: 1,
+  metalness: 0
+});
+
+const calle = new THREE.Mesh(
+  new THREE.PlaneGeometry(20, 35),
+  materialCalle
+);
+
+calle.rotation.x = -Math.PI / 2;
+
+// La calle va hacia el fondo, donde están las casas y el Tunari
+calle.position.set(0, -0.001, -15);
+
+calle.receiveShadow = true;
+
+e.add(calle);
+
+
+// Líneas blancas del centro
+const materialLinea = new THREE.MeshBasicMaterial({
+  color: 0xf5f1df
+});
+
+for (let z = -2; z > -32; z -= 4) {
+
+  const linea = new THREE.Mesh(
+    new THREE.PlaneGeometry(0.09, 1.8),
+    materialLinea
+  );
+
+  linea.rotation.x = -Math.PI / 2;
+  linea.position.set(0, 0.005, z);
+
+  e.add(linea);
+}
+
+// ==================== FIN CALLE ====================
     // plataforma celeste y blanca con halo que cambia de color según el estado
     const base = new THREE.Mesh(
       new THREE.CylinderGeometry(1.15, 1.25, 0.14, 72),
@@ -839,6 +995,25 @@ export class Avatar3D {
     this.halo.rotation.x = -Math.PI / 2;
     this.halo.position.y = 0.004;
     e.add(base, tapa, this.anillo, this.halo);
+
+    this.foquitos = [];
+    this.lucesPlataforma = [];
+    const materialFoco = new THREE.MeshStandardMaterial({
+      color: 0xffc45c, emissive: 0xff8a2a, emissiveIntensity: 0.2, roughness: 0.35,
+    });
+    for (let i = 0; i < 8; i++) {
+      const angulo = (i / 8) * Math.PI * 2;
+      const foco = new THREE.Mesh(new THREE.SphereGeometry(0.035, 12, 8), materialFoco);
+      foco.position.set(Math.cos(angulo) * 0.96, 0.08, Math.sin(angulo) * 0.96);
+      this.foquitos.push(foco);
+      e.add(foco);
+    }
+    for (const angulo of [0.2, Math.PI + 0.2, Math.PI / 2, Math.PI * 1.5]) {
+      const luzFoco = new THREE.PointLight(0xffa34d, 0, 2.8, 2);
+      luzFoco.position.set(Math.cos(angulo) * 0.82, 0.18, Math.sin(angulo) * 0.82);
+      this.lucesPlataforma.push(luzFoco);
+      e.add(luzFoco);
+    }
 
     // polvo dorado que sube alrededor
     const cantidad = 260;
@@ -1287,6 +1462,7 @@ export class Avatar3D {
     const w = this.contenedor.clientWidth || innerWidth;
     const h = this.contenedor.clientHeight || innerHeight;
     this.renderer.setSize(w, h, false);
+    this.compositor?.setSize(w, h);
     const cam = this.camara;
     cam.aspect = w / h;
     const tanV = Math.tan(THREE.MathUtils.degToRad(cam.fov / 2));
@@ -1304,6 +1480,13 @@ export class Avatar3D {
     if (dx || dy) cam.setViewOffset(w, h, dx, dy, w, h);
     else cam.clearViewOffset();
     cam.updateProjectionMatrix();
+     if (this.desenfoque) {
+    const esCelular = w < 768;
+
+    this.desenfoque.uniforms.focus.value = 3.5;
+    this.desenfoque.uniforms.aperture.value = esCelular ? 0.009 : 0.006;
+    this.desenfoque.uniforms.maxblur.value = esCelular ? 0.012 : 0.006;
+  }
   }
 
   // ---------- Animación ----------
@@ -1313,6 +1496,51 @@ export class Avatar3D {
     let suma = 0;
     for (const v of this.buffer) suma += ((v - 128) / 128) ** 2;
     return Math.sqrt(suma / this.buffer.length);
+  }
+
+  _actualizarHoraDelDia() {
+    const ahora = new Date();
+    //const hora=2;
+    const hora = ahora.getHours() + ahora.getMinutes() / 60;
+    if (Math.abs(hora - this.ultimaHoraDia) < 1 / 120) return;
+    this.ultimaHoraDia = hora;
+
+    const dia = limitar(Math.sin(((hora - 6) / 12) * Math.PI), 0, 1);
+    const amanecer = limitar(1 - Math.abs(hora - 7) / 1.8, 0, 1);
+    const atardecer = limitar(1 - Math.abs(hora - 18) / 2.2, 0, 1);
+    const dorado = Math.max(amanecer, atardecer);
+
+    this.luzCielo.intensity = 0.55 + dia * 0.9;
+    this.luzCielo.color.setRGB(0.58 + dia * 0.24, 0.68 + dia * 0.22, 0.98);
+    this.luzCielo.groundColor.setRGB(0.12 + dia * 0.3, 0.1 + dia * 0.2, 0.18 + dia * 0.12);
+
+    this.luzPrincipal.intensity = 0.55 + dia * 2.05 + dorado * 0.3;
+    this.luzPrincipal.color.setRGB(1, 0.72 + dia * 0.2, 0.5 + dia * 0.35);
+    this.luzRelleno.intensity = 0.35 + dia * 0.55;
+    this.luzRelleno.color.setRGB(0.35 + dia * 0.25, 0.55 + dia * 0.25, 1);
+    this.luzContraluz.intensity = 0.35 + dorado * 1.1;
+    this.luzContraluz.color.setRGB(1, 0.34 + dia * 0.35, 0.18 + dia * 0.25);
+
+    this.sol.material.opacity = 0.08 + dia * 0.92 + dorado * 0.12;
+    this.sol.material.color.setRGB(1, 0.55 + dia * 0.35, 0.25 + dia * 0.55);
+    this.sol.position.x = Math.cos(((hora - 12) / 12) * Math.PI) * 38;
+    this.sol.position.y = 8 + dia * 24;
+    this.sol.position.z = -52 - dia * 18;
+
+    for (const [nombre, colores] of Object.entries(CIELO)) {
+      this.materialCielo.uniforms[`c${nombre[0].toUpperCase()}${nombre.slice(1)}`].value
+        .copy(colores.noche)
+        .lerp(colores.dia, dia)
+        .lerp(colores.dorado, dorado * 0.7);
+    }
+
+    const noche = 1 - dia;
+    for (const luz of this.lucesPlataforma) luz.intensity = noche * 0.75;
+    for (const foco of this.foquitos) foco.material.emissiveIntensity = 0.2 + noche * 2.2;
+    for (const elemento of this.lucesEdificio) {
+      if (elemento.luz) elemento.luz.intensity = noche * 1.1;
+      if (elemento.material) elemento.material.opacity = 0.08 + noche * 0.92;
+    }
   }
 
   /** Movimientos de reposo variados para que no se vea en bucle; nunca repite el anterior. */
@@ -1348,6 +1576,7 @@ export class Avatar3D {
     const r = this.rostro;
     const estado = this._estado;
     const hablando = !!(this.analizador || this.simulado);
+    this._actualizarHoraDelDia();
 
     // boca: forma del sonido que suena (plan alineado al audio), de la palabra (voz del navegador) o del volumen
     const objetivo = this._forma;
@@ -1516,8 +1745,15 @@ export class Avatar3D {
     cam.position.set(px, this.objetivo.y + 0.1 + py, this.distancia);
     cam.lookAt(this.objetivo);
 
+    cam.layers.set(0);
+    this.compositor.render();
+    this.renderer.autoClear = false;
+    this.renderer.clearDepth();
+    cam.layers.set(1);
     this.renderer.render(this.escena, cam);
-    this._ajustarCalidad(real, ahora);
+    cam.layers.enable(0);
+    this.renderer.autoClear = true;
+    if (ahora - this.tInicio > 8000) this._ajustarCalidad(real, ahora);
   }
 
   /** Pollera y trenzas con resortes: se quedan atrás al girar o mover la cadera y se mecen un poco al hablar. */
@@ -1586,6 +1822,7 @@ export class Avatar3D {
     if (nuevo !== actual) {
       c.ultimoCambio = ahora;
       this.renderer.setPixelRatio(nuevo);
+      this.compositor.setPixelRatio(nuevo);
       this._redimensionar();
     }
   }

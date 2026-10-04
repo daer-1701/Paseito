@@ -1,7 +1,7 @@
 # Versión única: estado vigente tras fases 1–3
 
-Fecha: 2026-10-03. Producto Paseito para el reto Jarvis. Rama de entrega:
-`feat/etapa3-limpieza`, basada en etapa 2 (`f972a5f`) y aportes de etapa 1 (`114c0c5`).
+Fecha: 2026-10-03. Producto Paseito para el reto Jarvis. Rama de entrega: `main`,
+con las fases 1–3 integradas y el diseño definitivo de smm222-cyber activo.
 
 ## Arquitectura y aportes conservados
 
@@ -10,7 +10,7 @@ Fecha: 2026-10-03. Producto Paseito para el reto Jarvis. Rama de entrega:
 | API | FastAPI único en backend/app/main.py |
 | Datos | SQLite versionado, 1801 registros cargados; catálogo, precios y promociones de demo con procedencia |
 | IA | OpenAI Responses y respaldo local; clave ausente en la torre actual |
-| UX | Kiosco web responsive, avatar del compañero, visemas, 20 imágenes y 120 productos incorporados |
+| UX | Kiosco responsive, diseño definitivo de smm222-cyber (PR #4/#5): modelos GLB, árboles, suelo, iluminación horaria y desenfoque; dependencias Three.js locales y resolución adaptativa. Conserva visemas, QR, conversación, 20 imágenes y 120 productos incorporados |
 | Voz | Whisper/Kokoro GPU con streaming, cancelación y respaldo del navegador; GPU lista |
 | WhatsApp | Demo local y conector Twilio con firma y deduplicación; entrega real pendiente |
 | Administración | CRUD, calidad y analytics con token obligatorio |
